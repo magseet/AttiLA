@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.20617.1 PREVIEW
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttiLAservice", "AttiLAservice\AttiLAservice.csproj", "{83A83622-5725-4DCF-8502-C4302CB84622}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttiLA.Service", "AttiLAservice\AttiLA.Service.csproj", "{83A83622-5725-4DCF-8502-C4302CB84622}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedWifi", "managedwifi-1.1\ManagedWifi.csproj", "{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttiLA.Data", "AttiLA.Data\AttiLA.Data.csproj", "{EE8E2895-5075-41B6-8742-2711DCE3B573}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE8E2895-5075-41B6-8742-2711DCE3B573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE8E2895-5075-41B6-8742-2711DCE3B573}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE8E2895-5075-41B6-8742-2711DCE3B573}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE8E2895-5075-41B6-8742-2711DCE3B573}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

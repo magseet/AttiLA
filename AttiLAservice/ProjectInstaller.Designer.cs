@@ -1,4 +1,4 @@
-﻿namespace AttiLA
+﻿namespace AttiLA.Service
 {
     partial class ProjectInstaller
     {

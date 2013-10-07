@@ -5,16 +5,16 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-
-namespace AttiLA
+namespace AttiLA.Service
 {
+
     static class Program
     {
         /// <summary>
         /// Punto di ingresso principale dell'applicazione.
         /// </summary>
         static void Main()
-        {
+        {           
 #if DEBUG
             AttiLAservice svc = new AttiLAservice();
             svc.OnDebug();

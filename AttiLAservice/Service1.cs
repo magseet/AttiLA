@@ -11,8 +11,9 @@ using System.Globalization;
 using System.Resources;
 using NativeWifi;
 using System.Threading;
+using AttiLA.Data;
 
-namespace AttiLA
+namespace AttiLA.Service
 {
     public partial class AttiLAservice : ServiceBase
     {

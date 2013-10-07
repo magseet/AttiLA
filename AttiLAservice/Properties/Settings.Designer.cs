@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AttiLA.Properties {
+namespace AttiLA.Service.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
