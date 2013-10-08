@@ -3,7 +3,7 @@
     using System;
     using MongoDB.Bson;
 
-    interface IMongoEntity
+    public interface IMongoEntity
     {
         ObjectId Id { get; set; }
     }
