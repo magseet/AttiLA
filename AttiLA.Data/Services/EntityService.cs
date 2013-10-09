@@ -1,4 +1,6 @@
-﻿namespace AttiLA.Data.Services
+﻿using System;
+
+namespace AttiLA.Data.Services
 {
     using MongoDB.Bson;
     using MongoDB.Driver;
@@ -11,6 +13,10 @@
 
         public virtual void Create(T entity)
         {
+            if(entity==null)
+            {
+                throw new ArgumentNullException("entity");
+            }
             //// Save the entity with safe mode (WriteConcern.Acknowledged)
             var result = this.MongoConnectionHandler.MongoCollection.Save(
                 entity,
@@ -21,7 +27,7 @@
 
             if (!result.Ok)
             {
-                //// Something went wrong
+                throw new DataException(Properties.Resources.MsgErrorCreate + typeof(T).ToString());
             }
         }
 
@@ -35,7 +41,7 @@
 
             if (!result.Ok)
             {
-                //// Something went wrong
+                throw new DataException(Properties.Resources.MsgErrorDelete + typeof(T).ToString());
                 
             }
         }

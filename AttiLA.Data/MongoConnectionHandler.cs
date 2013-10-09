@@ -16,13 +16,13 @@ namespace AttiLA.Data
         public MongoConnectionHandler()
         {
             //// Get a thread-safe client object by using a connection string
-            var mongoClient = new MongoClient(Properties.Settings.Default.connectionString);
+            var mongoClient = new MongoClient(Properties.Settings.Default.ConnectionString);
 
             //// Get a reference to a server object from the Mongo client object
             var mongoServer = mongoClient.GetServer();
 
             //// Get a reference to the database object from the Mongo server object
-            var db = mongoServer.GetDatabase(Properties.Settings.Default.databaseName);
+            var db = mongoServer.GetDatabase(Properties.Settings.Default.DatabaseName);
 
             //// Get a reference to the collection object from the Mongo database object
             //// The collection name is the type converted to lowercase + "s"

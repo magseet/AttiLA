@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AttiLA.WindowsService.Properties {
+namespace AttiLA.WCFservice.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -23,15 +23,12 @@ namespace AttiLA.WindowsService.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string Setting {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public double SecondsBetweenSamples {
             get {
-                return ((string)(this["Setting"]));
-            }
-            set {
-                this["Setting"] = value;
+                return ((double)(this["SecondsBetweenSamples"]));
             }
         }
     }

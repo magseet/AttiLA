@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace AttiLA.Data
 {
-    public class ServiceException : Exception, ISerializable
+    public class DataException : Exception, ISerializable
     {
 
-        public ServiceException() { }
-        public ServiceException(string message) { }
-        public ServiceException(string message, Exception inner) { }
-        public ServiceException(SerializationInfo info, StreamingContext context) { }
+        public DataException() { }
+        public DataException(string message) { }
+        public DataException(string message, Exception inner) { }
+        public DataException(SerializationInfo info, StreamingContext context) { }
     }
 }

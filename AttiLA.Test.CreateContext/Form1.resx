@@ -117,13 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MsgErrorAddScanExample" xml:space="preserve">
-    <value>Error inserting a new example in the training set.</value>
-  </data>
-  <data name="MsgErrorCreate" xml:space="preserve">
-    <value>Error creating new document in the database:</value>
-  </data>
-  <data name="MsgErrorDelete" xml:space="preserve">
-    <value>Error deleting document from the database:</value>
-  </data>
 </root>

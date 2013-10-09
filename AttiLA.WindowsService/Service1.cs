@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Resources;
+using System.ServiceModel;
+using System.ServiceModel.Description;
 using NativeWifi;
 using System.Threading;
 using AttiLA.Data;
@@ -17,6 +19,8 @@ namespace AttiLA.WindowsService
 {
     public partial class AttiLAWindowsService : ServiceBase
     {
+        ServiceHost serviceHost;
+
         /// <summary>
         /// Manager Wifi object
         /// </summary>
@@ -134,6 +138,32 @@ namespace AttiLA.WindowsService
 #if ! DEBUG
             eventLog.WriteEntry(AttiLA.Properties.Resources.logmsg_start);
 #endif
+            if(serviceHost != null)
+            {
+                serviceHost.Close();
+            }
+            // Create a URI to serve as the base address
+            Uri httpUrl = new Uri(Properties.Settings.Default.ServiceHostURL);
+            // Create ServiceHost
+            serviceHost = new ServiceHost(typeof(AttiLA.WCFservice.LocalizationService), httpUrl);
+            try
+            {
+                // Add a service endpoint
+                serviceHost.AddServiceEndpoint
+                (typeof(AttiLA.WCFservice.ILocalizationService), new WSHttpBinding(), "");
+                // Enable metadata exchange
+                ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
+                smb.HttpGetEnabled = true;
+                serviceHost.Description.Behaviors.Add(smb);
+                // Start the Service
+                serviceHost.Open();
+
+            }
+            catch(CommunicationException)
+            {
+                serviceHost.Abort();
+                Thread.CurrentThread.Abort();
+            }
         }
 
         protected override void OnStop()
@@ -141,6 +171,11 @@ namespace AttiLA.WindowsService
 #if ! DEBUG
             eventLog.WriteEntry(AttiLA.Properties.Resources.logmsg_stop);
 #endif
+            if(serviceHost != null)
+            {
+                serviceHost.Close();
+                serviceHost = null;
+            }
         }
     }
 }

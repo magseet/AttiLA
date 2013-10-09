@@ -12,6 +12,7 @@ namespace AttiLA.Data.Entities
         {
             Features = new Dictionary<string, Feature>();
             Statistics = new List<ContextStatistics>();
+            TrainingSet = new List<ScanExample>();
         }
 
         /// <summary>

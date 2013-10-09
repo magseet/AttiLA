@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AttiLA.Data.Properties {
+namespace AttiLA.WindowsService.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -23,21 +23,15 @@ namespace AttiLA.Data.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("mongodb://localhost")]
-        public string ConnectionString {
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8090/AttiLAService/AttiLA")]
+        public string ServiceHostURL {
             get {
-                return ((string)(this["ConnectionString"]));
+                return ((string)(this["ServiceHostURL"]));
             }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("AttiLA")]
-        public string DatabaseName {
-            get {
-                return ((string)(this["DatabaseName"]));
+            set {
+                this["ServiceHostURL"] = value;
             }
         }
     }

@@ -68,5 +68,23 @@ namespace AttiLA.Data.Properties {
                 return ResourceManager.GetString("MsgErrorAddScanExample", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Error creating new document in the database:.
+        /// </summary>
+        internal static string MsgErrorCreate {
+            get {
+                return ResourceManager.GetString("MsgErrorCreate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Error deleting document from the database:.
+        /// </summary>
+        internal static string MsgErrorDelete {
+            get {
+                return ResourceManager.GetString("MsgErrorDelete", resourceCulture);
+            }
+        }
     }
 }
