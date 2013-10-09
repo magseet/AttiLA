@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace AttiLA.Data.Entities
 {
     [BsonIgnoreExtraElements]
-    class Context : MongoEntity
+    public class Context : MongoEntity
     {
         public Context()
         {
@@ -25,7 +25,12 @@ namespace AttiLA.Data.Entities
         public DateTime CreationDateTime { get; set; }
 
         /// <summary>
-        /// Data containing informations used to predict the actual context given the current signal relevations.
+        /// The examples used to train the classifier for this context.
+        /// </summary>
+        public List<ScanExample> TrainingSet { get; set; }
+
+        /// <summary>
+        /// The features used to classify a new example.
         /// </summary>
         public Dictionary<string, Feature> Features { get; set; }
 

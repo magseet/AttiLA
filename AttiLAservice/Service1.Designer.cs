@@ -1,6 +1,6 @@
-﻿namespace AttiLA.Service
+﻿namespace AttiLA.WindowsService
 {
-    partial class AttiLAservice
+    partial class AttiLAWindowsService
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.
@@ -31,9 +31,9 @@
             this.eventLog = new System.Diagnostics.EventLog();
             ((System.ComponentModel.ISupportInitialize)(this.eventLog)).BeginInit();
             // 
-            // AttiLAservice
+            // AttiLAWindowsService
             // 
-            this.ServiceName = "AttiLAservice";
+            this.ServiceName = "AttiLAWindowsService";
             ((System.ComponentModel.ISupportInitialize)(this.eventLog)).EndInit();
 
         }

@@ -5,7 +5,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AttiLA.Service
+namespace AttiLA.WindowsService
 {
 
     static class Program
@@ -16,7 +16,7 @@ namespace AttiLA.Service
         static void Main()
         {           
 #if DEBUG
-            AttiLAservice svc = new AttiLAservice();
+            AttiLAWindowsService svc = new AttiLAWindowsService();
             svc.OnDebug();
             System.Threading.Thread.Sleep(System.Threading.Timeout.Infinite);
 #else

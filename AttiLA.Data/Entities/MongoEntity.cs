@@ -8,7 +8,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AttiLA.Data.Entities
 {
-    class MongoEntity : IMongoEntity
+    public class MongoEntity : IMongoEntity
     {
         [BsonId]
         public ObjectId Id { get; set; }

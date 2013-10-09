@@ -121,7 +121,10 @@ namespace AttiLA.Data
                 else
                 {
                     new_mu = (score_N * score_mu + 1.0) / (score_N + 1);
+                    
+                    // useless.. 
                     score_sigma2 = score_sigma2 * (score_N - 1) / score_N + Math.Pow(1.0 - score_mu, 2) / (score_N + 1);
+                    
                     score_mu = new_mu;
                 }
                 score_N++;

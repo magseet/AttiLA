@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AttiLA.Data.Entities
 {
-    class ContextStatistics : MongoEntity
+    public class ContextStatistics : MongoEntity
     {
         /// <summary>
         /// Usage period starting time.

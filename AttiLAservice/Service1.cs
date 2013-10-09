@@ -13,9 +13,9 @@ using NativeWifi;
 using System.Threading;
 using AttiLA.Data;
 
-namespace AttiLA.Service
+namespace AttiLA.WindowsService
 {
-    public partial class AttiLAservice : ServiceBase
+    public partial class AttiLAWindowsService : ServiceBase
     {
         /// <summary>
         /// Manager Wifi object
@@ -82,7 +82,7 @@ namespace AttiLA.Service
         }
 
 
-        public AttiLAservice()
+        public AttiLAWindowsService()
         {
             InitializeComponent();
             // initialize managed wifi

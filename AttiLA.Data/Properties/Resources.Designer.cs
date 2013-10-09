@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AttiLA.WindowsService.Properties {
+namespace AttiLA.Data.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace AttiLA.WindowsService.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AttiLA.WindowsService.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("AttiLA.Data.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,20 +61,11 @@ namespace AttiLA.WindowsService.Properties {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Service started.
+        ///   Cerca una stringa localizzata simile a Error inserting a new example in the training set..
         /// </summary>
-        internal static string logmsg_start {
+        internal static string MsgErrorAddScanExample {
             get {
-                return ResourceManager.GetString("logmsg_start", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Service stopped.
-        /// </summary>
-        internal static string logmsg_stop {
-            get {
-                return ResourceManager.GetString("logmsg_stop", resourceCulture);
+                return ResourceManager.GetString("MsgErrorAddScanExample", resourceCulture);
             }
         }
     }

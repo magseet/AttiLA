@@ -5,36 +5,21 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace AttiLA.Data.Entities
 {
     [BsonIgnoreExtraElements]
-    class Feature : MongoEntity
+    public class Feature : MongoEntity
     {
-        /// <summary>
-        /// The number of samples used to calculate the current Gaussian parameters.
-        /// </summary>
-        public int N { get; set; }
-
         /// <summary>
         /// The Gaussian mean.
         /// </summary>
-        public double Mu { get; set; }
+        public double Mean { get; set; }
 
         /// <summary>
         /// The Gaussian variance.
         /// </summary>
-        public double Sigma2 { get; set; }
+        public double Variance { get; set; }
 
         /// <summary>
-        /// The number of sample used to calculate the current Gaussian parameters for score.
+        /// The percentage of variance explained by the feature.
         /// </summary>
-        public int ScoreN { get; set; }
-
-        /// <summary>
-        /// The Gaussian mean for score.
-        /// </summary>
-        public double ScoreMu { get; set; }
-
-        /// <summary>
-        /// The Gaussian variance for score.
-        /// </summary>
-        public double ScoreSigma2 { get; set; }
+        public int Expl { get; set; }
     }
 }
