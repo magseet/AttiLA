@@ -25,38 +25,42 @@ namespace AttiLA.LocalizationService
         private Dictionary<Guid, AutoResetEvent> wlanEventScanComplete = new Dictionary<Guid, AutoResetEvent>();
 
 
-        int skipScan = 0;
         /// <summary>
-        /// Function that scans WLAN interfaces and returns the signals read.
+        /// Performs a scan of the WLAN interfaces and returns a list of <see cref="AccessPoint"/> elements.
         /// </summary>
         /// <returns></returns>
-        private Dictionary<string, uint> getSignals()
+        private List<AccessPoint> GetAccessPoints()
         {
-            Dictionary<string, uint> signals = new Dictionary<string, uint>();
+            var accessPoints = new List<AccessPoint>();
+
             foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
             {
-                if (skipScan == 0)
-                {
-                    // scan for new network and wait for notification
-                    wlanIface.Scan();
-                    wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
-                }
-                skipScan = (skipScan + 1) % 10;
-
+                // scan for new bss and wait for notification
+                wlanIface.Scan();
+                wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
+                
                 Wlan.WlanBssEntry[] wlanBssEntries = wlanIface.GetNetworkBssList();
-                foreach (Wlan.WlanBssEntry network in wlanBssEntries)
+
+                foreach (Wlan.WlanBssEntry bss in wlanBssEntries)
                 {
-                    byte[] macAddr = network.dot11Bssid;
+                    byte[] macAddr = bss.dot11Bssid;
                     string tMac = "";
                     for (int i = 0; i < macAddr.Length; i++)
                     {
                         tMac += macAddr[i].ToString("x2").PadLeft(2, '0').ToUpper();
                     }
+                    string ssid = Encoding.ASCII.GetString(bss.dot11Ssid.SSID, 0, (int)bss.dot11Ssid.SSIDLength);
 
-                    signals.Add(tMac, network.linkQuality);
+                    accessPoints.Add(new AccessPoint
+                    {
+                        MAC = tMac,
+                        SSID = ssid,
+                        RSSI = bss.rssi,
+                        LinkQuality = bss.linkQuality
+                    });
                 }
             }
-            return signals;
+            return accessPoints;
         }
 
         /// <summary>
@@ -82,7 +86,6 @@ namespace AttiLA.LocalizationService
             }
 
         }
-
 
 
         public WlanScanner()

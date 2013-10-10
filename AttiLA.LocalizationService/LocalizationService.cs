@@ -29,54 +29,50 @@ namespace AttiLA.LocalizationService
         public delegate void TrackerStopNotificationHandler(Context previousContext);
 
         /// <summary>
-        /// Occurs when there is a request to enter in Track mode.
+        /// Occurs when there is a request to enter in track mode.
         /// </summary>
         public event TrackerStartNotificationHandler TrackerStartNotification;
 
         /// <summary>
-        /// Occurs when there is a request to leave the Track mode.
+        /// Occurs when there is a request to leave the track mode.
         /// </summary>
         public event TrackerStopNotificationHandler TrackerStopNotification;
 
         #endregion
 
-
-        /// <summary>
-        /// Changes the sampling rate used in Track mode.
-        /// </summary>
-        /// <param name="milliseconds"></param>
-        public void SetTrackerInterval (double milliseconds)
+        public GlobalSettings GetGlobalSettings()
         {
-            Properties.Settings.Default.TrackerInterval = milliseconds;
+            // TODO..
+            return null;
         }
 
-
-        public void TrackContext(string contextId)
+        public void SetGlobalSettings(GlobalSettings newSettings)
         {
-            if(String.IsNullOrWhiteSpace(contextId))
-            {
-                //// Handle fault here..
-            }
+            // TODO..
+        }
 
+        public void ChangeContext(string newContextId)
+        {
+            // TODO..
+        }
+
+        public void TrackModeStart()
+        {
             lock (lockTracking)
             {
+                // TODO..
 
             }
-
         }
 
-
-        public CompositeType GetDataUsingDataContract(CompositeType composite)
+        public void TrackModeStop()
         {
-            if (composite == null)
+            lock (lockTracking)
             {
-                throw new ArgumentNullException("composite");
+                // TODO..
+
             }
-            if (composite.BoolValue)
-            {
-                composite.StringValue += "Suffix";
-            }
-            return composite;
         }
+        
     }
 }

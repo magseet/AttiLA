@@ -15,8 +15,14 @@ using System.Threading;
 
 namespace AttiLA.WindowsService
 {
+    /// <summary>
+    /// The Windows Service class hosting the WCF localization service.
+    /// </summary>
     public partial class AttiLAWindowsService : ServiceBase
     {
+        /// <summary>
+        /// The hosted WCF service.
+        /// </summary>
         ServiceHost serviceHost;
 
         public AttiLAWindowsService()

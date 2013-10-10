@@ -11,38 +11,63 @@ namespace AttiLA.LocalizationService
     public interface ILocalizationService
     {
         [OperationContract]
-        void SetTrackerInterval(double milliseconds);
+        GlobalSettings GetGlobalSettings();
 
         [OperationContract]
-        void TrackContext(string contextId);
-
+        void SetGlobalSettings(GlobalSettings newSettings);
+            
+        [OperationContract]
+        void ChangeContext(string newContextId);
 
         [OperationContract]
-        CompositeType GetDataUsingDataContract(CompositeType composite);
+        void TrackModeStart();
 
-        // TODO: aggiungere qui le operazioni del servizio
+        [OperationContract]
+        void TrackModeStop();
+        
     }
 
-    // Per aggiungere tipi compositi alle operazioni del servizio utilizzare un contratto di dati come descritto nell'esempio seguente.
-    // È possibile aggiungere file XSD nel progetto. Dopo la compilazione del progetto è possibile utilizzare direttamente i tipi di dati definiti qui con lo spazio dei nomi "AttiLA.LocalizationService.ContractType".
     [DataContract]
-    public class CompositeType
+    public class GlobalSettings
     {
-        bool boolValue = true;
-        string stringValue = "Hello ";
+        [DataMember]
+        TrackerSettings Tracker { get; set; }
+    }
+
+
+    /// <summary>
+    /// Settings related to tracking module.
+    /// </summary>
+    [DataContract]
+    public class TrackerSettings
+    {
+        /// <summary>
+        /// Milliseconds between samples.
+        /// </summary>
+        [DataMember]
+        public double Interval { get; set; }
+
+        /// <summary>
+        /// Milliseconds between savings.
+        /// When the timeout fires, all tracked data are stored in database.
+        /// </summary>
+        public double UpdateInterval { get; set; }
+    }
+
+
+    [DataContract]
+    public class AccessPoint
+    {
+        [DataMember]
+        public string MAC { get; set; }
 
         [DataMember]
-        public bool BoolValue
-        {
-            get { return boolValue; }
-            set { boolValue = value; }
-        }
+        public string SSID { get; set; }
 
         [DataMember]
-        public string StringValue
-        {
-            get { return stringValue; }
-            set { stringValue = value; }
-        }
+        public int RSSI { get; set; }
+
+        [DataMember]
+        public uint LinkQuality { get; set; }
     }
 }
