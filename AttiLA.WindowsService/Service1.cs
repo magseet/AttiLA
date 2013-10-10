@@ -145,12 +145,12 @@ namespace AttiLA.WindowsService
             // Create a URI to serve as the base address
             Uri httpUrl = new Uri(Properties.Settings.Default.ServiceHostURL);
             // Create ServiceHost
-            serviceHost = new ServiceHost(typeof(AttiLA.WCFservice.LocalizationService), httpUrl);
+            serviceHost = new ServiceHost(typeof(AttiLA.LocalizationService.LocalizationService), httpUrl);
             try
             {
                 // Add a service endpoint
                 serviceHost.AddServiceEndpoint
-                (typeof(AttiLA.WCFservice.ILocalizationService), new WSHttpBinding(), "");
+                (typeof(AttiLA.LocalizationService.ILocalizationService), new WSHttpBinding(), "");
                 // Enable metadata exchange
                 ServiceMetadataBehavior smb = new ServiceMetadataBehavior();
                 smb.HttpGetEnabled = true;

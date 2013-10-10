@@ -55,6 +55,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="LocalizationService.cs" />
+    <Compile Include="Tracker.cs" />
+    <Compile Include="WlanScanner.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -62,6 +64,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AttiLA.Data\AttiLA.Data.csproj">
+      <Project>{ee8e2895-5075-41b6-8742-2711dce3b573}</Project>
+      <Name>AttiLA.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

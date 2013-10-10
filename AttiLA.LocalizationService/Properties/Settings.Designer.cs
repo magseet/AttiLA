@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AttiLA.WCFservice.Properties {
+namespace AttiLA.LocalizationService.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
@@ -23,12 +23,15 @@ namespace AttiLA.WCFservice.Properties {
             }
         }
         
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public double SecondsBetweenSamples {
+        [global::System.Configuration.DefaultSettingValueAttribute("200")]
+        public double TrackerInterval {
             get {
-                return ((double)(this["SecondsBetweenSamples"]));
+                return ((double)(this["TrackerInterval"]));
+            }
+            set {
+                this["TrackerInterval"] = value;
             }
         }
     }

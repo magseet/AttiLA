@@ -5,15 +5,17 @@ using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
 
-namespace AttiLA.WCFservice
+namespace AttiLA.LocalizationService
 {
     [ServiceContract]
     public interface ILocalizationService
     {
-
+        [OperationContract]
+        void SetTrackerInterval(double milliseconds);
 
         [OperationContract]
-        string GetData(int value);
+        void TrackContext(string contextId);
+
 
         [OperationContract]
         CompositeType GetDataUsingDataContract(CompositeType composite);
@@ -22,7 +24,7 @@ namespace AttiLA.WCFservice
     }
 
     // Per aggiungere tipi compositi alle operazioni del servizio utilizzare un contratto di dati come descritto nell'esempio seguente.
-    // È possibile aggiungere file XSD nel progetto. Dopo la compilazione del progetto è possibile utilizzare direttamente i tipi di dati definiti qui con lo spazio dei nomi "AttiLA.WCFservice.ContractType".
+    // È possibile aggiungere file XSD nel progetto. Dopo la compilazione del progetto è possibile utilizzare direttamente i tipi di dati definiti qui con lo spazio dei nomi "AttiLA.LocalizationService.ContractType".
     [DataContract]
     public class CompositeType
     {
