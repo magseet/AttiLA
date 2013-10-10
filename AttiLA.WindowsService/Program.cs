@@ -24,7 +24,7 @@ namespace AttiLA.WindowsService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[] 
             { 
-                new AttiLAsvc() 
+                new AttiLAWindowsService() 
             };
             ServiceBase.Run(ServicesToRun);
 

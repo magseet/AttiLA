@@ -23,15 +23,21 @@ namespace AttiLA.WindowsService.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:8090/AttiLAService/AttiLA")]
-        public string ServiceHostURL {
+        [global::System.Configuration.DefaultSettingValueAttribute("net.pipe://localhost/AttiLAService")]
+        public string ServiceHostURI {
             get {
-                return ((string)(this["ServiceHostURL"]));
+                return ((string)(this["ServiceHostURI"]));
             }
-            set {
-                this["ServiceHostURL"] = value;
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Localization")]
+        public string LocalizationServicePipe {
+            get {
+                return ((string)(this["LocalizationServicePipe"]));
             }
         }
     }

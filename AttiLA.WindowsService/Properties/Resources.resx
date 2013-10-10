@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="logmsg_start" xml:space="preserve">
+  <data name="LogMsgServiceStarted" xml:space="preserve">
     <value>Service started</value>
   </data>
-  <data name="logmsg_stop" xml:space="preserve">
+  <data name="LogMsgServiceStopped" xml:space="preserve">
     <value>Service stopped</value>
   </data>
 </root>

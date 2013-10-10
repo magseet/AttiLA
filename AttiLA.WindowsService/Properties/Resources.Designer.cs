@@ -63,18 +63,18 @@ namespace AttiLA.WindowsService.Properties {
         /// <summary>
         ///   Cerca una stringa localizzata simile a Service started.
         /// </summary>
-        internal static string logmsg_start {
+        internal static string LogMsgServiceStarted {
             get {
-                return ResourceManager.GetString("logmsg_start", resourceCulture);
+                return ResourceManager.GetString("LogMsgServiceStarted", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Cerca una stringa localizzata simile a Service stopped.
         /// </summary>
-        internal static string logmsg_stop {
+        internal static string LogMsgServiceStopped {
             get {
-                return ResourceManager.GetString("logmsg_stop", resourceCulture);
+                return ResourceManager.GetString("LogMsgServiceStopped", resourceCulture);
             }
         }
     }
