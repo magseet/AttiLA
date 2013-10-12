@@ -21,7 +21,6 @@ namespace AttiLA.Data.Entities
         /// Measurement of the power.
         /// Not serialized in the database.
         /// </summary>
-        [BsonIgnore]
         public int RSSI { get; set; }
     }
 }

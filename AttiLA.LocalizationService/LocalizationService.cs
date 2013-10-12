@@ -97,7 +97,7 @@ namespace AttiLA.LocalizationService
             var scenario = new Scenario
             {
                 CreationTime = DateTime.Now,
-                
+                ContextId = context.Id
             };
 
             try
@@ -120,20 +120,12 @@ namespace AttiLA.LocalizationService
 
         public void TrackModeStart()
         {
-            lock (lockTracking)
-            {
-                // TODO..
-
-            }
+            tracker.Enabled = true;
         }
 
         public void TrackModeStop()
         {
-            lock (lockTracking)
-            {
-                // TODO..
-
-            }
+            tracker.Enabled = false;
         }
 
         private static bool IsValidObjectId(string id)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
+using AttiLA.Data;
 using System.Timers;
 using MongoDB.Bson;
 
@@ -21,6 +22,14 @@ namespace AttiLA.LocalizationService
         NoSignalsDetected
     }
 
+    public enum TrackerErrorNotificationCode
+    {
+        DatabaseError
+    }
+
+    /// <summary>
+    /// Data for to notification event handler.
+    /// </summary>
     public class TrackerNotificationEventArgs : EventArgs
     {
         public TrackerNotificationEventArgs(TrackerNotificationCode code)
@@ -34,6 +43,36 @@ namespace AttiLA.LocalizationService
         public TrackerNotificationCode Code { get; private set; }
 
     }
+
+    /// <summary>
+    /// Data for error notification event handler.
+    /// </summary>
+    public class TrackerErrorNotificationEventArgs : EventArgs
+    {
+        public TrackerErrorNotificationEventArgs(TrackerErrorNotificationCode code)
+        {
+            Code = code;
+        }
+
+        public TrackerErrorNotificationEventArgs(TrackerErrorNotificationCode code, Exception cause)
+        {
+            Code = code;
+            Cause = cause;
+        }
+
+        /// <summary>
+        /// A code to identify the error notification type.
+        /// </summary>
+        public TrackerErrorNotificationCode Code { get; set; }
+
+        /// <summary>
+        /// The exception that raised this error.
+        /// </summary>
+        public Exception Cause { get; set; }
+    }
+
+
+
 
     /// <summary>
     /// The tracker samples periodically the WLAN signals and updates the scenario
@@ -51,9 +90,21 @@ namespace AttiLA.LocalizationService
         public delegate void TrackerNotificationEventHandler(object sender, TrackerNotificationEventArgs e);
 
         /// <summary>
+        /// Represents a method that will handle <see cref="TrackerErrorNotificationEvent"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public delegate void TrackerErrorNotificationEventHandler(object sender, TrackerErrorNotificationEventArgs e);
+
+        /// <summary>
         /// Tracker notification event.
         /// </summary>
         public event TrackerNotificationEventHandler TrackerNotification;
+
+        /// <summary>
+        /// Tracker error notification event.
+        /// </summary>
+        public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
 
         /// <summary>
@@ -182,11 +233,6 @@ namespace AttiLA.LocalizationService
             {
                 lock(trackerLock)
                 {
-                    if (value)
-                    {
-                        captureTimer.Interval = Properties.Settings.Default.TrackerCaptureInterval;
-                        updateTimer.Interval = Properties.Settings.Default.TrackerUpdateInterval;
-                    }
                     captureTimer.Enabled = value;
                     updateTimer.Enabled = value;
                 }
@@ -212,6 +258,35 @@ namespace AttiLA.LocalizationService
         {
             lock(trackerLock)
             {
+                // no more examples will be added until unlock
+
+                if(targetScenario == null || targetScenario.TrainingSet.Count == 0)
+                {
+                    // nothing to do
+                    return;
+                }
+                // suspend timers and store staging area in the database
+                suspend();
+                try
+                {
+                    scenarioService.AddScanExamples(
+                        targetScenario.Id.ToString(),
+                        targetScenario.TrainingSet);
+
+                    // erase staging area if no error detected
+                    targetScenario.TrainingSet.Clear();
+                }
+                catch(DatabaseException ex)
+                {
+                    // do not erase staging area and notify an error
+                    TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
+                        TrackerErrorNotificationCode.DatabaseError, ex));
+                }
+                finally
+                {
+                    // resume timers before unlock
+                    resume();
+                }
 
             }
             
@@ -233,6 +308,9 @@ namespace AttiLA.LocalizationService
                     return;
                 }
 
+                // suspend capture until completion
+                captureTimer.Stop();
+
                 var accessPoints = wlanScanner.GetAccessPoints();
                 if(accessPoints.Count == 0)
                 {
@@ -248,7 +326,28 @@ namespace AttiLA.LocalizationService
                         ScanSignals = accessPoints
                     });
                 }
+
+                // resume capture before unlock
+                captureTimer.Start();
             }
+        }
+
+        /// <summary>
+        /// Resume timers
+        /// </summary>
+        private void resume()
+        {
+            captureTimer.Start();
+            updateTimer.Start();
+        }
+
+        /// <summary>
+        /// Suspend timers
+        /// </summary>
+        private void suspend()
+        {
+            captureTimer.Stop();
+            updateTimer.Stop();
         }
         
 

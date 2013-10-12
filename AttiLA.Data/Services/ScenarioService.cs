@@ -13,31 +13,39 @@ namespace AttiLA.Data.Services
     public class ScenarioService : EntityService<Scenario>
     {
         /// <summary>
-        /// Adds a new scan example to the scenario.
+        /// Adds new scan examples to the training set.
         /// </summary>
         /// <exception cref="DataServiceExceptions">Thrown when the new example is not inserted due to an error.</exception>
         /// <param name="scenarioId"></param>
-        /// <param name="scanExample"></param>
-        public void AddScanExample(string scenarioId, ScanExample scanExample)
+        /// <param name="scanExamples">The list of examples to add</param>
+        public void AddScanExamples(string scenarioId, IEnumerable<ScanExample> scanExamples)
         {
-            if (scanExample == null)
+            if (scanExamples == null)
             {
-                throw new ArgumentNullException("scanExample");
+                throw new ArgumentNullException("scanExamples");
             }
             var scenarioObjectId = new ObjectId(scenarioId);
 
-            //// Append the new example to the scenario training set
-            var updateResult = this.MongoConnectionHandler.MongoCollection.Update(
-                Query<Scenario>.EQ(scenario => scenario.Id, scenarioObjectId),
-                Update<Scenario>.Push(scenario => scenario.TrainingSet, scanExample),
-                new MongoUpdateOptions
-                {
-                    WriteConcern = WriteConcern.Acknowledged
-                });
+            WriteConcernResult updateResult;
+            try
+            {
+                //// Append the new example to the scenario training set
+                updateResult = this.MongoConnectionHandler.MongoCollection.Update(
+                    Query<Scenario>.EQ(scenario => scenario.Id, scenarioObjectId),
+                    Update<Scenario>.PushAll(scenario => scenario.TrainingSet, scanExamples),
+                    new MongoUpdateOptions
+                    {
+                        WriteConcern = WriteConcern.Acknowledged
+                    });
+            }
+            catch(WriteConcernException ex)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorAddScanExample, ex);
+            }
 
             if (updateResult.DocumentsAffected == 0)
             {
-                throw new DataServiceExceptions(Properties.Resources.MsgErrorAddScanExample);
+                throw new DatabaseException(Properties.Resources.MsgErrorAddScanExample);
             }
         }
 

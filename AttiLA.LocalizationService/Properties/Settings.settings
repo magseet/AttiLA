@@ -6,7 +6,7 @@
       <Value Profile="(Default)">300</Value>
     </Setting>
     <Setting Name="TrackerUpdateInterval" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">20000</Value>
+      <Value Profile="(Default)">2000</Value>
     </Setting>
   </Settings>
 </SettingsFile>

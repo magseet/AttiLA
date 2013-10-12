@@ -46,5 +46,15 @@ namespace AttiLA.Test.LocalizationService
             }
             
         }
+
+        private void buttonTrackStart_Click(object sender, EventArgs e)
+        {
+            serviceClient.TrackModeStart();
+        }
+
+        private void buttonTrackStop_Click(object sender, EventArgs e)
+        {
+            serviceClient.TrackModeStop();
+        }
     }
 }
