@@ -5,16 +5,17 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace AttiLA.Data.Entities
 {
     [BsonIgnoreExtraElements]
-    public class AccessPoint
+    public class ScanSignal
     {
         /// <summary>
-        /// The MAC address of the access point.
+        /// Access point data.
         /// </summary>
-        public string MAC { get; set; }
+        public AccessPoint AP { get; set; }
 
         /// <summary>
-        /// The SSID of the network.
+        /// Measurement of the power.
+        /// Not serialized in the database.
         /// </summary>
-        public string SSID { get; set; }
+        public int RSSI { get; set; }
     }
 }

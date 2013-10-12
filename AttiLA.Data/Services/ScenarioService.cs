@@ -56,6 +56,7 @@ namespace AttiLA.Data.Services
         /// <returns></returns>
         public IEnumerable<Scenario> GetByPossibleFeatures(IEnumerable<string> features)
         {
+
             if (features == null)
             {
                 throw new ArgumentNullException("features");
@@ -67,6 +68,12 @@ namespace AttiLA.Data.Services
         public override void Update(Scenario entity)
         {
             throw new NotImplementedException();
+        }
+
+        public void prova()
+        {
+            
+
         }
     }
 }

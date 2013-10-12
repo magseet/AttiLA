@@ -40,9 +40,9 @@ namespace AttiLA.LocalizationService
         /// Performs a scan of the WLAN interfaces and returns a list of <see cref="AccessPoint"/> elements.
         /// </summary>
         /// <returns></returns>
-        public List<AccessPoint> GetAccessPoints()
+        public List<ScanSignal> GetScanSignals()
         {
-            var accessPoints = new List<AccessPoint>();
+            var scanSignals = new List<ScanSignal>();
 
             lock(scannerLock)
             {
@@ -66,16 +66,19 @@ namespace AttiLA.LocalizationService
                             bss.dot11Ssid.SSID, 
                             0, (int)bss.dot11Ssid.SSIDLength);
 
-                        accessPoints.Add(new AccessPoint
+                        scanSignals.Add(new ScanSignal
                         {
+                            AP = new AccessPoint
+                            {
                             MAC = tMac,
-                            SSID = ssid,
+                            SSID = ssid
+                            },
                             RSSI = bss.rssi,
                         });
                     }
                 }
             }
-            return accessPoints;
+            return scanSignals;
         }
 
         /// <summary>

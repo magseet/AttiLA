@@ -51,6 +51,11 @@ namespace AttiLA.LocalizationService
         private Tracker tracker = new Tracker();
 
         /// <summary>
+        /// The localization module.
+        /// </summary>
+        private Localizer localizer = new Localizer();
+
+        /// <summary>
         /// Service to interact with scenarios in database.
         /// </summary>
         private ScenarioService scenarioService = new ScenarioService();

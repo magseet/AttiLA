@@ -24,11 +24,11 @@ namespace AttiLA.Data.Entities
         /// <summary>
         /// The list of the access point signals.
         /// </summary>
-        public List<AccessPoint> ScanSignals { get; set; }
+        public List<ScanSignal> ScanSignals { get; set; }
 
         public ScanExample()
         {
-            ScanSignals = new List<AccessPoint>();
+            ScanSignals = new List<ScanSignal>();
         }
     }
 }

@@ -11,6 +11,8 @@ using MongoDB.Bson;
 
 namespace AttiLA.LocalizationService
 {
+    
+    #region Notification classes
     /// <summary>
     /// The notification codes.
     /// </summary>
@@ -22,6 +24,9 @@ namespace AttiLA.LocalizationService
         NoSignalsDetected
     }
 
+    /// <summary>
+    /// The notification error codes.
+    /// </summary>
     public enum TrackerErrorNotificationCode
     {
         DatabaseError
@@ -70,8 +75,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         public Exception Cause { get; set; }
     }
-
-
+    #endregion
 
 
     /// <summary>
@@ -311,8 +315,8 @@ namespace AttiLA.LocalizationService
                 // suspend capture until completion
                 captureTimer.Stop();
 
-                var accessPoints = wlanScanner.GetAccessPoints();
-                if(accessPoints.Count == 0)
+                var scanSignals = wlanScanner.GetScanSignals();
+                if(scanSignals.Count == 0)
                 {
                     // notify and ignore signals
                     TrackerNotification(this, new TrackerNotificationEventArgs(
@@ -323,7 +327,7 @@ namespace AttiLA.LocalizationService
                     targetScenario.TrainingSet.Add(new ScanExample
                     {
                         ScanDateTime = DateTime.Now,
-                        ScanSignals = accessPoints
+                        ScanSignals = scanSignals
                     });
                 }
 

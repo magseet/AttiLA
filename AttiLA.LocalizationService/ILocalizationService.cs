@@ -33,6 +33,16 @@ namespace AttiLA.LocalizationService
     }
 
     [DataContract]
+    public class ContextSimilarity
+    {
+        [DataMember]
+        string ContextId { get; set; }
+
+        [DataMember]
+        double Similarity { get; set; }
+    }
+
+    [DataContract]
     public class GlobalSettings
     {
         [DataMember]
