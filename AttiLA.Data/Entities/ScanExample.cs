@@ -14,7 +14,7 @@ namespace AttiLA.Data.Entities
     /// The result of a WLAN scan.
     /// </summary>
     [BsonIgnoreExtraElements]
-    public class ScanExample : MongoEntity
+    public class ScanExample
     {
         /// <summary>
         /// The time of the WLAN scan.
@@ -22,15 +22,13 @@ namespace AttiLA.Data.Entities
         public DateTime ScanDateTime { get; set; }
 
         /// <summary>
-        /// The signals strenghts mapped on MAC addresses.
+        /// The list of the access point signals.
         /// </summary>
-        public Dictionary<string, uint> ScanSignals { get; set; }
+        public List<AccessPoint> ScanSignals { get; set; }
 
         public ScanExample()
         {
-            ScanSignals = new Dictionary<string, uint>();
+            ScanSignals = new List<AccessPoint>();
         }
-
-
     }
 }

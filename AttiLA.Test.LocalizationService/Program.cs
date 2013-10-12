@@ -6,6 +6,8 @@ using System.Windows.Forms;
 
 namespace AttiLA.Test.LocalizationService
 {
+    using LocalizationServiceReference;
+    
     static class Program
     {
         /// <summary>

@@ -6,26 +6,31 @@ using System.ServiceModel;
 using System.Text;
 using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
+using AttiLA.Data;
+using MongoDB.Bson;
+using System.Text.RegularExpressions;
 
 namespace AttiLA.LocalizationService
 {
+
     public class LocalizationService : ILocalizationService
     {
+
         #region Locks
         private System.Object lockTracking = new System.Object();
         #endregion
 
         #region Events
         /// <summary>
-        /// Represent a method that will handle <see cref="TrackerStartNotification"/>
+        /// Represents a method that will handle <see cref="TrackerStartNotification"/>
         /// </summary>
-        /// <param name="context">The context to be tracked.</param>
+        /// <param name="scenario">The scenario to be tracked.</param>
         public delegate void TrackerStartNotificationHandler(Context context);
 
         /// <summary>
-        /// Represent a method that will handle <see cref="TrackerStartNotification"/>
+        /// Represents a method that will handle <see cref="TrackerStartNotification"/>
         /// </summary>
-        /// <param name="previousContext">The context that was tracked.</param>
+        /// <param name="previousContext">The scenario that was tracked.</param>
         public delegate void TrackerStopNotificationHandler(Context previousContext);
 
         /// <summary>
@@ -40,6 +45,22 @@ namespace AttiLA.LocalizationService
 
         #endregion
 
+        /// <summary>
+        /// The tracking module.
+        /// </summary>
+        private Tracker tracker = new Tracker();
+
+        /// <summary>
+        /// Service to interact with scenarios in database.
+        /// </summary>
+        private ScenarioService scenarioService = new ScenarioService();
+
+        /// <summary>
+        /// Service to interact with contexts in database.
+        /// </summary>
+        private ContextService contextService = new ContextService();
+
+
         public GlobalSettings GetGlobalSettings()
         {
             // TODO..
@@ -53,7 +74,48 @@ namespace AttiLA.LocalizationService
 
         public void ChangeContext(string newContextId)
         {
-            // TODO..
+
+            if(newContextId == null || !IsValidObjectId(newContextId))
+            {
+                throw new FaultException<ArgumentException>(
+                    new ArgumentException("newContextId"));
+            }
+
+            // TODO.. localize and check if prediction was right
+
+            // dummy case
+            var context = contextService.GetById(newContextId);
+            if(context == null)
+            {
+                throw new FaultException<ServiceException>(
+                    new ServiceException
+                    {
+                        Message = Properties.Resources.MsgFaultContextNotFound
+                    });
+            }
+
+            var scenario = new Scenario
+            {
+                CreationTime = DateTime.Now,
+                
+            };
+
+            try
+            {
+                scenarioService.Create(scenario);
+            }
+            catch(DatabaseException)
+            {
+                throw new FaultException<ServiceException>(
+                    new ServiceException
+                    {
+                        Message = Properties.Resources.MsgFaultDatabaseError
+                    });
+            }
+
+            tracker.ScenarioId = scenario.Id.ToString();
+
+            
         }
 
         public void TrackModeStart()
@@ -73,6 +135,10 @@ namespace AttiLA.LocalizationService
 
             }
         }
-        
+
+        private static bool IsValidObjectId(string id)
+        {
+            return Regex.Match(id, "^[0-9a-fA-F]{24}$").Success;
+        }
     }
 }

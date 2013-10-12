@@ -8,5 +8,11 @@
     <Setting Name="LocalizationServicePipe" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Localization</Value>
     </Setting>
+    <Setting Name="MessageServicePipe" Type="System.String" Scope="User">
+      <Value Profile="(Default)">mex</Value>
+    </Setting>
+    <Setting Name="BindingPipeName" Type="System.String" Scope="User">
+      <Value Profile="(Default)">netNamedPipeBinding</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

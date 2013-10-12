@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
+using AttiLA.Data;
 
 namespace AttiLA.Test.CreateContext
 {
@@ -40,7 +41,16 @@ namespace AttiLA.Test.CreateContext
                 ContextName = this.ContextName,
                 CreationDateTime = DateTime.Now
             };
-            contextService.Create(c);
+            try
+            {
+                contextService.Create(c);
+            }
+            catch(DatabaseException)
+            {
+                MessageBox.Show("Already exists.");
+                return;
+            }
+
             button1.Enabled = false;
             textBoxName.Enabled = false;
             labelID.Text = c.Id.ToString();

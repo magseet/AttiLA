@@ -14,15 +14,20 @@ namespace AttiLA.LocalizationService
         GlobalSettings GetGlobalSettings();
 
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
         void SetGlobalSettings(GlobalSettings newSettings);
             
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
+        [FaultContract(typeof(ArgumentException))]
         void ChangeContext(string newContextId);
 
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
         void TrackModeStart();
 
         [OperationContract]
+        [FaultContract(typeof(ServiceException))]
         void TrackModeStop();
         
     }
@@ -31,7 +36,7 @@ namespace AttiLA.LocalizationService
     public class GlobalSettings
     {
         [DataMember]
-        TrackerSettings Tracker { get; set; }
+        public TrackerSettings Tracking { get; set; }
     }
 
 
@@ -45,7 +50,7 @@ namespace AttiLA.LocalizationService
         /// Milliseconds between samples.
         /// </summary>
         [DataMember]
-        public double Interval { get; set; }
+        public double CaptureInterval { get; set; }
 
         /// <summary>
         /// Milliseconds between savings.
@@ -54,20 +59,10 @@ namespace AttiLA.LocalizationService
         public double UpdateInterval { get; set; }
     }
 
-
     [DataContract]
-    public class AccessPoint
+    public class ServiceException
     {
         [DataMember]
-        public string MAC { get; set; }
-
-        [DataMember]
-        public string SSID { get; set; }
-
-        [DataMember]
-        public int RSSI { get; set; }
-
-        [DataMember]
-        public uint LinkQuality { get; set; }
+        public string Message { get; set; }
     }
 }

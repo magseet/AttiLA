@@ -40,5 +40,29 @@ namespace AttiLA.WindowsService.Properties {
                 return ((string)(this["LocalizationServicePipe"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("mex")]
+        public string MessageServicePipe {
+            get {
+                return ((string)(this["MessageServicePipe"]));
+            }
+            set {
+                this["MessageServicePipe"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("netNamedPipeBinding")]
+        public string BindingPipeName {
+            get {
+                return ((string)(this["BindingPipeName"]));
+            }
+            set {
+                this["BindingPipeName"] = value;
+            }
+        }
     }
 }

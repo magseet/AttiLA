@@ -25,13 +25,25 @@ namespace AttiLA.LocalizationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("200")]
-        public double TrackerInterval {
+        [global::System.Configuration.DefaultSettingValueAttribute("300")]
+        public double TrackerCaptureInterval {
             get {
-                return ((double)(this["TrackerInterval"]));
+                return ((double)(this["TrackerCaptureInterval"]));
             }
             set {
-                this["TrackerInterval"] = value;
+                this["TrackerCaptureInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20000")]
+        public double TrackerUpdateInterval {
+            get {
+                return ((double)(this["TrackerUpdateInterval"]));
+            }
+            set {
+                this["TrackerUpdateInterval"] = value;
             }
         }
     }

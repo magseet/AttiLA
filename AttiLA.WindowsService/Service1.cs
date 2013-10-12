@@ -65,10 +65,15 @@ namespace AttiLA.WindowsService
 
             try
             {
-                // Add a service endpoint
+                // Add net named pipe service endpoint
+
+                //var binding = new NetNamedPipeBinding(NetNamedPipeSecurityMode.None);
+                var binding = new NetNamedPipeBinding();
+
+                binding.Name = Properties.Settings.Default.BindingPipeName;
                 serviceHost.AddServiceEndpoint(
                     typeof(AttiLA.LocalizationService.ILocalizationService), 
-                    new NetNamedPipeBinding(NetNamedPipeSecurityMode.None),
+                    binding,
                     Properties.Settings.Default.LocalizationServicePipe);
 
                 // Enable metadata exchange
@@ -78,6 +83,12 @@ namespace AttiLA.WindowsService
                     smb = new ServiceMetadataBehavior();
                     serviceHost.Description.Behaviors.Add(smb);
                 }
+                
+                // Add MEX endpoint
+                serviceHost.AddServiceEndpoint(
+                    ServiceMetadataBehavior.MexContractName,
+                    MetadataExchangeBindings.CreateMexNamedPipeBinding(),
+                    Properties.Settings.Default.MessageServicePipe);
 
                 // Start the Service
                 serviceHost.Open();

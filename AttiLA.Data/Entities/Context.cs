@@ -10,13 +10,11 @@ namespace AttiLA.Data.Entities
     {
         public Context()
         {
-            Features = new Dictionary<string, Feature>();
-            Statistics = new List<ContextStatistics>();
-            TrainingSet = new List<ScanExample>();
+            Statistics = new List<ContextStatistics>();   
         }
 
         /// <summary>
-        /// The name assigned by the user to the context.
+        /// The name assigned by the user to the scenario.
         /// </summary>
         public string ContextName { get; set; }
 
@@ -26,17 +24,7 @@ namespace AttiLA.Data.Entities
         public DateTime CreationDateTime { get; set; }
 
         /// <summary>
-        /// The examples used to train the classifier for this context.
-        /// </summary>
-        public List<ScanExample> TrainingSet { get; set; }
-
-        /// <summary>
-        /// The features used to classify a new example.
-        /// </summary>
-        public Dictionary<string, Feature> Features { get; set; }
-
-        /// <summary>
-        /// Statistics about context usage periods.
+        /// Statistics about scenario usage periods.
         /// </summary>
         public List<ContextStatistics> Statistics { get; set; }
     }

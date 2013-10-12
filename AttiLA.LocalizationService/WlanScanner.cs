@@ -5,14 +5,25 @@ using System.Text;
 using System.Threading.Tasks;
 using NativeWifi;
 using System.Threading;
+using AttiLA.Data.Entities;
 
 namespace AttiLA.LocalizationService
 {
     /// <summary>
     /// Performs interaction with Managed Wifi service.
+    /// This class is thread safe and singleton.
     /// </summary>
-    public class WlanScanner
+    public sealed class WlanScanner
     {
+        /// <summary>
+        /// Static inizialization of the private instance.
+        /// </summary>
+        private static readonly WlanScanner instance = new WlanScanner();
+
+        /// <summary>
+        /// The lock used to synchronize access to the scanner.
+        /// </summary>
+        private Object scannerLock = new Object();
 
         /// <summary>
         /// Managed Wifi object
@@ -29,35 +40,39 @@ namespace AttiLA.LocalizationService
         /// Performs a scan of the WLAN interfaces and returns a list of <see cref="AccessPoint"/> elements.
         /// </summary>
         /// <returns></returns>
-        private List<AccessPoint> GetAccessPoints()
+        public List<AccessPoint> GetAccessPoints()
         {
             var accessPoints = new List<AccessPoint>();
 
-            foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
+            lock(scannerLock)
             {
-                // scan for new bss and wait for notification
-                wlanIface.Scan();
-                wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
-                
-                Wlan.WlanBssEntry[] wlanBssEntries = wlanIface.GetNetworkBssList();
-
-                foreach (Wlan.WlanBssEntry bss in wlanBssEntries)
+                foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
                 {
-                    byte[] macAddr = bss.dot11Bssid;
-                    string tMac = "";
-                    for (int i = 0; i < macAddr.Length; i++)
-                    {
-                        tMac += macAddr[i].ToString("x2").PadLeft(2, '0').ToUpper();
-                    }
-                    string ssid = Encoding.ASCII.GetString(bss.dot11Ssid.SSID, 0, (int)bss.dot11Ssid.SSIDLength);
+                    // scan for new bss and wait for notification
+                    wlanIface.Scan();
+                    wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
 
-                    accessPoints.Add(new AccessPoint
+                    Wlan.WlanBssEntry[] wlanBssEntries = wlanIface.GetNetworkBssList();
+
+                    foreach (Wlan.WlanBssEntry bss in wlanBssEntries)
                     {
-                        MAC = tMac,
-                        SSID = ssid,
-                        RSSI = bss.rssi,
-                        LinkQuality = bss.linkQuality
-                    });
+                        byte[] macAddr = bss.dot11Bssid;
+                        string tMac = "";
+                        for (int i = 0; i < macAddr.Length; i++)
+                        {
+                            tMac += macAddr[i].ToString("x2").PadLeft(2, '0').ToUpper();
+                        }
+                        string ssid = Encoding.ASCII.GetString(
+                            bss.dot11Ssid.SSID, 
+                            0, (int)bss.dot11Ssid.SSIDLength);
+
+                        accessPoints.Add(new AccessPoint
+                        {
+                            MAC = tMac,
+                            SSID = ssid,
+                            RSSI = bss.rssi,
+                        });
+                    }
                 }
             }
             return accessPoints;
@@ -87,8 +102,7 @@ namespace AttiLA.LocalizationService
 
         }
 
-
-        public WlanScanner()
+        private WlanScanner()
         {
             foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
             {
@@ -97,6 +111,14 @@ namespace AttiLA.LocalizationService
                 // set wlan notifications handler
                 wlanIface.WlanNotification += wlanIface_WlanNotification;
             }
+        }
+
+        /// <summary>
+        /// Returns the unique instance of the singleton class.
+        /// </summary>
+        public static WlanScanner Instance
+        {
+            get { return instance; }
         }
     }
 }

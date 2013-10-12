@@ -11,38 +11,63 @@ namespace AttiLA.Data.Services
     {
         protected readonly MongoConnectionHandler<T> MongoConnectionHandler;
 
+        /// <summary>
+        /// Serialize the entity creating a document in the database.
+        /// The document id is eventually set.
+        /// </summary>
+        /// <exception cref="ArgumentNullException">The parameter is null.</exception>
+        /// <exception cref="DatabaseException">Write on database failure.</exception>
+        /// <param name="entity"></param>
         public virtual void Create(T entity)
         {
             if(entity==null)
             {
                 throw new ArgumentNullException("entity");
             }
-            //// Save the entity with safe mode (WriteConcern.Acknowledged)
-            var result = this.MongoConnectionHandler.MongoCollection.Save(
-                entity,
-                new MongoInsertOptions
-                {
-                    WriteConcern = WriteConcern.Acknowledged
-                });
 
-            if (!result.Ok)
+            try
             {
-                throw new DataException(Properties.Resources.MsgErrorCreate + typeof(T).ToString());
+                //// Save the entity with safe mode (WriteConcern.Acknowledged)
+                var result = this.MongoConnectionHandler.MongoCollection.Save(
+                    entity,
+                    new MongoInsertOptions
+                    {
+                        WriteConcern = WriteConcern.Acknowledged
+                    });
+
+                if (!result.Ok)
+                {
+                    throw new DatabaseException(Properties.Resources.MsgErrorCreate + typeof(T).ToString());
+                }
+            }
+            catch(WriteConcernException ex)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorCreate + typeof(T).ToString(), ex);
             }
         }
 
+        /// <summary>
+        /// Delete the document associated to the id.
+        /// </summary>
+        /// <param name="id">Identifier of the collection to be deleted.</param>
         public virtual void Delete(string id)
         {
-            var result = this.MongoConnectionHandler.MongoCollection.Remove(
-                Query<T>.EQ(e => e.Id,
-                new ObjectId(id)),
-                RemoveFlags.None,
-                WriteConcern.Acknowledged);
-
-            if (!result.Ok)
+            try
             {
-                throw new DataException(Properties.Resources.MsgErrorDelete + typeof(T).ToString());
-                
+                var result = this.MongoConnectionHandler.MongoCollection.Remove(
+                    Query<T>.EQ(e => e.Id,
+                    new ObjectId(id)),
+                    RemoveFlags.None,
+                    WriteConcern.Acknowledged);
+
+                if (!result.Ok)
+                {
+                    throw new DatabaseException(Properties.Resources.MsgErrorDelete + typeof(T).ToString());
+                }
+            }
+            catch(WriteConcernException ex)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorDelete + typeof(T).ToString(), ex);
             }
         }
 
@@ -51,6 +76,11 @@ namespace AttiLA.Data.Services
             MongoConnectionHandler = new MongoConnectionHandler<T>();
         }
 
+        /// <summary>
+        /// Deserialize into the entity the document associated to the id.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual T GetById(string id)
         {
             var entityQuery = Query<T>.EQ(e => e.Id, new ObjectId(id));

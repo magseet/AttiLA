@@ -45,13 +45,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Context.cs" />
+    <Compile Include="old_Context.cs" />
+    <Compile Include="Entities\AccessPoint.cs" />
     <Compile Include="Entities\Context.cs" />
     <Compile Include="Entities\ContextStatistics.cs" />
     <Compile Include="Entities\Feature.cs" />
     <Compile Include="Entities\IMongoEntity.cs" />
     <Compile Include="Entities\MongoEntity.cs" />
     <Compile Include="Entities\ScanExample.cs" />
+    <Compile Include="Entities\Scenario.cs" />
     <Compile Include="MongoConnectionHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -64,10 +66,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="ServiceException.cs" />
+    <Compile Include="DataExceptions.cs" />
     <Compile Include="Services\ContextService.cs" />
     <Compile Include="Services\EntityService.cs" />
     <Compile Include="Services\IEntityService.cs" />
+    <Compile Include="Services\ScenarioService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

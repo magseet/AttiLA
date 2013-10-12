@@ -7,6 +7,7 @@ namespace AttiLA.Data.Entities
     [BsonIgnoreExtraElements]
     public class Feature : MongoEntity
     {
+        
         /// <summary>
         /// The Gaussian mean.
         /// </summary>
