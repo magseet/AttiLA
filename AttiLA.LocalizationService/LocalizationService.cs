@@ -48,12 +48,20 @@ namespace AttiLA.LocalizationService
         /// <summary>
         /// The tracking module.
         /// </summary>
-        private Tracker tracker = new Tracker();
+        private Tracker tracker = new Tracker 
+        { 
+            CaptureInterval = Properties.Settings.Default.TrackerCaptureInterval,
+            UpdateInterval = Properties.Settings.Default.TrackerUpdateInterval,
+            Enabled = Properties.Settings.Default.TrackerEnabledOnStart
+        };
 
         /// <summary>
         /// The localization module.
         /// </summary>
-        private Localizer localizer = new Localizer();
+        private Localizer localizer = new Localizer
+        {
+            Retries = Properties.Settings.Default.LocalizerRetries
+        };
 
         /// <summary>
         /// Service to interact with scenarios in database.
@@ -132,6 +140,18 @@ namespace AttiLA.LocalizationService
         {
             tracker.Enabled = false;
         }
+
+        public string Localize(bool changeContext, out IEnumerable<ContextSimilarity> similarContexts)
+        {
+            Scenario scenario = localizer.Prediction(out similarContexts);
+            if(changeContext)
+            {
+                tracker.ScenarioId = (scenario == null ? null : scenario.Id.ToString());
+            }
+
+            return scenario == null ? null : scenario.Id.ToString();
+        }
+
 
         private static bool IsValidObjectId(string id)
         {

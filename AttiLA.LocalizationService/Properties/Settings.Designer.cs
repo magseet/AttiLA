@@ -46,5 +46,29 @@ namespace AttiLA.LocalizationService.Properties {
                 this["TrackerUpdateInterval"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public int LocalizerRetries {
+            get {
+                return ((int)(this["LocalizerRetries"]));
+            }
+            set {
+                this["LocalizerRetries"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool TrackerEnabledOnStart {
+            get {
+                return ((bool)(this["TrackerEnabledOnStart"]));
+            }
+            set {
+                this["TrackerEnabledOnStart"] = value;
+            }
+        }
     }
 }

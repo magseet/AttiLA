@@ -23,6 +23,15 @@ namespace AttiLA.LocalizationService
         void ChangeContext(string newContextId);
 
 
+        /// <summary>
+        /// Service providing a prediction of the most suitable context id for 
+        /// the current position. It is possible to switch immediately to the 
+        /// predicted context. Othe suitable contexts are provided with their
+        /// similarity value.
+        /// </summary>
+        /// <param name="changeContext">Switch immediately to the context or not.</param>
+        /// <param name="similarContexts">Suitable contexts with similarity value.</param>
+        /// <returns></returns>
         [OperationContract]
         [FaultContract(typeof(ServiceException))]
         string Localize(bool changeContext, out IEnumerable<ContextSimilarity> similarContexts);

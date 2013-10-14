@@ -162,7 +162,11 @@ namespace AttiLA.LocalizationService
             {
                 lock (trackerLock)
                 {
-                    if(targetScenario == null || !targetScenario.Id.ToString().Equals(value))
+                    if(value == null)
+                    {
+                        targetScenario = null;
+                    }
+                    else if(targetScenario == null || !targetScenario.Id.ToString().Equals(value))
                     {
                         // get scenario from database
                         targetScenario = scenarioService.GetById(value);
@@ -283,8 +287,11 @@ namespace AttiLA.LocalizationService
                 catch(DatabaseException ex)
                 {
                     // do not erase staging area and notify an deltaSimilarity
-                    TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
-                        TrackerErrorNotificationCode.DatabaseError, ex));
+                    if(TrackerErrorNotification != null)
+                    {
+                        TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
+                            TrackerErrorNotificationCode.DatabaseError, ex));
+                    }
                 }
                 finally
                 {
@@ -319,8 +326,11 @@ namespace AttiLA.LocalizationService
                 if(scanSignals.Count == 0)
                 {
                     // notify and ignore signals
-                    TrackerNotification(this, new TrackerNotificationEventArgs(
-                        TrackerNotificationCode.NoSignalsDetected));
+                    if (TrackerNotification != null)
+                    {
+                        TrackerNotification(this, new TrackerNotificationEventArgs(
+                            TrackerNotificationCode.NoSignalsDetected));
+                    }
                 }
                 else
                 {

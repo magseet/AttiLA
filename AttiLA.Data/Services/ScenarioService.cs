@@ -221,6 +221,14 @@ namespace AttiLA.Data.Services
                 throw new DatabaseException(Properties.Resources.MsgErrorScenarioRead, ex);
             }
 
+            if(scenarios.Count == 0)
+            {
+                // no suitable scenarios found
+                return scenarios;
+            }
+
+
+
             // prepare for map reduce
             string ts = Utils<Scenario>.MemberName(s => s.TrainingSet);
             string signals = Utils<TrainingSetExample>.MemberName(e => e.ScanSignals);

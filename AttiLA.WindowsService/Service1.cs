@@ -69,7 +69,13 @@ namespace AttiLA.WindowsService
 
                 //var binding = new NetNamedPipeBinding(NetNamedPipeSecurityMode.None);
                 var binding = new NetNamedPipeBinding();
-
+#if DEBUG
+                binding.CloseTimeout = TimeSpan.FromMinutes(1.0);
+                binding.OpenTimeout = TimeSpan.FromMinutes(1.0);
+                binding.ReceiveTimeout = TimeSpan.FromMinutes(30.0);
+                binding.SendTimeout = TimeSpan.FromMinutes(30.0);
+#endif
+                
                 binding.Name = Properties.Settings.Default.BindingPipeName;
                 serviceHost.AddServiceEndpoint(
                     typeof(AttiLA.LocalizationService.ILocalizationService), 

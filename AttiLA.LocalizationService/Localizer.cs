@@ -21,6 +21,19 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private ScenarioService scenarioService = new ScenarioService();
 
+        private int retries;
+
+        /// <summary>
+        /// Number of retries on WLAN scan failure.
+        /// </summary>
+        public int Retries {
+            get { return retries; }
+            set
+            {
+                retries = (value > 0 ? value : 0);
+            }
+        }
+
         /// <summary>
         /// Get a scenario for the requested context.
         /// </summary>
@@ -44,7 +57,23 @@ namespace AttiLA.LocalizationService
         /// <returns>The most suitable scenario or null.</returns>
         public Scenario Prediction(out IEnumerable<ContextSimilarity> similarContexts)
         {
-            var signals = wlanScanner.GetScanSignals();
+            List<ScanSignal> signals = null;
+            int retries = this.Retries;
+
+            for (var attempts = this.Retries + 1; attempts > 0; attempts--)
+            {
+                signals = wlanScanner.GetScanSignals();
+                if(signals.Count > 0)
+                {
+                    break;
+                }
+            }
+
+            if (signals.Count == 0)
+            {
+                similarContexts = null;
+                return null;
+            }
 
 
             // create map of signals for searches
@@ -82,9 +111,14 @@ namespace AttiLA.LocalizationService
                 foreach(var feature in scenario.Features)
                 {
                     // Reliability represents the maximum similarity
-                    var evidence = mapSignals[feature.Key.AP];
+                    int evidence;
                     double featureSimilarity;
-                    if (feature.Value.Variance == 0)
+
+                    if(!mapSignals.TryGetValue(feature.Key.AP, out evidence))
+                    {
+                        featureSimilarity = 0;
+                    }
+                    else if (feature.Value.Variance == 0)
                     {
                         featureSimilarity = (evidence == feature.Value.Avg ? feature.Value.Reliability : 0);
                     }
@@ -137,7 +171,7 @@ namespace AttiLA.LocalizationService
             return bestScenario;
         }
 
-    
+
 
         public Localizer()
         {

@@ -18,4 +18,17 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="ServiceException" nillable="true" type="tns:ServiceException" />
+  <xs:complexType name="ArrayOfContextSimilarity">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ContextSimilarity" nillable="true" type="tns:ContextSimilarity" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfContextSimilarity" nillable="true" type="tns:ArrayOfContextSimilarity" />
+  <xs:complexType name="ContextSimilarity">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ContextId" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Similarity" type="xs:double" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ContextSimilarity" nillable="true" type="tns:ContextSimilarity" />
 </xs:schema>

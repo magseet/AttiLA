@@ -64,6 +64,15 @@
   <wsdl:message name="ILocalizationService_ChangeContext_ArgumentExceptionFault_FaultMessage">
     <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/System" name="detail" element="q3:ArgumentException" />
   </wsdl:message>
+  <wsdl:message name="ILocalizationService_Localize_InputMessage">
+    <wsdl:part name="parameters" element="tns:Localize" />
+  </wsdl:message>
+  <wsdl:message name="ILocalizationService_Localize_OutputMessage">
+    <wsdl:part name="parameters" element="tns:LocalizeResponse" />
+  </wsdl:message>
+  <wsdl:message name="ILocalizationService_Localize_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q4:ServiceException" />
+  </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackModeStart_InputMessage">
     <wsdl:part name="parameters" element="tns:TrackModeStart" />
   </wsdl:message>
@@ -71,7 +80,7 @@
     <wsdl:part name="parameters" element="tns:TrackModeStartResponse" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackModeStart_ServiceExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q4:ServiceException" />
+    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q5:ServiceException" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackModeStop_InputMessage">
     <wsdl:part name="parameters" element="tns:TrackModeStop" />
@@ -80,7 +89,7 @@
     <wsdl:part name="parameters" element="tns:TrackModeStopResponse" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackModeStop_ServiceExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q5="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q5:ServiceException" />
+    <wsdl:part xmlns:q6="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q6:ServiceException" />
   </wsdl:message>
   <wsdl:portType name="ILocalizationService">
     <wsdl:operation name="GetGlobalSettings">
@@ -97,6 +106,11 @@
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextResponse" message="tns:ILocalizationService_ChangeContext_OutputMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_ChangeContext_ServiceExceptionFault_FaultMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextArgumentExceptionFault" name="ArgumentExceptionFault" message="tns:ILocalizationService_ChangeContext_ArgumentExceptionFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Localize">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/Localize" message="tns:ILocalizationService_Localize_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/LocalizeResponse" message="tns:ILocalizationService_Localize_OutputMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/LocalizeServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_Localize_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation name="TrackModeStart">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/TrackModeStart" message="tns:ILocalizationService_TrackModeStart_InputMessage" />
@@ -145,6 +159,18 @@
       </wsdl:fault>
       <wsdl:fault name="ArgumentExceptionFault">
         <soap:fault use="literal" name="ArgumentExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Localize">
+      <soap:operation soapAction="http://tempuri.org/ILocalizationService/Localize" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap:fault use="literal" name="ServiceExceptionFault" namespace="" />
       </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="TrackModeStart">
@@ -209,6 +235,18 @@
       </wsdl:fault>
       <wsdl:fault name="ArgumentExceptionFault">
         <soap12:fault use="literal" name="ArgumentExceptionFault" namespace="" />
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Localize">
+      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/Localize" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap12:fault use="literal" name="ServiceExceptionFault" namespace="" />
       </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="TrackModeStart">

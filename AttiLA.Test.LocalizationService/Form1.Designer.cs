@@ -39,6 +39,10 @@
             this.buttonTrackStart = new System.Windows.Forms.Button();
             this.buttonTrackStop = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.buttonLocalize = new System.Windows.Forms.Button();
+            this.listViewContexts = new System.Windows.Forms.ListView();
+            this.columnHeaderContextId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderSimilarity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -128,11 +132,43 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "Track mode";
             // 
+            // buttonLocalize
+            // 
+            this.buttonLocalize.Location = new System.Drawing.Point(29, 184);
+            this.buttonLocalize.Name = "buttonLocalize";
+            this.buttonLocalize.Size = new System.Drawing.Size(94, 23);
+            this.buttonLocalize.TabIndex = 10;
+            this.buttonLocalize.Text = "Localize";
+            this.buttonLocalize.UseVisualStyleBackColor = true;
+            this.buttonLocalize.Click += new System.EventHandler(this.buttonLocalize_Click);
+            // 
+            // listViewContexts
+            // 
+            this.listViewContexts.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeaderContextId,
+            this.columnHeaderSimilarity});
+            this.listViewContexts.Location = new System.Drawing.Point(34, 219);
+            this.listViewContexts.Name = "listViewContexts";
+            this.listViewContexts.Size = new System.Drawing.Size(398, 119);
+            this.listViewContexts.TabIndex = 11;
+            this.listViewContexts.UseCompatibleStateImageBehavior = false;
+            this.listViewContexts.View = System.Windows.Forms.View.Details;
+            // 
+            // columnHeaderContextId
+            // 
+            this.columnHeaderContextId.Text = "Context ID";
+            // 
+            // columnHeaderSimilarity
+            // 
+            this.columnHeaderSimilarity.Text = "Similarity";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(504, 376);
+            this.Controls.Add(this.listViewContexts);
+            this.Controls.Add(this.buttonLocalize);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.buttonTrackStop);
             this.Controls.Add(this.buttonTrackStart);
@@ -144,6 +180,7 @@
             this.Controls.Add(this.label2);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -161,6 +198,10 @@
         private System.Windows.Forms.Button buttonTrackStart;
         private System.Windows.Forms.Button buttonTrackStop;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button buttonLocalize;
+        private System.Windows.Forms.ListView listViewContexts;
+        private System.Windows.Forms.ColumnHeader columnHeaderContextId;
+        private System.Windows.Forms.ColumnHeader columnHeaderSimilarity;
     }
 }
 

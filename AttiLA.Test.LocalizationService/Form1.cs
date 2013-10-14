@@ -56,5 +56,29 @@ namespace AttiLA.Test.LocalizationService
         {
             serviceClient.TrackModeStop();
         }
+
+        private void buttonLocalize_Click(object sender, EventArgs e)
+        {
+            ContextSimilarity[] similarContexts;
+            string contextId = serviceClient.Localize(true, out similarContexts);
+
+            listViewContexts.Items.Clear();
+
+            if(similarContexts != null)
+            {
+                foreach(var context in similarContexts)
+                {
+                    var lvi = new ListViewItem();
+                    lvi.Text = context.ContextId;
+                    lvi.SubItems.Add(context.Similarity.ToString());
+                    listViewContexts.Items.Add(lvi);
+                }
+            }
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+        }
     }
 }
