@@ -105,12 +105,13 @@ namespace AttiLA.LocalizationService
                     continue;
                 }
 
-                double deltaSimilarity = 0;
-                double similarity = 0;
+                double deltaSimilarity2 = 0;
+                double similarity2 = 0;
+                double reliability2 = 0;
 
                 foreach(var feature in scenario.Features)
                 {
-                    // Reliability represents the maximum similarity
+                    // Reliability represents the maximum similarity2
                     int evidence;
                     double featureSimilarity;
 
@@ -129,17 +130,20 @@ namespace AttiLA.LocalizationService
                         Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
                         featureSimilarity = feature.Value.Reliability * Math.Exp(Z);
                     }
-                    var featureDeltaSimilarity = feature.Value.Reliability - featureSimilarity;
+                    //var featureDeltaSimilarity = feature.Value.Reliability - featureSimilarity;
 
-                    similarity += featureSimilarity * featureSimilarity;
-                    deltaSimilarity += featureDeltaSimilarity * featureDeltaSimilarity;
+                    similarity2 += featureSimilarity * featureSimilarity;
+                    //deltaSimilarity2 += featureDeltaSimilarity * featureDeltaSimilarity;
+                    reliability2 += feature.Value.Reliability * feature.Value.Reliability;
 
                 }
 
                 // result for scenario
-                double scenarioSimilarity = (similarity == 0 ? 0 : 1 - Math.Sqrt(deltaSimilarity / similarity));
+                //double scenarioSimilarity = (similarity2 == 0 ? 0 : 1 - Math.Sqrt(deltaSimilarity2 / similarity2));
+                //double scenarioSimilarity = (similarity2 == 0 ? 0 : 1 - Math.Sqrt(deltaSimilarity2 / reliability2));
+                double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / reliability2));
 
-                // update context similarity
+                // update context similarity2
                 ContextSimilarity context;
                 if(mapContextSimilarities.TryGetValue(scenario.ContextId.ToString(), out context))
                 {

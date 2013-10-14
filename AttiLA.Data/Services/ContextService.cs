@@ -25,5 +25,13 @@ namespace AttiLA.Data.Services
                 new IndexKeysBuilder().Ascending("ContextName"),
                 IndexOptions.SetUnique(true));
         }
+
+        public IEnumerable<Context> GetMoreRecent(int limit)
+        {
+            
+
+            //this.MongoConnectionHandler.MongoCollection.Find(query);
+            return null;
+        }
     }
 }

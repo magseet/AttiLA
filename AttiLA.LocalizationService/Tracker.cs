@@ -25,7 +25,7 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// The notification deltaSimilarity codes.
+    /// The notification deltaSimilarity2 codes.
     /// </summary>
     public enum TrackerErrorNotificationCode
     {
@@ -50,7 +50,7 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// Data for deltaSimilarity notification event handler.
+    /// Data for deltaSimilarity2 notification event handler.
     /// </summary>
     public class TrackerErrorNotificationEventArgs : EventArgs
     {
@@ -66,12 +66,12 @@ namespace AttiLA.LocalizationService
         }
 
         /// <summary>
-        /// A code to identify the deltaSimilarity notification type.
+        /// A code to identify the deltaSimilarity2 notification type.
         /// </summary>
         public TrackerErrorNotificationCode Code { get; set; }
 
         /// <summary>
-        /// The exception that raised this deltaSimilarity.
+        /// The exception that raised this deltaSimilarity2.
         /// </summary>
         public Exception Cause { get; set; }
     }
@@ -106,7 +106,7 @@ namespace AttiLA.LocalizationService
         public event TrackerNotificationEventHandler TrackerNotification;
 
         /// <summary>
-        /// Tracker deltaSimilarity notification event.
+        /// Tracker deltaSimilarity2 notification event.
         /// </summary>
         public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
@@ -281,12 +281,12 @@ namespace AttiLA.LocalizationService
                         targetScenario.Id.ToString(),
                         targetScenario.TrainingSet);
 
-                    // erase staging area if no deltaSimilarity detected
+                    // erase staging area if no deltaSimilarity2 detected
                     targetScenario.TrainingSet.Clear();
                 }
                 catch(DatabaseException ex)
                 {
-                    // do not erase staging area and notify an deltaSimilarity
+                    // do not erase staging area and notify an deltaSimilarity2
                     if(TrackerErrorNotification != null)
                     {
                         TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(

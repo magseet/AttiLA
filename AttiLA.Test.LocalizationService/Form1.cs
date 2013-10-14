@@ -9,18 +9,22 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AttiLA.Test.LocalizationService.LocalizationServiceReference;
 using System.ServiceModel;
+using AttiLA.Data.Services;
+using AttiLA.Data.Entities;
+
 
 namespace AttiLA.Test.LocalizationService
 {
     public partial class Form1 : Form
     {
-        private LocalizationServiceClient serviceClient;
+        private LocalizationServiceClient serviceClient = new LocalizationServiceClient(
+                Properties.Settings.Default.EndpointConfigurationName);
+
+        private ContextService contextService = new ContextService();
         
         public Form1()
         {
             InitializeComponent();
-            serviceClient = new LocalizationServiceClient(
-                Properties.Settings.Default.EndpointConfigurationName);
         }
 
         private void buttonChangeContextId_Click(object sender, EventArgs e)
@@ -68,8 +72,10 @@ namespace AttiLA.Test.LocalizationService
             {
                 foreach(var context in similarContexts)
                 {
+
                     var lvi = new ListViewItem();
-                    lvi.Text = context.ContextId;
+                    var contextName = contextService.GetById(context.ContextId.ToString()).ContextName;
+                    lvi.Text = contextName;
                     lvi.SubItems.Add(context.Similarity.ToString());
                     listViewContexts.Items.Add(lvi);
                 }
