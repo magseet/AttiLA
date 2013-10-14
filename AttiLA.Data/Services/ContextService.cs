@@ -13,7 +13,6 @@ namespace AttiLA.Data.Services
 
     public class ContextService : EntityService<Context>
     {
-
         public override void Update(Context entity)
         {
             //// TODO

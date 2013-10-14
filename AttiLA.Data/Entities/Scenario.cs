@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace AttiLA.Data.Entities
 {
+    [BsonIgnoreExtraElements]
     public class Scenario : MongoEntity
     {
         /// <summary>
@@ -20,19 +19,25 @@ namespace AttiLA.Data.Entities
         public DateTime CreationTime { get; set; }
 
         /// <summary>
-        /// The last time the classifier war trained.
+        /// The last time the classifier was trained.
         /// </summary>
         public DateTime TrainingTime { get; set; }
 
         /// <summary>
-        /// The examples used to train the classifier for this scenario.
+        /// The last time new examples were added to the training set
         /// </summary>
-        public List<ScanExample> TrainingSet { get; set; }
+        public DateTime UpdateTime { get; set; }
 
         /// <summary>
-        /// The features used to classify a new example.
+        /// The examples used to train the classifier for this scenario.
         /// </summary>
-        public Dictionary<string, Feature> Features { get; set; }
+        public List<TrainingSetExample> TrainingSet { get; set; }
+
+        /// <summary>
+        /// The result of statistical computation on the training examples.
+        /// </summary>
+        [BsonIgnore]
+        public List<Feature> Features { get; set; }
 
         /// <summary>
         /// Number of times the selection prediction was right.
@@ -46,8 +51,8 @@ namespace AttiLA.Data.Entities
 
         public Scenario()
         {
-            Features = new Dictionary<string, Feature>();
-            TrainingSet = new List<ScanExample>();
+            Features = new List<Feature>();
+            TrainingSet = new List<TrainingSetExample>();
         }
     }
 }

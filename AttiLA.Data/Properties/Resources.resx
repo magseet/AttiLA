@@ -126,4 +126,10 @@
   <data name="MsgErrorDelete" xml:space="preserve">
     <value>Error deleting document from the database:</value>
   </data>
+  <data name="MsgErrorScenarioRead" xml:space="preserve">
+    <value>Error reading scenarios from from the database</value>
+  </data>
+  <data name="MsgErrorScenarioTrain" xml:space="preserve">
+    <value>Error training scenario</value>
+  </data>
 </root>

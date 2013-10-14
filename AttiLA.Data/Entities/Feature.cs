@@ -4,23 +4,29 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace AttiLA.Data.Entities
 {
+    /// <summary>
+    /// This class is the result of a map reduce in database to calculate
+    /// statistic values on data.
+    /// </summary>
     [BsonIgnoreExtraElements]
-    public class Feature : MongoEntity
+    public class Feature : IMongoEntity
     {
-        
         /// <summary>
-        /// The Gaussian mean.
+        /// unused id
         /// </summary>
-        public double Mean { get; set; }
+        [BsonIgnore]
+        public ObjectId Id { get; set; }
 
         /// <summary>
-        /// The Gaussian variance.
+        /// Feature identification.
         /// </summary>
-        public double Variance { get; set; }
+        [BsonId]
+        public FeatureKey Key { get; set; }
 
         /// <summary>
-        /// The percentage of variance explained by the feature.
+        /// Feature value.
         /// </summary>
-        public int Expl { get; set; }
+        [BsonElement("value")]
+        public FeatureValue Value { get; set; }
     }
 }

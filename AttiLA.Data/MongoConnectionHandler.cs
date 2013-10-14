@@ -26,7 +26,7 @@ namespace AttiLA.Data
 
             //// Get a reference to the collection object from the Mongo database object
             //// The collection name is the type converted to lowercase + "s"
-            MongoCollection = db.GetCollection<T>(typeof(T).Name.ToLower() + "s");
+            MongoCollection = db.GetCollection<T>(Utils<T>.CollectionName);
 
         }
 

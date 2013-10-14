@@ -23,7 +23,7 @@ namespace AttiLA.LocalizationService
 
         public Localizer()
         {
-            scenarioService.prova();
+
         }
 
     }

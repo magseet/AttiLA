@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 
 namespace AttiLA.Data.Services
 {
@@ -9,6 +10,7 @@ namespace AttiLA.Data.Services
 
     public abstract class EntityService<T> : IEntityService<T> where T : IMongoEntity
     {
+
         protected readonly MongoConnectionHandler<T> MongoConnectionHandler;
 
         /// <summary>

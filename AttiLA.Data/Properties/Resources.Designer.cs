@@ -86,5 +86,23 @@ namespace AttiLA.Data.Properties {
                 return ResourceManager.GetString("MsgErrorDelete", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Error reading scenarios from from the database.
+        /// </summary>
+        internal static string MsgErrorScenarioRead {
+            get {
+                return ResourceManager.GetString("MsgErrorScenarioRead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Error training scenario.
+        /// </summary>
+        internal static string MsgErrorScenarioTrain {
+            get {
+                return ResourceManager.GetString("MsgErrorScenarioTrain", resourceCulture);
+            }
+        }
     }
 }

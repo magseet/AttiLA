@@ -32,6 +32,9 @@ namespace AttiLA.Test.CreateContext
         {
             InitializeComponent();
             contextService = new ContextService();
+
+            var prova = new ScenarioService();
+            prova.prova();
         }
 
         private void button1_Click(object sender, EventArgs e)

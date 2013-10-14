@@ -324,7 +324,7 @@ namespace AttiLA.LocalizationService
                 }
                 else
                 {
-                    targetScenario.TrainingSet.Add(new ScanExample
+                    targetScenario.TrainingSet.Add(new TrainingSetExample
                     {
                         ScanDateTime = DateTime.Now,
                         ScanSignals = scanSignals
