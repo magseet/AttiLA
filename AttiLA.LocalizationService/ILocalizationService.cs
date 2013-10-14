@@ -22,6 +22,11 @@ namespace AttiLA.LocalizationService
         [FaultContract(typeof(ArgumentException))]
         void ChangeContext(string newContextId);
 
+
+        [OperationContract]
+        [FaultContract(typeof(ServiceException))]
+        string Localize(bool changeContext, out IEnumerable<ContextSimilarity> similarContexts);
+
         [OperationContract]
         [FaultContract(typeof(ServiceException))]
         void TrackModeStart();
@@ -32,14 +37,23 @@ namespace AttiLA.LocalizationService
         
     }
 
+    /// <summary>
+    /// Information about a context similarity detected on prediction.
+    /// </summary>
     [DataContract]
     public class ContextSimilarity
     {
+        /// <summary>
+        /// The context identifier.
+        /// </summary>
         [DataMember]
-        string ContextId { get; set; }
+        public string ContextId { get; set; }
 
+        /// <summary>
+        /// The context value of similarity to the predicted one.
+        /// </summary>
         [DataMember]
-        double Similarity { get; set; }
+        public double Similarity { get; set; }
     }
 
     [DataContract]
