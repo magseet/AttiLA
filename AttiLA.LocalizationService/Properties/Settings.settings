@@ -11,7 +11,7 @@
     <Setting Name="LocalizerRetries" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
-    <Setting Name="TrackerEnabledOnStart" Type="System.Boolean" Scope="User">
+    <Setting Name="TrackerEnabledOnStartup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

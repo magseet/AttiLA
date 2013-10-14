@@ -52,7 +52,7 @@ namespace AttiLA.LocalizationService
         { 
             CaptureInterval = Properties.Settings.Default.TrackerCaptureInterval,
             UpdateInterval = Properties.Settings.Default.TrackerUpdateInterval,
-            Enabled = Properties.Settings.Default.TrackerEnabledOnStart
+            Enabled = Properties.Settings.Default.TrackerEnabledOnStartup
         };
 
         /// <summary>
@@ -73,6 +73,15 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private ContextService contextService = new ContextService();
 
+        public bool Subscribe()
+        {
+            return false;
+        }
+
+        public bool Unsubscribe()
+        {
+            return false;
+        }
 
         public GlobalSettings GetGlobalSettings()
         {

@@ -62,12 +62,12 @@ namespace AttiLA.LocalizationService.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool TrackerEnabledOnStart {
+        public bool TrackerEnabledOnStartup {
             get {
-                return ((bool)(this["TrackerEnabledOnStart"]));
+                return ((bool)(this["TrackerEnabledOnStartup"]));
             }
             set {
-                this["TrackerEnabledOnStart"] = value;
+                this["TrackerEnabledOnStartup"] = value;
             }
         }
     }
