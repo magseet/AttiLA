@@ -70,6 +70,12 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private double CaptureIntervalField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private bool EnabledOnStartupField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private double UpdateIntervalField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -89,6 +95,32 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
                 if ((this.CaptureIntervalField.Equals(value) != true)) {
                     this.CaptureIntervalField = value;
                     this.RaisePropertyChanged("CaptureInterval");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool EnabledOnStartup {
+            get {
+                return this.EnabledOnStartupField;
+            }
+            set {
+                if ((this.EnabledOnStartupField.Equals(value) != true)) {
+                    this.EnabledOnStartupField = value;
+                    this.RaisePropertyChanged("EnabledOnStartup");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double UpdateInterval {
+            get {
+                return this.UpdateIntervalField;
+            }
+            set {
+                if ((this.UpdateIntervalField.Equals(value) != true)) {
+                    this.UpdateIntervalField = value;
+                    this.RaisePropertyChanged("UpdateInterval");
                 }
             }
         }
@@ -210,8 +242,20 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="LocalizationServiceReference.ILocalizationService")]
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="LocalizationServiceReference.ILocalizationService", CallbackContract=typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ILocalizationServiceCallback), SessionMode=System.ServiceModel.SessionMode.Required)]
     public interface ILocalizationService {
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Subscribe", ReplyAction="http://tempuri.org/ILocalizationService/SubscribeResponse")]
+        bool Subscribe();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Subscribe", ReplyAction="http://tempuri.org/ILocalizationService/SubscribeResponse")]
+        System.Threading.Tasks.Task<bool> SubscribeAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Unsubscribe", ReplyAction="http://tempuri.org/ILocalizationService/UnsubscribeResponse")]
+        bool Unsubscribe();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Unsubscribe", ReplyAction="http://tempuri.org/ILocalizationService/UnsubscribeResponse")]
+        System.Threading.Tasks.Task<bool> UnsubscribeAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetGlobalSettings", ReplyAction="http://tempuri.org/ILocalizationService/GetGlobalSettingsResponse")]
         AttiLA.Test.LocalizationService.LocalizationServiceReference.GlobalSettings GetGlobalSettings();
@@ -257,6 +301,16 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         System.Threading.Tasks.Task TrackModeStopAsync();
     }
     
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public interface ILocalizationServiceCallback {
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStarted")]
+        void TrackModeStarted(System.DateTime startTime);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStopped")]
+        void TrackModeStopped(System.DateTime stopTime);
+    }
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ServiceModel.MessageContractAttribute(WrapperName="Localize", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
@@ -299,25 +353,42 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class LocalizationServiceClient : System.ServiceModel.ClientBase<AttiLA.Test.LocalizationService.LocalizationServiceReference.ILocalizationService>, AttiLA.Test.LocalizationService.LocalizationServiceReference.ILocalizationService {
+    public partial class LocalizationServiceClient : System.ServiceModel.DuplexClientBase<AttiLA.Test.LocalizationService.LocalizationServiceReference.ILocalizationService>, AttiLA.Test.LocalizationService.LocalizationServiceReference.ILocalizationService {
         
-        public LocalizationServiceClient() {
+        public LocalizationServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
+                base(callbackInstance) {
         }
         
-        public LocalizationServiceClient(string endpointConfigurationName) : 
-                base(endpointConfigurationName) {
+        public LocalizationServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName) : 
+                base(callbackInstance, endpointConfigurationName) {
         }
         
-        public LocalizationServiceClient(string endpointConfigurationName, string remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress) {
+        public LocalizationServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, string remoteAddress) : 
+                base(callbackInstance, endpointConfigurationName, remoteAddress) {
         }
         
-        public LocalizationServiceClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress) {
+        public LocalizationServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(callbackInstance, endpointConfigurationName, remoteAddress) {
         }
         
-        public LocalizationServiceClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(binding, remoteAddress) {
+        public LocalizationServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+                base(callbackInstance, binding, remoteAddress) {
+        }
+        
+        public bool Subscribe() {
+            return base.Channel.Subscribe();
+        }
+        
+        public System.Threading.Tasks.Task<bool> SubscribeAsync() {
+            return base.Channel.SubscribeAsync();
+        }
+        
+        public bool Unsubscribe() {
+            return base.Channel.Unsubscribe();
+        }
+        
+        public System.Threading.Tasks.Task<bool> UnsubscribeAsync() {
+            return base.Channel.UnsubscribeAsync();
         }
         
         public AttiLA.Test.LocalizationService.LocalizationServiceReference.GlobalSettings GetGlobalSettings() {

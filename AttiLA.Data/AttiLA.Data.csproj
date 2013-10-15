@@ -45,11 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Entities\FeatureKey.cs" />
     <Compile Include="Entities\FeatureValue.cs" />
     <Compile Include="Entities\ScanSignal.cs" />
-    <Compile Include="old_Context.cs" />
     <Compile Include="Entities\AccessPoint.cs" />
     <Compile Include="Entities\Context.cs" />
     <Compile Include="Entities\ContextStatistics.cs" />

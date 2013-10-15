@@ -19,14 +19,14 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="http://localhost:8733/Design_Time_Addresses/AttiLAService/mex" Protocol="mex" SourceId="1" />
+    <MetadataSource Address="net.pipe://localhost/AttiLAService/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="66ff8b78-ac79-46c0-8235-631ac395b96b" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/AttiLAService/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="6298d4be-9d84-4242-859f-6e7e16fa4cf9" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/AttiLAService/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="8e8f2aba-0e03-498f-91bb-850d64c79cae" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/AttiLAService/mex" />
-    <MetadataFile FileName="AttiLA.LocalizationService.xsd" MetadataType="Schema" ID="b2723294-645f-4503-87f7-8717c335ef5b" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/AttiLAService/mex" />
-    <MetadataFile FileName="System.xsd" MetadataType="Schema" ID="dadd7e3a-1f4b-4ebd-817b-ce441b21b322" SourceId="1" SourceUrl="http://localhost:8733/Design_Time_Addresses/AttiLAService/mex" />
+    <MetadataFile FileName="service1.wsdl" MetadataType="Wsdl" ID="fe64e39d-07b1-4b36-83f0-7156010fd1b5" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="service2.xsd" MetadataType="Schema" ID="4bfdc710-6dd9-4f94-9d86-b871c09431f2" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="service21.xsd" MetadataType="Schema" ID="c81d1bf0-d303-4055-93bd-03d0fea5f562" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="AttiLA.LocalizationService1.xsd" MetadataType="Schema" ID="b0034c51-7b30-4a92-afae-0cec6758ecbf" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="System1.xsd" MetadataType="Schema" ID="a59d3bb4-c5d0-4dc0-8437-ce24f74e88c9" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

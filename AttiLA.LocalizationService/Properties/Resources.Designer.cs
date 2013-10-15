@@ -79,7 +79,7 @@ namespace AttiLA.LocalizationService.Properties {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Operation aborted due to a datase deltaSimilarity..
+        ///   Cerca una stringa localizzata simile a Operation aborted due to a datase deltaSimilarity2..
         /// </summary>
         internal static string MsgFaultDatabaseError {
             get {

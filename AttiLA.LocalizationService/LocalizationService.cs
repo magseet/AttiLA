@@ -13,6 +13,14 @@ using System.Text.RegularExpressions;
 namespace AttiLA.LocalizationService
 {
 
+    /// <summary>
+    /// Service implementation:
+    ///  --- Processes messages on one thread at a time
+    ///  --- Creates a single service object
+    /// </summary>
+    [ServiceBehavior(
+        InstanceContextMode = InstanceContextMode.Single,
+        ConcurrencyMode = ConcurrencyMode.Single)]
     public class LocalizationService : ILocalizationService
     {
 
@@ -60,27 +68,113 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private Localizer localizer = new Localizer
         {
-            Retries = Properties.Settings.Default.LocalizerRetries
+            Retries = Properties.Settings.Default.LocalizerRetries,
+            //SimilarityAlgorithm = new SimilarityAlgorithm()[Properties.Settings.Default.]
         };
 
         /// <summary>
         /// Service to interact with scenarios in database.
         /// </summary>
-        private ScenarioService scenarioService = new ScenarioService();
+        private static readonly ScenarioService scenarioService = new ScenarioService();
 
         /// <summary>
         /// Service to interact with contexts in database.
         /// </summary>
-        private ContextService contextService = new ContextService();
+        private static readonly ContextService contextService = new ContextService();
+
+        /// <summary>
+        /// Record the subscribers to the callback service.
+        /// </summary>
+        private static readonly List<ILocalizationServiceCallback> 
+            subscribers = new List<ILocalizationServiceCallback>();
+
+
+        public LocalizationService()
+        {
+            tracker.TrackerNotification += tracker_TrackerNotification;
+        }
+
+        /// <summary>
+        /// Handler for notifications from tracker.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void tracker_TrackerNotification(object sender, TrackerNotificationEventArgs e)
+        {
+            switch(e.Code)
+            {
+                case TrackerNotificationCode.NoSignalsDetected:
+                    break;
+
+                case TrackerNotificationCode.Start:
+                    // notify all subscribers about tracker start
+                    var startTime = DateTime.Now;
+                    subscribers.ForEach(delegate(ILocalizationServiceCallback callback)
+                    {
+                        if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                        {
+                            callback.TrackModeStarted(startTime);
+                        }
+                        else
+                        {
+                            subscribers.Remove(callback);
+                        }
+                    });
+                    break;
+
+                case TrackerNotificationCode.Stop:
+                    // notify all subscribers about tracker stop
+                    var stopTime = DateTime.Now;
+                    subscribers.ForEach(delegate(ILocalizationServiceCallback callback)
+                    {
+                        if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                        {
+                            callback.TrackModeStopped(stopTime);
+                        }
+                        else
+                        {
+                            subscribers.Remove(callback);
+                        }
+                    });
+                    break;
+                
+            }
+        }
+
+
 
         public bool Subscribe()
         {
-            return false;
+            try
+            {
+                var callback = OperationContext.Current
+                    .GetCallbackChannel<ILocalizationServiceCallback>();
+                if(!subscribers.Contains(callback))
+                {
+                    subscribers.Add(callback);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool Unsubscribe()
         {
-            return false;
+            try
+            {
+                var callback = OperationContext.Current
+                    .GetCallbackChannel<ILocalizationServiceCallback>();
+                if (subscribers.Contains(callback))
+                    subscribers.Remove(callback);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public GlobalSettings GetGlobalSettings()

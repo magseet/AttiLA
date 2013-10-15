@@ -11,7 +11,9 @@ namespace AttiLA.LocalizationService
     /// <summary>
     /// WCF service that performs localization based on WLAN signals.
     /// </summary>
-    [ServiceContract]
+    [ServiceContract(
+        SessionMode=SessionMode.Required, 
+        CallbackContract=typeof(ILocalizationServiceCallback))]
     public interface ILocalizationService
     {
         /// <summary>
@@ -61,10 +63,10 @@ namespace AttiLA.LocalizationService
         /// Operation providing a prediction of the most suitable context id 
         /// for the current position. It is possible to switch immediately to 
         /// the predicted context. Other suitable contexts are provided with 
-        /// their similarity value.
+        /// their similarity2 value.
         /// </summary>
         /// <param name="changeContext">Switch immediately to the context or not.</param>
-        /// <param name="similarContexts">Suitable contexts with similarity value.</param>
+        /// <param name="similarContexts">Suitable contexts with similarity2 value.</param>
         /// <returns></returns>
         [OperationContract]
         [FaultContract(typeof(ServiceException))]
@@ -87,7 +89,7 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// Informations about a context similarity detected on prediction.
+    /// Informations about a context similarity2 detected on prediction.
     /// </summary>
     [DataContract]
     public class ContextSimilarity
@@ -99,7 +101,7 @@ namespace AttiLA.LocalizationService
         public string ContextId { get; set; }
 
         /// <summary>
-        /// The context value of similarity to the predicted one.
+        /// The context value of similarity2 to the predicted one.
         /// </summary>
         [DataMember]
         public double Similarity { get; set; }
@@ -117,6 +119,7 @@ namespace AttiLA.LocalizationService
         [DataMember]
         public TrackerSettings Tracking { get; set; }
 
+        public LocalizationSettings Localization { get; set; }
         
     }
 
@@ -141,10 +144,21 @@ namespace AttiLA.LocalizationService
         public double UpdateInterval { get; set; }
 
         /// <summary>
-        /// Flag to enable the tracker on service startup.
+        /// Flag to enable the tracker on service startup (localize and track).
         /// </summary>
         [DataMember]
         public bool EnabledOnStartup { get; set; }
+    }
+
+
+    /// <summary>
+    /// Settings related to localize module.
+    /// </summary>
+    [DataContract]
+    public class LocalizationSettings
+    {
+        [DataMember]
+        SimilarityAlgorithmType SimilarityAlgorithm { get; set; }
     }
 
     /// <summary>
@@ -158,5 +172,19 @@ namespace AttiLA.LocalizationService
         /// </summary>
         [DataMember]
         public string Message { get; set; }
+    }
+
+    /// <summary>
+    /// Values for similarity algorithm option.
+    /// </summary>
+    [DataContract]
+    public enum SimilarityAlgorithmType
+    {
+        [EnumMember]
+        NaiveBayes,
+        [EnumMember]
+        RelativeError,
+        [EnumMember]
+        RelativeError2
     }
 }

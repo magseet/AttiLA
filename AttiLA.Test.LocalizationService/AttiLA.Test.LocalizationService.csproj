@@ -74,6 +74,8 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="Properties\DataSources\AttiLA.LocalizationService.ContextSimilarity.datasource" />
+    <None Include="Properties\DataSources\AttiLA.LocalizationService.GlobalSettings.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -83,7 +85,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="Service References\LocalizationServiceReference\AttiLA.LocalizationService.xsd">
+    <None Include="Service References\LocalizationServiceReference\AttiLA.LocalizationService1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextSimilarity.datasource">
@@ -95,14 +97,14 @@
     <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\LocalizationServiceReference\service.wsdl" />
-    <None Include="Service References\LocalizationServiceReference\service.xsd">
+    <None Include="Service References\LocalizationServiceReference\service1.wsdl" />
+    <None Include="Service References\LocalizationServiceReference\service2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\LocalizationServiceReference\service1.xsd">
+    <None Include="Service References\LocalizationServiceReference\service21.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\LocalizationServiceReference\System.xsd">
+    <None Include="Service References\LocalizationServiceReference\System1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -128,6 +130,12 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AttiLA.Data\AttiLA.Data.csproj">
+      <Project>{ee8e2895-5075-41b6-8742-2711dce3b573}</Project>
+      <Name>AttiLA.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

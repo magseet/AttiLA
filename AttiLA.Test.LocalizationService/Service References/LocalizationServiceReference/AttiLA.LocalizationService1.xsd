@@ -9,6 +9,8 @@
   <xs:complexType name="TrackerSettings">
     <xs:sequence>
       <xs:element minOccurs="0" name="CaptureInterval" type="xs:double" />
+      <xs:element minOccurs="0" name="EnabledOnStartup" type="xs:boolean" />
+      <xs:element minOccurs="0" name="UpdateInterval" type="xs:double" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="TrackerSettings" nillable="true" type="tns:TrackerSettings" />
