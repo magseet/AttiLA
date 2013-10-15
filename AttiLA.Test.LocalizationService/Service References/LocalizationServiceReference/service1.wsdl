@@ -74,11 +74,11 @@
   <wsdl:message name="ILocalizationService_ChangeContext_OutputMessage">
     <wsdl:part name="parameters" element="tns:ChangeContextResponse" />
   </wsdl:message>
-  <wsdl:message name="ILocalizationService_ChangeContext_ServiceExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q2:ServiceException" />
-  </wsdl:message>
   <wsdl:message name="ILocalizationService_ChangeContext_ArgumentExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/System" name="detail" element="q3:ArgumentException" />
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/System" name="detail" element="q2:ArgumentException" />
+  </wsdl:message>
+  <wsdl:message name="ILocalizationService_ChangeContext_ServiceExceptionFault_FaultMessage">
+    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q3:ServiceException" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_Localize_InputMessage">
     <wsdl:part name="parameters" element="tns:Localize" />
@@ -134,8 +134,8 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ChangeContext">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContext" message="tns:ILocalizationService_ChangeContext_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextResponse" message="tns:ILocalizationService_ChangeContext_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_ChangeContext_ServiceExceptionFault_FaultMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextArgumentExceptionFault" name="ArgumentExceptionFault" message="tns:ILocalizationService_ChangeContext_ArgumentExceptionFault_FaultMessage" />
+      <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/ChangeContextServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_ChangeContext_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Localize">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/Localize" message="tns:ILocalizationService_Localize_InputMessage" />
@@ -210,11 +210,11 @@
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceExceptionFault">
-        <soap12:fault use="literal" name="ServiceExceptionFault" namespace="" />
-      </wsdl:fault>
       <wsdl:fault name="ArgumentExceptionFault">
         <soap12:fault use="literal" name="ArgumentExceptionFault" namespace="" />
+      </wsdl:fault>
+      <wsdl:fault name="ServiceExceptionFault">
+        <soap12:fault use="literal" name="ServiceExceptionFault" namespace="" />
       </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="Localize">

@@ -70,5 +70,17 @@ namespace AttiLA.LocalizationService.Properties {
                 this["TrackerEnabledOnStartup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public byte LocalizerSimilarityAlgorithm {
+            get {
+                return ((byte)(this["LocalizerSimilarityAlgorithm"]));
+            }
+            set {
+                this["LocalizerSimilarityAlgorithm"] = value;
+            }
+        }
     }
 }

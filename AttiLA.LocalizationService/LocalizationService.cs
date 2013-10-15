@@ -69,7 +69,7 @@ namespace AttiLA.LocalizationService
         private Localizer localizer = new Localizer
         {
             Retries = Properties.Settings.Default.LocalizerRetries,
-            //SimilarityAlgorithm = new SimilarityAlgorithm()[Properties.Settings.Default.]
+            SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(SimilarityAlgorithmType.RelativeError)
         };
 
         /// <summary>
@@ -244,9 +244,9 @@ namespace AttiLA.LocalizationService
             tracker.Enabled = false;
         }
 
-        public string Localize(bool changeContext, out IEnumerable<ContextSimilarity> similarContexts)
+        public string Localize(bool changeContext, out IEnumerable<ContextPreference> preferences)
         {
-            Scenario scenario = localizer.Prediction(out similarContexts);
+            Scenario scenario = localizer.Prediction(out preferences);
             if(changeContext)
             {
                 tracker.ScenarioId = (scenario == null ? null : scenario.Id.ToString());

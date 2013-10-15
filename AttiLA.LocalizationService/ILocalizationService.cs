@@ -49,10 +49,10 @@ namespace AttiLA.LocalizationService
             
 
         /// <summary>
-        /// Operation used to inform the service that a context has been
+        /// Operation used to inform the service that a preference has been
         /// manually selected.
         /// </summary>
-        /// <param name="newContextId">The manually selected context id.</param>
+        /// <param name="newContextId">The manually selected preference id.</param>
         [OperationContract]
         [FaultContract(typeof(ServiceException))]
         [FaultContract(typeof(ArgumentException))]
@@ -60,17 +60,17 @@ namespace AttiLA.LocalizationService
 
 
         /// <summary>
-        /// Operation providing a prediction of the most suitable context id 
+        /// Operation providing a prediction of the most suitable preference id 
         /// for the current position. It is possible to switch immediately to 
-        /// the predicted context. Other suitable contexts are provided with 
+        /// the predicted preference. Other suitable contexts are provided with 
         /// their similarity2 value.
         /// </summary>
-        /// <param name="changeContext">Switch immediately to the context or not.</param>
-        /// <param name="similarContexts">Suitable contexts with similarity2 value.</param>
+        /// <param name="changeContext">Switch immediately to the preference or not.</param>
+        /// <param name="preferences">Suitable contexts with preference value.</param>
         /// <returns></returns>
         [OperationContract]
         [FaultContract(typeof(ServiceException))]
-        string Localize(bool changeContext, out IEnumerable<ContextSimilarity> similarContexts);
+        string Localize(bool changeContext, out IEnumerable<ContextPreference> preferences);
 
         /// <summary>
         /// Operation to enable the tracker.
@@ -89,22 +89,22 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// Informations about a context similarity2 detected on prediction.
+    /// Context preference result.
     /// </summary>
     [DataContract]
-    public class ContextSimilarity
+    public class ContextPreference
     {
         /// <summary>
-        /// The context identifier.
+        /// The preference identifier.
         /// </summary>
         [DataMember]
         public string ContextId { get; set; }
 
         /// <summary>
-        /// The context value of similarity2 to the predicted one.
+        /// The preference value associated to the preference.
         /// </summary>
         [DataMember]
-        public double Similarity { get; set; }
+        public double Value { get; set; }
     }
 
     /// <summary>
@@ -183,8 +183,8 @@ namespace AttiLA.LocalizationService
         [EnumMember]
         NaiveBayes,
         [EnumMember]
-        RelativeError,
+        RelativeErrorExtended,
         [EnumMember]
-        RelativeError2
+        RelativeError
     }
 }

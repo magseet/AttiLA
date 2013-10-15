@@ -11,12 +11,7 @@ namespace AttiLA.LocalizationService
 {
     public class Localizer
     {
-
-        public Func<IEnumerable<Feature>, IDictionary<AccessPoint, int>, double> SimilarityAlgorithm { get; set; }
-
-
-        private static readonly Dictionary<SimilarityAlgorithmType, Func<IEnumerable<Feature>, IDictionary<AccessPoint, int>, double>>
-            algorithms = new Dictionary<SimilarityAlgorithmType, Func<IEnumerable<Feature>, IDictionary<AccessPoint, int>, double>>();
+        public Func<Scenario, IDictionary<AccessPoint, int>, double> SimilarityAlgorithm { get; set; }
 
         /// <summary>
         /// Samples supplier module.
@@ -42,27 +37,27 @@ namespace AttiLA.LocalizationService
         }
 
         /// <summary>
-        /// Get a scenario for the requested context.
+        /// Get a scenario for the requested preference.
         /// </summary>
-        /// <param name="contextId">The requested context id.</param>
-        /// <param name="similarContexts">Similar contexts predicted.</param>
+        /// <param name="contextId">The requested preference id.</param>
+        /// <param name="preferences">Similar contexts predicted.</param>
         /// <returns></returns>
-        public Scenario ChangeContext(string contextId, out IEnumerable<ContextSimilarity> similarContexts)
+        public Scenario ChangeContext(string contextId, out IEnumerable<ContextPreference> preferences)
         {
             // prediction
 
 
 
-            similarContexts = null;
+            preferences = null;
             return null;
         }
 
         /// <summary>
         /// Get the most suitable scenario based on the releaved signals.
         /// </summary>
-        /// <param name="similarContexts">Similar contexts predicted.</param>
+        /// <param name="preferences">Similar contexts predicted with preference value.</param>
         /// <returns>The most suitable scenario or null.</returns>
-        public Scenario Prediction(out IEnumerable<ContextSimilarity> similarContexts)
+        public Scenario Prediction(out IEnumerable<ContextPreference> preferences)
         {
             List<ScanSignal> signals = null;
             int retries = this.Retries;
@@ -78,7 +73,7 @@ namespace AttiLA.LocalizationService
 
             if (signals.Count == 0)
             {
-                similarContexts = null;
+                preferences = null;
                 return null;
             }
 
@@ -95,12 +90,12 @@ namespace AttiLA.LocalizationService
             if(similarScenarios.Count() == 0)
             {
                 // no suitable scenarios were found.
-                similarContexts = null;
+                preferences = null;
                 return null;
             }
 
-            // create map with context id as key.
-            var mapContextSimilarities = new Dictionary<string, ContextSimilarity>();
+            // create map with preference id as key.
+            var mapPreferences = new Dictionary<string, ContextPreference>();
             double bestScenarioSimilarity = -1.0; // min value will be 0.0
             Scenario bestScenario = null;
 
@@ -111,72 +106,26 @@ namespace AttiLA.LocalizationService
                     // skip scenario
                     continue;
                 }
-
-                double similarity2 = 0;
-                double reliability2 = 0;
-                double naiveSimilarity = 1;
-
-                foreach(var feature in scenario.Features)
-                {
-                    // Reliability represents the maximum similarity2
-                    int evidence;
-                    double featureSimilarityWhenFound;
-                    double featureSimilarityWhenNotFound;
-                    double featureSimilarity;
-                    //double featureMaxSimilarity = feature.Value.Reliability * featureMaxSimilarityWhenFound;      // consider only first addend
-
-                    if(!mapSignals.TryGetValue(feature.Key.AP, out evidence))
-                    {
-                        // no evidence for this feature
-                        featureSimilarityWhenFound = 0;
-                        featureSimilarityWhenNotFound = 1;
-                    }
-                    else if (feature.Value.Variance == 0)
-                    {
-                        // evidence found - feature is a delta function
-                        featureSimilarityWhenFound = (evidence == feature.Value.Avg ? 1 : 0);
-                        featureSimilarityWhenNotFound = (evidence < feature.Value.Avg ? 1 : 0);
-                    }
-                    else
-                    {
-                        // evindence found - feature is a gaussian function
-                        double Z = evidence - feature.Value.Avg;
-                        Z = Z * Z;
-                        Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
-                        featureSimilarityWhenFound = Math.Exp(Z);
-                        featureSimilarityWhenNotFound = 1.0 - Phi((evidence - feature.Value.Avg) / feature.Value.Variance);
-                    }
-                    featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound + (1.0 - feature.Value.Reliability) * featureSimilarityWhenNotFound;
-                    //featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound;   // consider only first addend
-
-                    similarity2 += featureSimilarity * featureSimilarity;
-                    //reliability2 += featureMaxSimilarity * featureMaxSimilarity;
-                    reliability2++;
-
-                    naiveSimilarity *= featureSimilarity;
-                }
-
                 // result for scenario
-                //double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / reliability2));
-                double scenarioSimilarity = naiveSimilarity;
+                double scenarioSimilarity = SimilarityAlgorithm(scenario,mapSignals);
 
-                // update context similarity
-                ContextSimilarity context;
-                if(mapContextSimilarities.TryGetValue(scenario.ContextId.ToString(), out context))
+                // update preference similarity
+                ContextPreference preference;
+                if(mapPreferences.TryGetValue(scenario.ContextId.ToString(), out preference))
                 {
-                    if(scenarioSimilarity > context.Similarity)
+                    if(scenarioSimilarity > preference.Value)
                     {
-                        // new best scenario for the context
-                        context.Similarity = scenarioSimilarity;
+                        // new best scenario for the preference
+                        preference.Value = scenarioSimilarity;
                     }
                 }
                 else
                 {
-                    // new suitable context found
-                    mapContextSimilarities.Add(scenario.ContextId.ToString(), new ContextSimilarity
+                    // new suitable preference found
+                    mapPreferences.Add(scenario.ContextId.ToString(), new ContextPreference
                     {
                         ContextId = scenario.ContextId.ToString(),
-                        Similarity = scenarioSimilarity
+                        Value = scenarioSimilarity
                     });
                 }
 
@@ -188,7 +137,24 @@ namespace AttiLA.LocalizationService
                 }
             }
 
-            similarContexts = (bestScenario == null ? null : mapContextSimilarities.Values);
+            preferences = (bestScenario == null ? null : mapPreferences.Values);
+
+            if(preferences != null)
+            {
+                double global = 0;
+                foreach(var context in preferences)
+                {
+                    global += context.Value;
+                }
+                if(global > 0)
+                {
+                    foreach(var context in preferences)
+                    {
+                        context.Value /= global;
+                    }
+                }
+            }
+
             return bestScenario;
         }
 
@@ -198,118 +164,6 @@ namespace AttiLA.LocalizationService
         {
 
         }
-
-        private static double Phi(double x)
-        {
-            // constants
-            const double a1 = 0.254829592;
-            const double a2 = -0.284496736;
-            const double a3 = 1.421413741;
-            const double a4 = -1.453152027;
-            const double a5 = 1.061405429;
-            const double p = 0.3275911;
-
-            // Save the sign of x
-            int sign = Math.Sign(x);
-            x = Math.Abs(x) / Math.Sqrt(2.0);
-
-            // A&S formula 7.1.26
-            double t = 1.0 / (1.0 + p * x);
-            double y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.Exp(-x * x);
-
-            return 0.5 * (1.0 + sign * y);
-        }
-
-        private static double NaiveBayesSimilarity(IEnumerable<Feature> features, IDictionary<AccessPoint, int> mapSignals)
-        {
-            double naiveSimilarity = 1;
-            foreach(var feature in features)
-            {
-                // Reliability represents the maximum similarity2
-                int evidence;
-                double featureSimilarityWhenFound;
-                double featureSimilarityWhenNotFound;
-                double featureSimilarity;
-
-                if(!mapSignals.TryGetValue(feature.Key.AP, out evidence))
-                {
-                    // no evidence for this feature
-                    featureSimilarityWhenFound = 0;
-                    featureSimilarityWhenNotFound = 1;
-                }
-                else if (feature.Value.Variance == 0)
-                {
-                    // evidence found - feature is a delta function
-                    featureSimilarityWhenFound = (evidence == feature.Value.Avg ? 1 : 0);
-                    featureSimilarityWhenNotFound = (evidence < feature.Value.Avg ? 1 : 0);
-                }
-                else
-                {
-                    // evindence found - feature is a gaussian function
-                    double Z = evidence - feature.Value.Avg;
-                    Z = Z * Z;
-                    Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
-                    featureSimilarityWhenFound = Math.Exp(Z);
-                    featureSimilarityWhenNotFound = 1.0 - Phi((evidence - feature.Value.Avg) / feature.Value.Variance);
-                }
-                featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound + (1.0 - feature.Value.Reliability) * featureSimilarityWhenNotFound;
-                naiveSimilarity *= featureSimilarity;
-            }
-            return naiveSimilarity;
-        }
-
-        private static double RelativeErrorSimilarity(IEnumerable<Feature> features, IDictionary<AccessPoint, int> mapSignals)
-        {
-            double similarity2 = 0;
-            double reliability2 = 0;
-            double naiveSimilarity = 1;
-
-            foreach (var feature in features)
-            {
-                // Reliability represents the maximum similarity2
-                int evidence;
-                double featureSimilarityWhenFound;
-                double featureSimilarityWhenNotFound;
-                double featureSimilarity;
-                //double featureMaxSimilarity = feature.Value.Reliability * featureMaxSimilarityWhenFound;      // consider only first addend
-
-                if (!mapSignals.TryGetValue(feature.Key.AP, out evidence))
-                {
-                    // no evidence for this feature
-                    featureSimilarityWhenFound = 0;
-                    featureSimilarityWhenNotFound = 1;
-                }
-                else if (feature.Value.Variance == 0)
-                {
-                    // evidence found - feature is a delta function
-                    featureSimilarityWhenFound = (evidence == feature.Value.Avg ? 1 : 0);
-                    featureSimilarityWhenNotFound = (evidence < feature.Value.Avg ? 1 : 0);
-                }
-                else
-                {
-                    // evindence found - feature is a gaussian function
-                    double Z = evidence - feature.Value.Avg;
-                    Z = Z * Z;
-                    Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
-                    featureSimilarityWhenFound = Math.Exp(Z);
-                    featureSimilarityWhenNotFound = 1.0 - Phi((evidence - feature.Value.Avg) / feature.Value.Variance);
-                }
-                featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound + (1.0 - feature.Value.Reliability) * featureSimilarityWhenNotFound;
-                //featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound;   // consider only first addend
-
-                similarity2 += featureSimilarity * featureSimilarity;
-                //reliability2 += featureMaxSimilarity * featureMaxSimilarity;
-                reliability2++;
-
-                naiveSimilarity *= featureSimilarity;
-            }
-
-            // result for scenario
-            //double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / reliability2));
-            double scenarioSimilarity = naiveSimilarity;
-            return scenarioSimilarity;
-        }
-
 
     }
 }

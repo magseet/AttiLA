@@ -88,7 +88,7 @@
     <None Include="Service References\LocalizationServiceReference\AttiLA.LocalizationService1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextSimilarity.datasource">
+    <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.GlobalSettings.datasource">

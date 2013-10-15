@@ -48,7 +48,7 @@ namespace AttiLA.Test.LocalizationService
                 }
                 catch(FaultException<ArgumentException>)
                 {
-                    MessageBox.Show("invalid context");
+                    MessageBox.Show("invalid preference");
                 }
                 catch(FaultException<ServiceException> ex)
                 {
@@ -74,11 +74,11 @@ namespace AttiLA.Test.LocalizationService
 
         private void buttonLocalize_Click(object sender, EventArgs e)
         {
-            ContextSimilarity[] similarContexts;
+            ContextPreference[] preferences;
             try
             {
                 buttonLocalize.Enabled = false;
-                string contextId = serviceClient.Localize(true, out similarContexts);
+                string contextId = serviceClient.Localize(true, out preferences);
             }
             finally
             {
@@ -88,16 +88,16 @@ namespace AttiLA.Test.LocalizationService
 
             listViewContexts.Items.Clear();
 
-            if(similarContexts != null)
+            if(preferences != null)
             {
-                foreach(var context in similarContexts)
+                foreach(var preference in preferences)
                 {
 
                     var lvi = new ListViewItem();
-                    var contextName = contextService.GetById(context.ContextId.ToString()).ContextName;
-                    lvi.Text = context.ContextId.ToString();
+                    var contextName = contextService.GetById(preference.ContextId.ToString()).ContextName;
+                    lvi.Text = preference.ContextId.ToString();
                     lvi.SubItems.Add(contextName);
-                    lvi.SubItems.Add(context.Similarity.ToString());
+                    lvi.SubItems.Add(preference.Value.ToString());
                     listViewContexts.Items.Add(lvi);
                 }
             }

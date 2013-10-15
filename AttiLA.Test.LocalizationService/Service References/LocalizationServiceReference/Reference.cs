@@ -182,9 +182,9 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ContextSimilarity", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ContextPreference", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
     [System.SerializableAttribute()]
-    public partial class ContextSimilarity : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class ContextPreference : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -193,7 +193,7 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         private string ContextIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double SimilarityField;
+        private double ValueField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -219,14 +219,14 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public double Similarity {
+        public double Value {
             get {
-                return this.SimilarityField;
+                return this.ValueField;
             }
             set {
-                if ((this.SimilarityField.Equals(value) != true)) {
-                    this.SimilarityField = value;
-                    this.RaisePropertyChanged("Similarity");
+                if ((this.ValueField.Equals(value) != true)) {
+                    this.ValueField = value;
+                    this.RaisePropertyChanged("Value");
                 }
             }
         }
@@ -271,8 +271,8 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         System.Threading.Tasks.Task SetGlobalSettingsAsync(AttiLA.Test.LocalizationService.LocalizationServiceReference.GlobalSettings newSettings);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/ChangeContext", ReplyAction="http://tempuri.org/ILocalizationService/ChangeContextResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/ChangeContextServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
         [System.ServiceModel.FaultContractAttribute(typeof(System.ArgumentException), Action="http://tempuri.org/ILocalizationService/ChangeContextArgumentExceptionFault", Name="ArgumentException", Namespace="http://schemas.datacontract.org/2004/07/System")]
+        [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/ChangeContextServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
         void ChangeContext(string newContextId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/ChangeContext", ReplyAction="http://tempuri.org/ILocalizationService/ChangeContextResponse")]
@@ -336,14 +336,14 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         public string LocalizeResult;
         
         [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
-        public AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextSimilarity[] similarContexts;
+        public AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] preferences;
         
         public LocalizeResponse() {
         }
         
-        public LocalizeResponse(string LocalizeResult, AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextSimilarity[] similarContexts) {
+        public LocalizeResponse(string LocalizeResult, AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] preferences) {
             this.LocalizeResult = LocalizeResult;
-            this.similarContexts = similarContexts;
+            this.preferences = preferences;
         }
     }
     
@@ -420,11 +420,11 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
             return base.Channel.Localize(request);
         }
         
-        public string Localize(bool changeContext, out AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextSimilarity[] similarContexts) {
+        public string Localize(bool changeContext, out AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] preferences) {
             AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeRequest inValue = new AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeRequest();
             inValue.changeContext = changeContext;
             AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeResponse retVal = ((AttiLA.Test.LocalizationService.LocalizationServiceReference.ILocalizationService)(this)).Localize(inValue);
-            similarContexts = retVal.similarContexts;
+            preferences = retVal.preferences;
             return retVal.LocalizeResult;
         }
         

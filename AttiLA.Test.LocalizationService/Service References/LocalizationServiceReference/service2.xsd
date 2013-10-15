@@ -72,7 +72,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="LocalizeResult" nillable="true" type="xs:string" />
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="similarContexts" nillable="true" type="q3:ArrayOfContextSimilarity" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="preferences" nillable="true" type="q3:ArrayOfContextPreference" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
