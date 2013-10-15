@@ -75,7 +75,16 @@ namespace AttiLA.Test.LocalizationService
         private void buttonLocalize_Click(object sender, EventArgs e)
         {
             ContextSimilarity[] similarContexts;
-            string contextId = serviceClient.Localize(true, out similarContexts);
+            try
+            {
+                buttonLocalize.Enabled = false;
+                string contextId = serviceClient.Localize(true, out similarContexts);
+            }
+            finally
+            {
+                buttonLocalize.Enabled = true;
+            }
+            
 
             listViewContexts.Items.Clear();
 
