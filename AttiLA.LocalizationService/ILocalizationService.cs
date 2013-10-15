@@ -11,7 +11,7 @@ namespace AttiLA.LocalizationService
     /// <summary>
     /// WCF service that performs localization based on WLAN signals.
     /// </summary>
-    [ServiceContract]
+    [ServiceContract(SessionMode=SessionMode.Required, CallbackContract=typeof(ILocalizationServiceCallback))]
     public interface ILocalizationService
     {
         /// <summary>

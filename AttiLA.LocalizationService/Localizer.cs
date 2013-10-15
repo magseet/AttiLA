@@ -105,7 +105,7 @@ namespace AttiLA.LocalizationService
                     continue;
                 }
 
-                double deltaSimilarity2 = 0;
+                //double deltaSimilarity2 = 0;
                 double similarity2 = 0;
                 double reliability2 = 0;
 
@@ -143,7 +143,7 @@ namespace AttiLA.LocalizationService
                 //double scenarioSimilarity = (similarity2 == 0 ? 0 : 1 - Math.Sqrt(deltaSimilarity2 / reliability2));
                 double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / reliability2));
 
-                // update context similarity2
+                // update context similarity
                 ContextSimilarity context;
                 if(mapContextSimilarities.TryGetValue(scenario.ContextId.ToString(), out context))
                 {

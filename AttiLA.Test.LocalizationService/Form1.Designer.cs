@@ -7,6 +7,7 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+
         /// <summary>
         /// Pulire le risorse in uso.
         /// </summary>
@@ -43,6 +44,7 @@
             this.listViewContexts = new System.Windows.Forms.ListView();
             this.columnHeaderContextId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderSimilarity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -146,6 +148,7 @@
             // 
             this.listViewContexts.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderContextId,
+            this.columnHeaderName,
             this.columnHeaderSimilarity});
             this.listViewContexts.Location = new System.Drawing.Point(34, 219);
             this.listViewContexts.Name = "listViewContexts";
@@ -157,10 +160,15 @@
             // columnHeaderContextId
             // 
             this.columnHeaderContextId.Text = "Context ID";
+            this.columnHeaderContextId.Width = 166;
             // 
             // columnHeaderSimilarity
             // 
             this.columnHeaderSimilarity.Text = "Similarity";
+            // 
+            // columnHeaderName
+            // 
+            this.columnHeaderName.Text = "Name";
             // 
             // Form1
             // 
@@ -181,11 +189,13 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.FormClosing += Form1_FormClosing;
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
+   
         #endregion
 
         private System.Windows.Forms.NotifyIcon notifyIcon1;
@@ -202,6 +212,7 @@
         private System.Windows.Forms.ListView listViewContexts;
         private System.Windows.Forms.ColumnHeader columnHeaderContextId;
         private System.Windows.Forms.ColumnHeader columnHeaderSimilarity;
+        private System.Windows.Forms.ColumnHeader columnHeaderName;
     }
 }
 

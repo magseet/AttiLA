@@ -73,14 +73,44 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private ContextService contextService = new ContextService();
 
+        /// <summary>
+        /// Record the subscribers to the callback service.
+        /// </summary>
+        private static readonly List<ILocalizationServiceCallback> 
+            subscribers = new List<ILocalizationServiceCallback>();
+
         public bool Subscribe()
         {
-            return false;
+            try
+            {
+                var callback = OperationContext.Current
+                    .GetCallbackChannel<ILocalizationServiceCallback>();
+                if(!subscribers.Contains(callback))
+                {
+                    subscribers.Add(callback);
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public bool Unsubscribe()
         {
-            return false;
+            try
+            {
+                var callback = OperationContext.Current
+                    .GetCallbackChannel<ILocalizationServiceCallback>();
+                if (subscribers.Contains(callback))
+                    subscribers.Remove(callback);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public GlobalSettings GetGlobalSettings()

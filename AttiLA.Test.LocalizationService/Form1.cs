@@ -15,17 +15,28 @@ using AttiLA.Data.Entities;
 
 namespace AttiLA.Test.LocalizationService
 {
-    public partial class Form1 : Form
+    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    public partial class Form1 : Form, ILocalizationServiceCallback
     {
-        private LocalizationServiceClient serviceClient = new LocalizationServiceClient(
-                Properties.Settings.Default.EndpointConfigurationName);
+        
+        private LocalizationServiceClient serviceClient;
 
         private ContextService contextService = new ContextService();
         
         public Form1()
         {
             InitializeComponent();
+            var context = new InstanceContext(this);
+            serviceClient = new LocalizationServiceClient(context);
+            serviceClient.Subscribe();
         }
+
+        void Form1_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
+        {
+            serviceClient.Unsubscribe();
+        }
+
+
 
         private void buttonChangeContextId_Click(object sender, EventArgs e)
         {
@@ -75,7 +86,8 @@ namespace AttiLA.Test.LocalizationService
 
                     var lvi = new ListViewItem();
                     var contextName = contextService.GetById(context.ContextId.ToString()).ContextName;
-                    lvi.Text = contextName;
+                    lvi.Text = context.ContextId.ToString();
+                    lvi.SubItems.Add(contextName);
                     lvi.SubItems.Add(context.Similarity.ToString());
                     listViewContexts.Items.Add(lvi);
                 }
@@ -85,6 +97,16 @@ namespace AttiLA.Test.LocalizationService
 
         private void Form1_Load(object sender, EventArgs e)
         {
+        }
+
+        public void TrackModeStarted(DateTime startTime)
+        {
+
+        }
+
+        public void TrackModeStopped(DateTime stopTime)
+        {
+
         }
     }
 }
