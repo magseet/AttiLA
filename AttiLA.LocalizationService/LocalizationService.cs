@@ -29,27 +29,7 @@ namespace AttiLA.LocalizationService
         #endregion
 
         #region Events
-        /// <summary>
-        /// Represents a method that will handle <see cref="TrackerStartNotification"/>
-        /// </summary>
-        /// <param name="scenario">The scenario to be tracked.</param>
-        public delegate void TrackerStartNotificationHandler(Context context);
 
-        /// <summary>
-        /// Represents a method that will handle <see cref="TrackerStartNotification"/>
-        /// </summary>
-        /// <param name="previousContext">The scenario that was tracked.</param>
-        public delegate void TrackerStopNotificationHandler(Context previousContext);
-
-        /// <summary>
-        /// Occurs when there is a request to enter in track mode.
-        /// </summary>
-        public event TrackerStartNotificationHandler TrackerStartNotification;
-
-        /// <summary>
-        /// Occurs when there is a request to leave the track mode.
-        /// </summary>
-        public event TrackerStopNotificationHandler TrackerStopNotification;
 
         #endregion
 
@@ -83,7 +63,7 @@ namespace AttiLA.LocalizationService
         private static readonly ContextService contextService = new ContextService();
 
         /// <summary>
-        /// Record the subscribers to the callback service.
+        /// Record the subscribers to the subscriber service.
         /// </summary>
         private static readonly List<ILocalizationServiceCallback> 
             subscribers = new List<ILocalizationServiceCallback>();
@@ -92,10 +72,37 @@ namespace AttiLA.LocalizationService
         public LocalizationService()
         {
             tracker.TrackerNotification += tracker_TrackerNotification;
+            localizer.LocalizerNotification += localizer_LocalizerNotification;
         }
 
         /// <summary>
-        /// Handler for notifications from tracker.
+        /// Handler for notifications by the localizer.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void localizer_LocalizerNotification(object sender, LocalizerNotificationEventArgs e)
+        {
+            switch (e.Code)
+            {
+                case LocalizerNotificationCode.Progress:
+                    // notify all subscribers about localization progress
+                    foreach (var subscriber in subscribers)
+                    {
+                        if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                        {
+                            subscriber.ReportLocalizationProgress(e.ValueAsProgress);
+                        }
+                        else
+                        {
+                            subscribers.Remove(subscriber);
+                        }
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Handler for notifications by the tracker.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -109,33 +116,35 @@ namespace AttiLA.LocalizationService
                 case TrackerNotificationCode.Start:
                     // notify all subscribers about tracker start
                     var startTime = DateTime.Now;
-                    subscribers.ForEach(delegate(ILocalizationServiceCallback callback)
+                    foreach(var subscriber in subscribers)
                     {
-                        if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                        if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
                         {
-                            callback.TrackModeStarted(startTime);
+                            var contextId = (e.TargetScenario == null ? null : e.TargetScenario.ContextId.ToString());
+                            subscriber.TrackModeStarted(startTime, contextId);
                         }
                         else
                         {
-                            subscribers.Remove(callback);
-                        }
-                    });
+                            subscribers.Remove(subscriber);
+                        } 
+                    }
                     break;
 
                 case TrackerNotificationCode.Stop:
                     // notify all subscribers about tracker stop
                     var stopTime = DateTime.Now;
-                    subscribers.ForEach(delegate(ILocalizationServiceCallback callback)
+                    foreach(var subscriber in subscribers)
                     {
-                        if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                        if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
                         {
-                            callback.TrackModeStopped(stopTime);
+                            var contextId = (e.TargetScenario == null ? null : e.TargetScenario.ContextId.ToString());
+                            subscriber.TrackModeStopped(stopTime, contextId);
                         }
                         else
                         {
-                            subscribers.Remove(callback);
+                            subscribers.Remove(subscriber);
                         }
-                    });
+                    }
                     break;
                 
             }

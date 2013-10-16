@@ -64,7 +64,7 @@ namespace AttiLA.Data.Services
             }
             if(accessPoints.Count() == 0)
             {
-                return new List<Scenario>();
+                return new List<Scenario>().AsEnumerable();
             }
 
             //// Get all ids of scenarios containing at least one access point in the list
@@ -224,7 +224,7 @@ namespace AttiLA.Data.Services
             if(scenarios.Count == 0)
             {
                 // no suitable scenarios found
-                return scenarios;
+                return scenarios.AsEnumerable();
             }
 
 
@@ -333,7 +333,7 @@ namespace AttiLA.Data.Services
                 }
             }
 
-            return scenarios;
+            return scenarios.AsEnumerable();
         }
 
         public void prova()

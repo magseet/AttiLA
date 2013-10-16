@@ -17,7 +17,7 @@ namespace AttiLA.LocalizationService
     public interface ILocalizationService
     {
         /// <summary>
-        /// Operation of subscription to the callback service.
+        /// Operation of subscription to the subscriber service.
         /// </summary>
         /// <returns></returns>
         [OperationContract]
@@ -25,7 +25,7 @@ namespace AttiLA.LocalizationService
 
 
         /// <summary>
-        /// Operation of cancellation from the callback service.
+        /// Operation of cancellation from the subscriber service.
         /// </summary>
         /// <returns></returns>
         [OperationContract]
@@ -76,14 +76,12 @@ namespace AttiLA.LocalizationService
         /// Operation to enable the tracker.
         /// </summary>
         [OperationContract]
-        [FaultContract(typeof(ServiceException))]
         void TrackModeStart();
 
         /// <summary>
         /// Operation to disable the tracker.
         /// </summary>
         [OperationContract]
-        [FaultContract(typeof(ServiceException))]
         void TrackModeStop();
         
     }

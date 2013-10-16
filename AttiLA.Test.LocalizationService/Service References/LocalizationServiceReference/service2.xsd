@@ -100,6 +100,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="startTime" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -107,6 +108,14 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="stopTime" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReportLocalizationProgress">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="progress" type="xs:double" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

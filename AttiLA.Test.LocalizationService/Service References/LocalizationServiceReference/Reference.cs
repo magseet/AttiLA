@@ -287,14 +287,12 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         System.Threading.Tasks.Task<AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeResponse> LocalizeAsync(AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeRequest request);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStartResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackModeStartServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
         void TrackModeStart();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStartResponse")]
         System.Threading.Tasks.Task TrackModeStartAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStopResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackModeStopServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
         void TrackModeStop();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStopResponse")]
@@ -305,10 +303,13 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
     public interface ILocalizationServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStarted")]
-        void TrackModeStarted(System.DateTime startTime);
+        void TrackModeStarted(System.DateTime startTime, string contextId);
         
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStopped")]
-        void TrackModeStopped(System.DateTime stopTime);
+        void TrackModeStopped(System.DateTime stopTime, string contextId);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportLocalizationProgress")]
+        void ReportLocalizationProgress(double progress);
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]

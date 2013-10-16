@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using AttiLA.Test.LocalizationService.LocalizationServiceReference;
 using System.ServiceModel;
@@ -15,17 +16,23 @@ using AttiLA.Data.Entities;
 
 namespace AttiLA.Test.LocalizationService
 {
-    [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    [CallbackBehavior(
+        //ConcurrencyMode = ConcurrencyMode.Reentrant
+        UseSynchronizationContext=false
+        )]
     public partial class Form1 : Form, ILocalizationServiceCallback
     {
         
         private LocalizationServiceClient serviceClient;
 
         private ContextService contextService = new ContextService();
+
+        SynchronizationContext _SyncContext = null;
         
         public Form1()
         {
             InitializeComponent();
+            _SyncContext = WindowsFormsSynchronizationContext.Current;
             var context = new InstanceContext(this);
             serviceClient = new LocalizationServiceClient(context);
             serviceClient.Subscribe();
@@ -72,16 +79,33 @@ namespace AttiLA.Test.LocalizationService
             serviceClient.TrackModeStop();
         }
 
+
+        void LocalizeCallCompleted(IAsyncResult ar)
+        {
+            MessageBox.Show("Localization completed");
+        }
+
+       
+        public delegate TV MyFunc<in T, TU, out TV>(T input, out TU output);
         private void buttonLocalize_Click(object sender, EventArgs e)
         {
+             
             ContextPreference[] preferences;
             try
             {
+                progressBarLocalize.Value = 0;
                 buttonLocalize.Enabled = false;
-                string contextId = serviceClient.Localize(true, out preferences);
+                MyFunc<bool, ContextPreference[],string> localizeCall = new MyFunc<bool,ContextPreference[],string>(serviceClient.Localize);
+
+                localizeCall.BeginInvoke(
+                    true, 
+                    out preferences,
+                    LocalizeCallCompleted,
+                    localizeCall);                
             }
             finally
             {
+                // TODO..
                 buttonLocalize.Enabled = true;
             }
             
@@ -108,14 +132,26 @@ namespace AttiLA.Test.LocalizationService
         {
         }
 
-        public void TrackModeStarted(DateTime startTime)
+        public void TrackModeStarted(DateTime startTime, string contextId)
+        {
+            MessageBox.Show("Started!");
+        }
+
+        public void TrackModeStopped(DateTime stopTime, string contextId)
         {
 
         }
 
-        public void TrackModeStopped(DateTime stopTime)
-        {
 
+        public void ReportLocalizationProgress(double progress)
+        {
+            SendOrPostCallback setProgressBar = delegate
+            {
+                progressBarLocalize.Value = (int)(progress * 100);
+                label4.Text = (progress * 100).ToString();
+            };
+
+            _SyncContext.Post(setProgressBar, null);
         }
     }
 }

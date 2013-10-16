@@ -43,8 +43,10 @@
             this.buttonLocalize = new System.Windows.Forms.Button();
             this.listViewContexts = new System.Windows.Forms.ListView();
             this.columnHeaderContextId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeaderSimilarity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderSimilarity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.progressBarLocalize = new System.Windows.Forms.ProgressBar();
+            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -162,19 +164,38 @@
             this.columnHeaderContextId.Text = "Context ID";
             this.columnHeaderContextId.Width = 166;
             // 
+            // columnHeaderName
+            // 
+            this.columnHeaderName.Text = "Name";
+            // 
             // columnHeaderSimilarity
             // 
             this.columnHeaderSimilarity.Text = "Similarity";
             // 
-            // columnHeaderName
+            // progressBarLocalize
             // 
-            this.columnHeaderName.Text = "Name";
+            this.progressBarLocalize.Location = new System.Drawing.Point(137, 183);
+            this.progressBarLocalize.Name = "progressBarLocalize";
+            this.progressBarLocalize.Size = new System.Drawing.Size(295, 23);
+            this.progressBarLocalize.Step = 1;
+            this.progressBarLocalize.TabIndex = 12;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(439, 193);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(35, 13);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "label4";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(504, 376);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.progressBarLocalize);
             this.Controls.Add(this.listViewContexts);
             this.Controls.Add(this.buttonLocalize);
             this.Controls.Add(this.label3);
@@ -189,7 +210,6 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.FormClosing += Form1_FormClosing;
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -213,6 +233,8 @@
         private System.Windows.Forms.ColumnHeader columnHeaderContextId;
         private System.Windows.Forms.ColumnHeader columnHeaderSimilarity;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
+        private System.Windows.Forms.ProgressBar progressBarLocalize;
+        private System.Windows.Forms.Label label4;
     }
 }
 

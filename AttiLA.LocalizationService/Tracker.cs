@@ -14,7 +14,7 @@ namespace AttiLA.LocalizationService
     
     #region Notification classes
     /// <summary>
-    /// The notification codes.
+    /// The tracker notification codes.
     /// </summary>
     public enum TrackerNotificationCode
     {
@@ -25,7 +25,7 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// The notification deltaSimilarity2 codes.
+    /// The tracker notification error codes.
     /// </summary>
     public enum TrackerErrorNotificationCode
     {
@@ -33,11 +33,11 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// Data for to notification event handler.
+    /// Arguments of tracker notifications.
     /// </summary>
     public class TrackerNotificationEventArgs : EventArgs
     {
-        public TrackerNotificationEventArgs(TrackerNotificationCode code)
+        public TrackerNotificationEventArgs(TrackerNotificationCode code, Scenario targetScenario = null)
         {
             Code = code;
         }
@@ -45,12 +45,16 @@ namespace AttiLA.LocalizationService
         /// <summary>
         /// A code to identify the notification type.
         /// </summary>
-        public TrackerNotificationCode Code { get; private set; }
+        public TrackerNotificationCode Code { get; set; }
 
+        /// <summary>
+        /// The scenario used by the tracker.
+        /// </summary>
+        public Scenario TargetScenario { get; set; }
     }
 
     /// <summary>
-    /// Data for deltaSimilarity2 notification event handler.
+    /// Data for tracker error notification event handler.
     /// </summary>
     public class TrackerErrorNotificationEventArgs : EventArgs
     {
@@ -66,12 +70,12 @@ namespace AttiLA.LocalizationService
         }
 
         /// <summary>
-        /// A code to identify the deltaSimilarity2 notification type.
+        /// A code to identify the tracker error notification type.
         /// </summary>
         public TrackerErrorNotificationCode Code { get; set; }
 
         /// <summary>
-        /// The exception that raised this deltaSimilarity2.
+        /// The exception that raised this tracker error.
         /// </summary>
         public Exception Cause { get; set; }
     }
@@ -106,10 +110,15 @@ namespace AttiLA.LocalizationService
         public event TrackerNotificationEventHandler TrackerNotification;
 
         /// <summary>
-        /// Tracker deltaSimilarity2 notification event.
+        /// Tracker error notification event.
         /// </summary>
         public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
+
+        /// <summary>
+        /// The lock used to synchronize access to the tracker.
+        /// </summary>
+        private Object trackerLock = new Object();
 
         /// <summary>
         /// Samples supplier module.
@@ -130,11 +139,6 @@ namespace AttiLA.LocalizationService
         /// The timer used to save all the captured samples in the scenario on the database.
         /// </summary>
         private Timer updateTimer = new Timer();
-
-        /// <summary>
-        /// The lock used to synchronize access to the tracker.
-        /// </summary>
-        private Object trackerLock = new Object();
 
         /// <summary>
         /// A copy of the scenario on database used to save informations between updates.
@@ -241,8 +245,18 @@ namespace AttiLA.LocalizationService
             {
                 lock(trackerLock)
                 {
+                    var beforeState = captureTimer.Enabled;
                     captureTimer.Enabled = value;
                     updateTimer.Enabled = value;
+
+                    // fire the notification event only if the tracker changes state
+                    if (beforeState != value && TrackerNotification != null)
+                    {
+                        var args = new TrackerNotificationEventArgs(
+                            value ? TrackerNotificationCode.Start : TrackerNotificationCode.Stop,
+                            targetScenario);
+                        TrackerNotification(this, args);
+                    }
                 }
             }
         }
@@ -281,12 +295,12 @@ namespace AttiLA.LocalizationService
                         targetScenario.Id.ToString(),
                         targetScenario.TrainingSet);
 
-                    // erase staging area if no deltaSimilarity2 detected
+                    // erase staging area if no error detected
                     targetScenario.TrainingSet.Clear();
                 }
                 catch(DatabaseException ex)
                 {
-                    // do not erase staging area and notify an deltaSimilarity2
+                    // do not erase staging area and notify an error
                     if(TrackerErrorNotification != null)
                     {
                         TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
