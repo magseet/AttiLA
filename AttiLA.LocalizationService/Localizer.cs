@@ -202,13 +202,31 @@ namespace AttiLA.LocalizationService
         /// <returns></returns>
         public Scenario ChangeContext(string contextId, out IEnumerable<ContextPreference> preferences)
         {
+            if(contextId == null)
+            {
+                throw new ArgumentNullException("contextId");
+            }
+
+            // TODO: check if contextId is valid
+
             lock(localizerLock)
             {
-                //TODO...
+                Scenario predictedScenario;
+                for (var attempts = this.Retries + 1; attempts > 0; attempts--)
+                {
+                    IEnumerable<ContextPreference> p;
+                    predictedScenario = Prediction(out p);
+                    if (predictedScenario == null || contextId.Equals(predictedScenario.ContextId.ToString()))
+                    {
+                        break;
+                    }
+                    
+                    // wrong prediction
+                    predictedScenario.FalsePositives++;
 
-                // prediction
-
-
+                }
+                
+                
                 preferences = null;
                 return null;
 
@@ -225,7 +243,6 @@ namespace AttiLA.LocalizationService
             lock(localizerLock)
             {
                 List<ScanSignal> signals = null;
-                int retries = this.Retries;
 
                 for (var attempts = this.Retries + 1; attempts > 0; attempts--)
                 {

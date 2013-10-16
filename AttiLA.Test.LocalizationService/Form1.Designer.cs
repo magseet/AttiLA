@@ -31,9 +31,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.label2 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxContextId = new System.Windows.Forms.TextBox();
             this.buttonChangeContextId = new System.Windows.Forms.Button();
@@ -46,7 +43,6 @@
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderSimilarity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.progressBarLocalize = new System.Windows.Forms.ProgressBar();
-            this.label4 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -54,37 +50,10 @@
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 43);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(100, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Localization interval";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(339, 39);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.checkBox1.Size = new System.Drawing.Size(86, 17);
-            this.checkBox1.TabIndex = 2;
-            this.checkBox1.Text = "Auto localize";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(137, 35);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(172, 20);
-            this.textBox1.TabIndex = 3;
-            // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 86);
+            this.label1.Location = new System.Drawing.Point(12, 31);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(57, 13);
             this.label1.TabIndex = 4;
@@ -92,14 +61,14 @@
             // 
             // textBoxContextId
             // 
-            this.textBoxContextId.Location = new System.Drawing.Point(137, 79);
+            this.textBoxContextId.Location = new System.Drawing.Point(137, 24);
             this.textBoxContextId.Name = "textBoxContextId";
             this.textBoxContextId.Size = new System.Drawing.Size(172, 20);
             this.textBoxContextId.TabIndex = 5;
             // 
             // buttonChangeContextId
             // 
-            this.buttonChangeContextId.Location = new System.Drawing.Point(339, 79);
+            this.buttonChangeContextId.Location = new System.Drawing.Point(339, 24);
             this.buttonChangeContextId.Name = "buttonChangeContextId";
             this.buttonChangeContextId.Size = new System.Drawing.Size(94, 20);
             this.buttonChangeContextId.TabIndex = 6;
@@ -109,7 +78,7 @@
             // 
             // buttonTrackStart
             // 
-            this.buttonTrackStart.Location = new System.Drawing.Point(137, 132);
+            this.buttonTrackStart.Location = new System.Drawing.Point(137, 77);
             this.buttonTrackStart.Name = "buttonTrackStart";
             this.buttonTrackStart.Size = new System.Drawing.Size(75, 23);
             this.buttonTrackStart.TabIndex = 7;
@@ -119,7 +88,7 @@
             // 
             // buttonTrackStop
             // 
-            this.buttonTrackStop.Location = new System.Drawing.Point(234, 132);
+            this.buttonTrackStop.Location = new System.Drawing.Point(234, 77);
             this.buttonTrackStop.Name = "buttonTrackStop";
             this.buttonTrackStop.Size = new System.Drawing.Size(75, 23);
             this.buttonTrackStop.TabIndex = 8;
@@ -130,7 +99,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 142);
+            this.label3.Location = new System.Drawing.Point(12, 87);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(64, 13);
             this.label3.TabIndex = 9;
@@ -138,7 +107,7 @@
             // 
             // buttonLocalize
             // 
-            this.buttonLocalize.Location = new System.Drawing.Point(29, 184);
+            this.buttonLocalize.Location = new System.Drawing.Point(29, 129);
             this.buttonLocalize.Name = "buttonLocalize";
             this.buttonLocalize.Size = new System.Drawing.Size(94, 23);
             this.buttonLocalize.TabIndex = 10;
@@ -152,7 +121,7 @@
             this.columnHeaderContextId,
             this.columnHeaderName,
             this.columnHeaderSimilarity});
-            this.listViewContexts.Location = new System.Drawing.Point(34, 219);
+            this.listViewContexts.Location = new System.Drawing.Point(34, 164);
             this.listViewContexts.Name = "listViewContexts";
             this.listViewContexts.Size = new System.Drawing.Size(398, 119);
             this.listViewContexts.TabIndex = 11;
@@ -174,27 +143,18 @@
             // 
             // progressBarLocalize
             // 
-            this.progressBarLocalize.Location = new System.Drawing.Point(137, 183);
+            this.progressBarLocalize.Location = new System.Drawing.Point(137, 128);
+            this.progressBarLocalize.Maximum = 10000;
             this.progressBarLocalize.Name = "progressBarLocalize";
             this.progressBarLocalize.Size = new System.Drawing.Size(295, 23);
             this.progressBarLocalize.Step = 1;
             this.progressBarLocalize.TabIndex = 12;
             // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(439, 193);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(35, 13);
-            this.label4.TabIndex = 13;
-            this.label4.Text = "label4";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(504, 376);
-            this.Controls.Add(this.label4);
+            this.ClientSize = new System.Drawing.Size(460, 311);
             this.Controls.Add(this.progressBarLocalize);
             this.Controls.Add(this.listViewContexts);
             this.Controls.Add(this.buttonLocalize);
@@ -204,9 +164,6 @@
             this.Controls.Add(this.buttonChangeContextId);
             this.Controls.Add(this.textBoxContextId);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.label2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -219,9 +176,6 @@
         #endregion
 
         private System.Windows.Forms.NotifyIcon notifyIcon1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox textBoxContextId;
         private System.Windows.Forms.Button buttonChangeContextId;
@@ -234,7 +188,6 @@
         private System.Windows.Forms.ColumnHeader columnHeaderSimilarity;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
         private System.Windows.Forms.ProgressBar progressBarLocalize;
-        private System.Windows.Forms.Label label4;
     }
 }
 

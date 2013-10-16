@@ -135,7 +135,8 @@ namespace AttiLA.LocalizationService
                             int evidence;
                             double featureSimilarityWhenFound;
                             double featureSimilarity;
-                            double featureMaxSimilarityWhenFound = (feature.Value.Variance == 0 ? 1 : 1 / Math.Sqrt(2 * Math.PI * feature.Value.Variance));
+                            double featureMaxSimilarityWhenFound = 1;
+                            //double featureMaxSimilarityWhenFound = (feature.Value.Variance == 0 ? 1 : 1 / Math.Sqrt(2 * Math.PI * feature.Value.Variance));
                             double featureMaxSimilarity = feature.Value.Reliability * featureMaxSimilarityWhenFound;
 
                             if(!mapSignals.TryGetValue(feature.Key.AP, out evidence))

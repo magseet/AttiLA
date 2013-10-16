@@ -82,7 +82,31 @@ namespace AttiLA.Test.LocalizationService
 
         void LocalizeCallCompleted(IAsyncResult ar)
         {
-            MessageBox.Show("Localization completed");
+            var localizeCall = (MyFunc<bool, ContextPreference[], string>)ar.AsyncState;
+            ContextPreference[] preferences;
+
+            var best = localizeCall.EndInvoke(out preferences,ar);
+
+            SendOrPostCallback setList = delegate
+            {
+                listViewContexts.Items.Clear();
+
+                if (preferences != null)
+                {
+                    foreach (var preference in preferences)
+                    {
+
+                        var lvi = new ListViewItem();
+                        var contextName = contextService.GetById(preference.ContextId.ToString()).ContextName;
+                        lvi.Text = preference.ContextId.ToString();
+                        lvi.SubItems.Add(contextName);
+                        lvi.SubItems.Add(preference.Value.ToString());
+                        listViewContexts.Items.Add(lvi);
+                    }
+                }
+            };
+
+            _SyncContext.Post(setList, null);
         }
 
        
@@ -95,6 +119,7 @@ namespace AttiLA.Test.LocalizationService
             {
                 progressBarLocalize.Value = 0;
                 buttonLocalize.Enabled = false;
+                listViewContexts.Items.Clear();
                 MyFunc<bool, ContextPreference[],string> localizeCall = new MyFunc<bool,ContextPreference[],string>(serviceClient.Localize);
 
                 localizeCall.BeginInvoke(
@@ -109,22 +134,6 @@ namespace AttiLA.Test.LocalizationService
                 buttonLocalize.Enabled = true;
             }
             
-
-            listViewContexts.Items.Clear();
-
-            if(preferences != null)
-            {
-                foreach(var preference in preferences)
-                {
-
-                    var lvi = new ListViewItem();
-                    var contextName = contextService.GetById(preference.ContextId.ToString()).ContextName;
-                    lvi.Text = preference.ContextId.ToString();
-                    lvi.SubItems.Add(contextName);
-                    lvi.SubItems.Add(preference.Value.ToString());
-                    listViewContexts.Items.Add(lvi);
-                }
-            }
 
         }
 
@@ -147,8 +156,16 @@ namespace AttiLA.Test.LocalizationService
         {
             SendOrPostCallback setProgressBar = delegate
             {
-                progressBarLocalize.Value = (int)(progress * 100);
-                label4.Text = (progress * 100).ToString();
+                int value = (int)(progress * progressBarLocalize.Maximum + progressBarLocalize.Minimum);
+                progressBarLocalize.Value = value;
+                if (value > 0)
+                {
+                    progressBarLocalize.Value = value - 1;
+                }
+                if(value == progressBarLocalize.Maximum)
+                {
+                    progressBarLocalize.Value = progressBarLocalize.Maximum;
+                }
             };
 
             _SyncContext.Post(setProgressBar, null);

@@ -336,21 +336,9 @@ namespace AttiLA.Data.Services
             return scenarios.AsEnumerable();
         }
 
-        public void prova()
-        {
-
-            var accessPoints = new List<AccessPoint>
-            {
-                new AccessPoint{MAC = "00146C58355E", SSID = "NETGEAR"},
-                new AccessPoint{MAC = "4494FC43DA9E", SSID = "StudioL"},
-                new AccessPoint{MAC = "F07D686BC630", SSID = "D-Link"},
-            };
-
-            GetByPossibleAccessPoints(accessPoints);
-        }
-
         public override void Update(Scenario entity)
         {
+            
             throw new NotImplementedException();
         }
     }
