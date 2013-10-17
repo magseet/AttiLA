@@ -7,6 +7,7 @@ namespace AttiLA.Data.Services
     using MongoDB.Driver;
     using MongoDB.Driver.Builders;
     using Entities;
+    using System.Text.RegularExpressions;
 
     public abstract class EntityService<T> : IEntityService<T> where T : IMongoEntity
     {
@@ -42,7 +43,7 @@ namespace AttiLA.Data.Services
                     throw new DatabaseException(Properties.Resources.MsgErrorCreate + typeof(T).ToString());
                 }
             }
-            catch(WriteConcernException ex)
+            catch(MongoException ex)
             {
                 throw new DatabaseException(Properties.Resources.MsgErrorCreate + typeof(T).ToString(), ex);
             }
@@ -67,7 +68,7 @@ namespace AttiLA.Data.Services
                     throw new DatabaseException(Properties.Resources.MsgErrorDelete + typeof(T).ToString());
                 }
             }
-            catch(WriteConcernException ex)
+            catch(MongoException ex)
             {
                 throw new DatabaseException(Properties.Resources.MsgErrorDelete + typeof(T).ToString(), ex);
             }
@@ -86,9 +87,21 @@ namespace AttiLA.Data.Services
         public virtual T GetById(string id)
         {
             var entityQuery = Query<T>.EQ(e => e.Id, new ObjectId(id));
-            return this.MongoConnectionHandler.MongoCollection.FindOne(entityQuery);
+            return this.MongoConnectionHandler.MongoCollection.FindOneById(new ObjectId(id));
         }
 
         public abstract void Update(T entity);
+
+        public static bool IsValidObjectID(string str) 
+        {
+            if (str.Length == 12 || str.Length == 24) 
+            {
+                return Regex.Match(str, "^[0-9a-fA-F]{" + str.Length + "}$").Success;
+            } 
+            else 
+            {
+                return false;
+            }
+        }
     }
 }

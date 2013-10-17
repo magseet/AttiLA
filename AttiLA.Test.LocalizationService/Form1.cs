@@ -12,7 +12,7 @@ using AttiLA.Test.LocalizationService.LocalizationServiceReference;
 using System.ServiceModel;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
-
+using MongoDB.Bson;
 
 namespace AttiLA.Test.LocalizationService
 {
@@ -28,6 +28,8 @@ namespace AttiLA.Test.LocalizationService
         private ContextService contextService = new ContextService();
 
         SynchronizationContext _SyncContext = null;
+
+        private string SelectedContext { get; set; }
         
         public Form1()
         {
@@ -45,13 +47,14 @@ namespace AttiLA.Test.LocalizationService
 
 
 
-        private void buttonChangeContextId_Click(object sender, EventArgs e)
+        private void btnChange_Click(object sender, EventArgs e)
         {
-            if(!String.IsNullOrWhiteSpace(textBoxContextId.Text))
+            /*
+            if(!String.IsNullOrWhiteSpace(SelectedContext))
             {
                 try
                 {
-                    serviceClient.ChangeContext(textBoxContextId.Text);
+                    serviceClient.ChangeContext(SelectedContext);
                 }
                 catch(FaultException<ArgumentException>)
                 {
@@ -66,34 +69,34 @@ namespace AttiLA.Test.LocalizationService
                     MessageBox.Show("PD!");
                 }
             }
+             */
             
         }
 
-        private void buttonTrackStart_Click(object sender, EventArgs e)
+        private void btnTrackStart_Click(object sender, EventArgs e)
         {
-            serviceClient.TrackModeStart();
+            //serviceClient.TrackModeStart();
         }
 
-        private void buttonTrackStop_Click(object sender, EventArgs e)
+        private void btnTrackStop_Click(object sender, EventArgs e)
         {
-            serviceClient.TrackModeStop();
+            //serviceClient.TrackModeStop();
         }
 
 
-        void LocalizeCallCompleted(IAsyncResult ar)
+        void PredictionCallCompleted(IAsyncResult ar)
         {
-            var localizeCall = (MyFunc<bool, ContextPreference[], string>)ar.AsyncState;
-            ContextPreference[] preferences;
+            var predictionCall = (Func<IEnumerable<ContextPreference>>)ar.AsyncState;
 
-            var best = localizeCall.EndInvoke(out preferences,ar);
+            var preferences = predictionCall.EndInvoke(ar);
 
             SendOrPostCallback setList = delegate
             {
-                listViewContexts.Items.Clear();
+                lstPreferences.Items.Clear();
 
                 if (preferences != null)
                 {
-                    foreach (var preference in preferences)
+                    foreach (var preference in preferences.OrderByDescending(p => p.Value))
                     {
 
                         var lvi = new ListViewItem();
@@ -101,7 +104,7 @@ namespace AttiLA.Test.LocalizationService
                         lvi.Text = preference.ContextId.ToString();
                         lvi.SubItems.Add(contextName);
                         lvi.SubItems.Add(preference.Value.ToString());
-                        listViewContexts.Items.Add(lvi);
+                        lstPreferences.Items.Add(lvi);
                     }
                 }
             };
@@ -111,27 +114,23 @@ namespace AttiLA.Test.LocalizationService
 
        
         public delegate TV MyFunc<in T, TU, out TV>(T input, out TU output);
-        private void buttonLocalize_Click(object sender, EventArgs e)
+        private void btnPrediction_Click(object sender, EventArgs e)
         {
-             
-            ContextPreference[] preferences;
             try
             {
-                progressBarLocalize.Value = 0;
-                buttonLocalize.Enabled = false;
-                listViewContexts.Items.Clear();
-                MyFunc<bool, ContextPreference[],string> localizeCall = new MyFunc<bool,ContextPreference[],string>(serviceClient.Localize);
+                progbarLocalize.Value = 0;
+                btnPrediction.Enabled = false;
+                lstPreferences.Items.Clear();
+                var predictionCall = new Func<IEnumerable<ContextPreference>>(serviceClient.Prediction);
 
-                localizeCall.BeginInvoke(
-                    true, 
-                    out preferences,
-                    LocalizeCallCompleted,
-                    localizeCall);                
+                predictionCall.BeginInvoke(
+                    PredictionCallCompleted,
+                    predictionCall);
             }
             finally
             {
                 // TODO..
-                buttonLocalize.Enabled = true;
+                btnPrediction.Enabled = true;
             }
             
 
@@ -156,19 +155,57 @@ namespace AttiLA.Test.LocalizationService
         {
             SendOrPostCallback setProgressBar = delegate
             {
-                int value = (int)(progress * progressBarLocalize.Maximum + progressBarLocalize.Minimum);
-                progressBarLocalize.Value = value;
+                int value = (int)(progress * progbarLocalize.Maximum + progbarLocalize.Minimum);
+                progbarLocalize.Value = value;
                 if (value > 0)
                 {
-                    progressBarLocalize.Value = value - 1;
+                    progbarLocalize.Value = value - 1;
                 }
-                if(value == progressBarLocalize.Maximum)
+                if(value == progbarLocalize.Maximum)
                 {
-                    progressBarLocalize.Value = progressBarLocalize.Maximum;
+                    progbarLocalize.Value = progbarLocalize.Maximum;
                 }
             };
 
             _SyncContext.Post(setProgressBar, null);
         }
+
+        private void lstRecent_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if(lstRecent.SelectedItems.Count > 0)
+            {
+                SelectedContext = lstRecent.SelectedItems[0].Text;
+                txtSelected.Text = lstRecent.SelectedItems[0].SubItems[1].Text;
+            }
+        }
+
+        private void lstPreferences_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (lstPreferences.SelectedItems.Count > 0)
+            {
+                SelectedContext = lstPreferences.SelectedItems[0].Text;
+                txtSelected.Text = lstPreferences.SelectedItems[0].SubItems[1].Text;
+            }
+        }
+
+        private void btnUpdate_Click(object sender, EventArgs e)
+        {
+            LoadRecentContexts(5);
+        }
+
+        private void LoadRecentContexts(int limit)
+        {
+            lstRecent.Items.Clear();
+            var contexts = contextService.GetMoreRecent(limit);
+            foreach(var context in contexts)
+            {
+                var lvi = new ListViewItem();
+                lvi.Text = context.Id.ToString();
+                lvi.SubItems.Add(context.ContextName);
+                lvi.SubItems.Add(context.CreationDateTime.ToString());
+                lstRecent.Items.Add(lvi);
+            }
+        }
+
     }
 }

@@ -34,6 +34,10 @@
   <ItemGroup>
     <Reference Include="Microsoft.ReportViewer.Common, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91" />
     <Reference Include="Microsoft.ReportViewer.WinForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL" />
+    <Reference Include="MongoDB.Bson, Version=1.8.3.9, Culture=neutral, PublicKeyToken=f686731cfb9cc103, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\MongoDB\CSharpDriver 1.8.3\MongoDB.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -94,7 +98,7 @@
     <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.GlobalSettings.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.LocalizeResponse.datasource">
+    <None Include="Service References\LocalizationServiceReference\AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\LocalizationServiceReference\service1.wsdl" />
@@ -102,9 +106,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\LocalizationServiceReference\service21.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\LocalizationServiceReference\System1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

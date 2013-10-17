@@ -34,11 +34,11 @@ namespace AttiLA.LocalizationService
             }
         }
 
-        internal static Func<Scenario,IDictionary<AccessPoint,int>,double> PredefinedAlgorithm(SimilarityAlgorithmType name)
+        internal static Func<Scenario,IDictionary<AccessPoint,int>,double> PredefinedAlgorithm(SimilarityAlgorithmCode name)
         {
             switch(name)
             {
-                case SimilarityAlgorithmType.NaiveBayes:
+                case SimilarityAlgorithmCode.NaiveBayes:
                     return delegate(Scenario scenario, IDictionary<AccessPoint, int> mapSignals)
                     {
                         double naiveSimilarity = 1;
@@ -78,7 +78,7 @@ namespace AttiLA.LocalizationService
                     };
 
                 /// -----------------------------------------------------------
-                case SimilarityAlgorithmType.RelativeErrorExtended:
+                case SimilarityAlgorithmCode.RelativeErrorExtended:
                     return delegate(Scenario scenario, IDictionary<AccessPoint, int> mapSignals)
                     {
                         double similarity2 = 0;
@@ -123,7 +123,7 @@ namespace AttiLA.LocalizationService
 
                     };
                 /// -----------------------------------------------------------
-                case SimilarityAlgorithmType.RelativeError:
+                case SimilarityAlgorithmCode.RelativeError:
                     return delegate(Scenario scenario, IDictionary<AccessPoint, int> mapSignals)
                     {
                         double similarity2 = 0;

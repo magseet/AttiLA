@@ -28,10 +28,10 @@ namespace AttiLA.Data.Services
 
         public IEnumerable<Context> GetMoreRecent(int limit)
         {
-            
-
-            //this.MongoConnectionHandler.MongoCollection.Find(query);
-            return null;
+            return this.MongoConnectionHandler.MongoCollection
+                .Find(new QueryDocument())
+                .SetSortOrder(SortBy.Descending(Utils<Context>.MemberName(c => c.CreationDateTime)))
+                .SetLimit(limit).AsEnumerable();
         }
     }
 }

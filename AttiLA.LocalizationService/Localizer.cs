@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AttiLA.Data;
 using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
+using MongoDB.Bson;
 
 namespace AttiLA.LocalizationService
 {
@@ -65,7 +66,8 @@ namespace AttiLA.LocalizationService
     /// </summary>
     public enum LocalizerErrorNotificationCode
     {
-        DatabaseError
+        DatabaseError,
+        UnknownContext
     }
 
 
@@ -154,7 +156,7 @@ namespace AttiLA.LocalizationService
         /// <summary>
         /// Number of retries on WLAN scan failure.
         /// </summary>
-        public int Retries
+        public uint Retries
         {
             get
             {
@@ -192,7 +194,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private ScenarioService scenarioService = new ScenarioService();
 
-        private int retries;
+        private uint retries;
 
         /// <summary>
         /// Get a scenario for the requested preference.
@@ -204,30 +206,102 @@ namespace AttiLA.LocalizationService
         {
             if(contextId == null)
             {
+                // don't complain, should have been checked
                 throw new ArgumentNullException("contextId");
             }
 
-            // TODO: check if contextId is valid
+            if (!ContextService.IsValidObjectID(contextId))
+            {
+                // don't complain, should have been checked
+                throw new ArgumentOutOfRangeException("contextId");
+            }
+
+            try
+            {
+                if (scenarioService.GetById(contextId) == null)
+                {
+                    // notify error
+                    if(LocalizerErrorNotification != null)
+                    {
+                        var args = new LocalizerErrorNotificationEventArgs(
+                            LocalizerErrorNotificationCode.UnknownContext);
+                        LocalizerErrorNotification(this, args);
+                    }
+                    preferences = null;
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                if(LocalizerErrorNotification != null)
+                {
+                    // notify error
+                    var args = new LocalizerErrorNotificationEventArgs(
+                        LocalizerErrorNotificationCode.DatabaseError,ex);
+                    LocalizerErrorNotification(this, args);
+                }
+                preferences = null;
+                return null;
+            }
+
+            // context is valid
 
             lock(localizerLock)
             {
-                Scenario predictedScenario;
+                Scenario scenario = null;
+                IEnumerable<ContextPreference> pref = null;
                 for (var attempts = this.Retries + 1; attempts > 0; attempts--)
                 {
-                    IEnumerable<ContextPreference> p;
-                    predictedScenario = Prediction(out p);
-                    if (predictedScenario == null || contextId.Equals(predictedScenario.ContextId.ToString()))
+                    
+                    scenario = Prediction(out pref);
+                    if (scenario == null)
                     {
+                        // retry, eventually..
+                        continue;
+                    }
+
+                    if(contextId.Equals(scenario.ContextId.ToString()))
+                    {
+                        // right prediction
+                        scenarioService.IncreaseAccuracy(scenario);
                         break;
                     }
                     
                     // wrong prediction
-                    predictedScenario.FalsePositives++;
-
+                    scenarioService.DecreaseAccuracy(scenario);
+                    scenario = null;
                 }
                 
-                
-                preferences = null;
+                if(scenario == null)
+                {
+                    // create a new scenario for the requested context
+                    scenario = new Scenario
+                    {
+                        ContextId = new ObjectId(contextId),
+                        CreationTime = DateTime.Now
+                    };
+
+                    try
+                    {
+                        scenarioService.Create(scenario);
+                    }
+                    catch(Exception ex)
+                    {
+                        if(LocalizerErrorNotification != null)
+                        {
+                            // notify error
+                            var args = new LocalizerErrorNotificationEventArgs(
+                                LocalizerErrorNotificationCode.DatabaseError, ex);
+                            LocalizerErrorNotification(this, args);
+                        }
+                        preferences = null;
+                        return null;
+                    }
+                }
+
+                // TODO: last preferences are applied for now.
+                // Consider a better alternative, if any.
+                preferences = pref;
                 return null;
 
             }

@@ -132,4 +132,7 @@
   <data name="MsgErrorScenarioTrain" xml:space="preserve">
     <value>Error training scenario</value>
   </data>
+  <data name="MsgErrorUpdate" xml:space="preserve">
+    <value>Error on database update:</value>
+  </data>
 </root>

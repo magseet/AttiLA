@@ -8,14 +8,17 @@
     <Setting Name="TrackerUpdateInterval" Type="System.Double" Scope="User">
       <Value Profile="(Default)">2000</Value>
     </Setting>
-    <Setting Name="LocalizerRetries" Type="System.Int32" Scope="User">
+    <Setting Name="LocalizerRetries" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">5</Value>
-    </Setting>
-    <Setting Name="TrackerEnabledOnStartup" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
     </Setting>
     <Setting Name="LocalizerSimilarityAlgorithm" Type="System.Byte" Scope="User">
       <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="PredictionInterval" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">5000</Value>
+    </Setting>
+    <Setting Name="NotificationThreshold" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">5</Value>
     </Setting>
   </Settings>
 </SettingsFile>

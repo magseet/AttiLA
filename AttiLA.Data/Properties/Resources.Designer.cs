@@ -104,5 +104,14 @@ namespace AttiLA.Data.Properties {
                 return ResourceManager.GetString("MsgErrorScenarioTrain", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Error on database update:.
+        /// </summary>
+        internal static string MsgErrorUpdate {
+            get {
+                return ResourceManager.GetString("MsgErrorUpdate", resourceCulture);
+            }
+        }
     }
 }

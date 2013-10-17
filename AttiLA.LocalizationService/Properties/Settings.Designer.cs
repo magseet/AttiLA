@@ -50,24 +50,12 @@ namespace AttiLA.LocalizationService.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int LocalizerRetries {
+        public uint LocalizerRetries {
             get {
-                return ((int)(this["LocalizerRetries"]));
+                return ((uint)(this["LocalizerRetries"]));
             }
             set {
                 this["LocalizerRetries"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool TrackerEnabledOnStartup {
-            get {
-                return ((bool)(this["TrackerEnabledOnStartup"]));
-            }
-            set {
-                this["TrackerEnabledOnStartup"] = value;
             }
         }
         
@@ -80,6 +68,30 @@ namespace AttiLA.LocalizationService.Properties {
             }
             set {
                 this["LocalizerSimilarityAlgorithm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
+        public double PredictionInterval {
+            get {
+                return ((double)(this["PredictionInterval"]));
+            }
+            set {
+                this["PredictionInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public uint NotificationThreshold {
+            get {
+                return ((uint)(this["NotificationThreshold"]));
+            }
+            set {
+                this["NotificationThreshold"] = value;
             }
         }
     }
