@@ -35,6 +35,24 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private Dictionary<Guid, AutoResetEvent> wlanEventScanComplete = new Dictionary<Guid, AutoResetEvent>();
 
+        private uint retries = 3;
+        private uint Retries 
+        { 
+            get
+            {
+                lock(scannerLock)
+                {
+                    return retries;
+                }
+            }
+            set
+            {
+                lock(scannerLock)
+                {
+                    retries = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Performs a scan of the WLAN interfaces and returns a list of <see cref="AccessPoint"/> elements.
@@ -48,11 +66,19 @@ namespace AttiLA.LocalizationService
             {
                 foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
                 {
-                    // scan for new bss and wait for notification
-                    wlanIface.Scan();
-                    wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
-
-                    Wlan.WlanBssEntry[] wlanBssEntries = wlanIface.GetNetworkBssList();
+                    Wlan.WlanBssEntry[] wlanBssEntries = null;
+                    for (var attempts = this.Retries + 1; attempts > 0; attempts--)
+                    {
+                        // scan for new bss and wait for notification
+                        wlanIface.Scan();
+                        wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
+                        wlanBssEntries = wlanIface.GetNetworkBssList();
+                        
+                        if (wlanBssEntries.Count() > 0)
+                        {
+                            break;
+                        }
+                    }
 
                     foreach (Wlan.WlanBssEntry bss in wlanBssEntries)
                     {
@@ -66,15 +92,17 @@ namespace AttiLA.LocalizationService
                             bss.dot11Ssid.SSID, 
                             0, (int)bss.dot11Ssid.SSIDLength);
 
-                        scanSignals.Add(new ScanSignal
+                        var signal = new ScanSignal
                         {
                             AP = new AccessPoint
                             {
-                            MAC = tMac,
-                            SSID = ssid
+                                MAC = tMac,
+                                SSID = ssid
                             },
                             RSSI = bss.rssi,
-                        });
+                        };
+
+                        scanSignals.Add(signal);
                     }
                 }
             }

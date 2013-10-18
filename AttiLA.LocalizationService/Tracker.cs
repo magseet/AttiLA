@@ -115,6 +115,103 @@ namespace AttiLA.LocalizationService
         public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
 
+        #region Properties
+
+        /// <summary>
+        /// The target scenario ID.
+        /// </summary>
+        public string ScenarioId
+        {
+            get
+            {
+                lock (trackerLock)
+                {
+                    return (targetScenario == null ? null : targetScenario.Id.ToString());
+                }
+            }
+            set
+            {
+                lock (trackerLock)
+                {
+                    if (value == null)
+                    {
+                        targetScenario = null;
+                    }
+                    else if (targetScenario == null || !targetScenario.Id.ToString().Equals(value))
+                    {
+                        if(!ScenarioService.IsValidObjectID(value))
+                        {
+                            throw new ArgumentOutOfRangeException("value");
+                        }
+                        // get scenario from database
+                        targetScenario = scenarioService.GetById(value);
+                        if (targetScenario == null)
+                        {
+                            throw new ArgumentOutOfRangeException("value", Properties.Resources.MsgErrorInvalidScenarioId);
+                        }
+
+                        // use this object as container for new sampling data
+                        targetScenario.TrainingSet.Clear();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The interval in milliseconds between captures.
+        /// </summary>
+        public double Interval
+        {
+            get
+            {
+                lock (trackerLock)
+                {
+                    return trackerTimer.Interval;
+                }
+            }
+            set
+            {
+                lock (trackerLock)
+                {
+                    trackerTimer.Interval = value;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Property used to enable/disable the tracker.
+        /// </summary>
+        public bool Enabled
+        {
+            get
+            {
+                lock (trackerLock)
+                {
+                    return trackerTimer.Enabled;
+                }
+            }
+            set
+            {
+                lock (trackerLock)
+                {
+                    var beforeState = trackerTimer.Enabled;
+                    trackerTimer.Enabled = value;
+
+                    // fire the notification event only if the tracker changes state
+                    if (beforeState != value && TrackerNotification != null)
+                    {
+                        var args = new TrackerNotificationEventArgs(
+                            value ? TrackerNotificationCode.Start : TrackerNotificationCode.Stop,
+                            targetScenario);
+                        TrackerNotification(this, args);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// The lock used to synchronize access to the tracker.
         /// </summary>
@@ -133,12 +230,7 @@ namespace AttiLA.LocalizationService
         /// <summary>
         /// The timer used to capture WLAN signal samples at a certain rate.
         /// </summary>
-        private Timer captureTimer = new Timer();
-
-        /// <summary>
-        /// The timer used to save all the captured samples in the scenario on the database.
-        /// </summary>
-        private Timer updateTimer = new Timer();
+        private Timer trackerTimer = new Timer();
 
         /// <summary>
         /// A copy of the scenario on database used to save informations between updates.
@@ -146,148 +238,28 @@ namespace AttiLA.LocalizationService
         private Scenario targetScenario;
 
         /// <summary>
-        /// The target scenario ID.
-        /// </summary>
-        public string ScenarioId
-        {
-            get
-            {
-                lock (trackerLock)
-                {
-                    if (targetScenario == null)
-                    {
-                        return null;
-                    }
-                    return targetScenario.Id.ToString();
-                    
-                }
-            }
-            set
-            {
-                lock (trackerLock)
-                {
-                    if(value == null)
-                    {
-                        targetScenario = null;
-                    }
-                    else if(targetScenario == null || !targetScenario.Id.ToString().Equals(value))
-                    {
-                        // get scenario from database
-                        targetScenario = scenarioService.GetById(value);
-                        if(targetScenario == null)
-                        {
-                            throw new ArgumentOutOfRangeException("value", Properties.Resources.MsgErrorInvalidScenarioId);
-                        }
-
-                        // use this object as container for new sampling data
-                        targetScenario.TrainingSet.Clear();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// The interval in milliseconds between captures.
-        /// </summary>
-        public double CaptureInterval
-        {
-            get
-            {
-                lock (trackerLock)
-                {
-                    return captureTimer.Interval;
-                }
-            }
-            set
-            {
-                lock(trackerLock)
-                {
-                    captureTimer.Interval = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The interval in milliseconds between updates.
-        /// </summary>
-        public double UpdateInterval
-        {
-            get
-            {
-                lock(trackerLock)
-                { 
-                    return updateTimer.Interval;
-                }
-            }
-            set
-            {
-                lock(trackerLock)
-                {
-                    updateTimer.Interval = value;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Property used to enable/disable the tracker.
-        /// </summary>
-        public bool Enabled
-        {
-            get
-            {
-                lock (trackerLock)
-                {
-                    return captureTimer.Enabled;
-                }
-            }
-            set
-            {
-                lock(trackerLock)
-                {
-                    var beforeState = captureTimer.Enabled;
-                    captureTimer.Enabled = value;
-                    updateTimer.Enabled = value;
-
-                    // fire the notification event only if the tracker changes state
-                    if (beforeState != value && TrackerNotification != null)
-                    {
-                        var args = new TrackerNotificationEventArgs(
-                            value ? TrackerNotificationCode.Start : TrackerNotificationCode.Stop,
-                            targetScenario);
-                        TrackerNotification(this, args);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Initialize a new instance of the class <see cref="Tracker"/>
         /// </summary>
         public Tracker()
         {
-            captureTimer.Elapsed += captureTimer_Elapsed;
-            updateTimer.Elapsed += updateTimer_Elapsed;
+            trackerTimer.Elapsed += trackerTimer_Elapsed;
         }
 
         /// <summary>
-        /// Each time this handler is invoked, all the examples in the staging
-        /// area are stored in the database.
+        /// All the examples in the staging area are stored in the database.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void updateTimer_Elapsed(object sender, ElapsedEventArgs e)
+        public void Update()
         {
-            lock(trackerLock)
+            lock (trackerLock)
             {
                 // no more examples will be added until unlock
 
-                if(targetScenario == null || targetScenario.TrainingSet.Count == 0)
+                if (targetScenario == null || targetScenario.TrainingSet.Count == 0)
                 {
                     // nothing to do
                     return;
                 }
-                // suspend timers and store staging area in the database
+                // suspend timer and store staging area in the database
                 suspend();
                 try
                 {
@@ -298,10 +270,10 @@ namespace AttiLA.LocalizationService
                     // erase staging area if no error detected
                     targetScenario.TrainingSet.Clear();
                 }
-                catch(DatabaseException ex)
+                catch (DatabaseException ex)
                 {
                     // do not erase staging area and notify an error
-                    if(TrackerErrorNotification != null)
+                    if (TrackerErrorNotification != null)
                     {
                         TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
                             TrackerErrorNotificationCode.DatabaseError, ex));
@@ -309,13 +281,14 @@ namespace AttiLA.LocalizationService
                 }
                 finally
                 {
-                    // resume timers before unlock
+                    // resume timer before unlock
                     resume();
                 }
 
             }
-            
+
         }
+
 
         /// <summary>
         /// Each time this handler is invoked, a new WLAN scan is performed
@@ -323,7 +296,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void captureTimer_Elapsed(object sender, ElapsedEventArgs e)
+        void trackerTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             lock(trackerLock)
             {
@@ -334,7 +307,7 @@ namespace AttiLA.LocalizationService
                 }
 
                 // suspend capture until completion
-                captureTimer.Stop();
+                trackerTimer.Stop();
 
                 var scanSignals = wlanScanner.GetScanSignals();
                 if(scanSignals.Count == 0)
@@ -356,7 +329,7 @@ namespace AttiLA.LocalizationService
                 }
 
                 // resume capture before unlock
-                captureTimer.Start();
+                trackerTimer.Start();
             }
         }
 
@@ -365,8 +338,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private void resume()
         {
-            captureTimer.Start();
-            updateTimer.Start();
+            trackerTimer.Start();
         }
 
         /// <summary>
@@ -374,8 +346,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private void suspend()
         {
-            captureTimer.Stop();
-            updateTimer.Stop();
+            trackerTimer.Stop();
         }
         
 

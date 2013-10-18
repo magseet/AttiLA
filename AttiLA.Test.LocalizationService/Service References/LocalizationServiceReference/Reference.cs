@@ -104,9 +104,6 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         private uint NotificationThresholdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double PredictionIntervalField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private AttiLA.Test.LocalizationService.LocalizationServiceReference.TrackerSettings TrackerField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
@@ -146,19 +143,6 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public double PredictionInterval {
-            get {
-                return this.PredictionIntervalField;
-            }
-            set {
-                if ((this.PredictionIntervalField.Equals(value) != true)) {
-                    this.PredictionIntervalField = value;
-                    this.RaisePropertyChanged("PredictionInterval");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
         public AttiLA.Test.LocalizationService.LocalizationServiceReference.TrackerSettings Tracker {
             get {
                 return this.TrackerField;
@@ -191,6 +175,9 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private double IntervalField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
         private uint RetriesField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
@@ -203,6 +190,19 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
             }
             set {
                 this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double Interval {
+            get {
+                return this.IntervalField;
+            }
+            set {
+                if ((this.IntervalField.Equals(value) != true)) {
+                    this.IntervalField = value;
+                    this.RaisePropertyChanged("Interval");
+                }
             }
         }
         
@@ -252,10 +252,7 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double CaptureIntervalField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double UpdateIntervalField;
+        private double IntervalField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -268,27 +265,14 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public double CaptureInterval {
+        public double Interval {
             get {
-                return this.CaptureIntervalField;
+                return this.IntervalField;
             }
             set {
-                if ((this.CaptureIntervalField.Equals(value) != true)) {
-                    this.CaptureIntervalField = value;
-                    this.RaisePropertyChanged("CaptureInterval");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double UpdateInterval {
-            get {
-                return this.UpdateIntervalField;
-            }
-            set {
-                if ((this.UpdateIntervalField.Equals(value) != true)) {
-                    this.UpdateIntervalField = value;
-                    this.RaisePropertyChanged("UpdateInterval");
+                if ((this.IntervalField.Equals(value) != true)) {
+                    this.IntervalField = value;
+                    this.RaisePropertyChanged("Interval");
                 }
             }
         }
@@ -458,12 +442,11 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/SetGlobalSettings", ReplyAction="http://tempuri.org/ILocalizationService/SetGlobalSettingsResponse")]
         System.Threading.Tasks.Task<bool> SetGlobalSettingsAsync(AttiLA.Test.LocalizationService.LocalizationServiceReference.GlobalSettings newSettings);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Prediction", ReplyAction="http://tempuri.org/ILocalizationService/PredictionResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/PredictionServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
-        AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] Prediction();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetCloserContexts", ReplyAction="http://tempuri.org/ILocalizationService/GetCloserContextsResponse")]
+        AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] GetCloserContexts();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Prediction", ReplyAction="http://tempuri.org/ILocalizationService/PredictionResponse")]
-        System.Threading.Tasks.Task<AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[]> PredictionAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetCloserContexts", ReplyAction="http://tempuri.org/ILocalizationService/GetCloserContextsResponse")]
+        System.Threading.Tasks.Task<AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[]> GetCloserContextsAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStartResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackingStartServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
@@ -473,7 +456,6 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         System.Threading.Tasks.Task<bool> TrackingStartAsync(string contextId);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStopResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackingStopServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
         bool TrackingStop();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStopResponse")]
@@ -489,14 +471,14 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface ILocalizationServiceCallback {
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStarted")]
-        void TrackModeStarted(System.DateTime startTime, string contextId);
-        
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStopped")]
-        void TrackModeStopped(System.DateTime stopTime, string contextId);
-        
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportLocalizationProgress")]
         void ReportLocalizationProgress(double progress);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportPrediction")]
+        void ReportPrediction(string contextId);
+        
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportTracking")]
+        void ReportTracking(bool enabled, string contextId);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -567,12 +549,12 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
             return base.Channel.SetGlobalSettingsAsync(newSettings);
         }
         
-        public AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] Prediction() {
-            return base.Channel.Prediction();
+        public AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[] GetCloserContexts() {
+            return base.Channel.GetCloserContexts();
         }
         
-        public System.Threading.Tasks.Task<AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[]> PredictionAsync() {
-            return base.Channel.PredictionAsync();
+        public System.Threading.Tasks.Task<AttiLA.Test.LocalizationService.LocalizationServiceReference.ContextPreference[]> GetCloserContextsAsync() {
+            return base.Channel.GetCloserContextsAsync();
         }
         
         public bool TrackingStart(string contextId) {

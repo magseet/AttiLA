@@ -117,7 +117,7 @@ namespace AttiLA.LocalizationService
                             similarity2 += featureSimilarity * featureSimilarity;
                         }
 
-                        // result for scenario
+                        // prediction for scenario
                         double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / scenario.Features.Count));
                         return scenarioSimilarity;
 
@@ -162,7 +162,7 @@ namespace AttiLA.LocalizationService
                             similarity2 += featureSimilarity * featureSimilarity;
                             maxSimilarity2 += featureMaxSimilarity * featureMaxSimilarity;
                         }
-                        // result for scenario
+                        // prediction for scenario
                         double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / maxSimilarity2));
                         return scenarioSimilarity;
                     };

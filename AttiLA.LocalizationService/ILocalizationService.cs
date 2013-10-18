@@ -59,10 +59,11 @@ namespace AttiLA.LocalizationService
         /// Operation providing a prediction of the most suitable contexts 
         /// in the current position.
         /// </summary>
-        /// <returns>Suitable contexts with preference value.</returns>
+        /// <returns>
+        /// Suitable contexts with preference value or null in case of error.
+        /// </returns>
         [OperationContract]
-        [FaultContract(typeof(ServiceException))]
-        IEnumerable<ContextPreference> Prediction();
+        IEnumerable<ContextPreference> GetCloserContexts();
 
         /// <summary>
         /// Operation to put the service in <see cref="Tracking"/> state.
@@ -76,7 +77,6 @@ namespace AttiLA.LocalizationService
         /// Operation to abandon the <see cref="Tracking"/> state.
         /// </summary>
         [OperationContract]
-        [FaultContract(typeof(ServiceException))]
         bool TrackingStop();
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// Context preference result.
+    /// Context preference prediction.
     /// </summary>
     [DataContract]
     public class ContextPreference
@@ -124,14 +124,6 @@ namespace AttiLA.LocalizationService
         [DataMember]
         public LocalizerSettings Localizer { get; set; }
 
-
-        /// <summary>
-        /// Milliseconds between predictions.
-        /// </summary>
-        [DataMember]
-        public double PredictionInterval { get; set; }
-
-
         /// <summary>
         /// Number of correct predictions required for a notification.
         /// </summary>
@@ -166,17 +158,11 @@ namespace AttiLA.LocalizationService
     public class TrackerSettings
     {
         /// <summary>
-        /// Milliseconds between samples.
+        /// Minimum time in milliseconds between samples.
         /// </summary>
         [DataMember]
-        public double CaptureInterval { get; set; }
+        public double Interval { get; set; }
 
-        /// <summary>
-        /// Milliseconds between savings.
-        /// When the timeout fires, all tracked data are stored in database.
-        /// </summary>
-        [DataMember]
-        public double UpdateInterval { get; set; }
     }
 
 
@@ -187,11 +173,16 @@ namespace AttiLA.LocalizationService
     public class LocalizerSettings
     {
         /// <summary>
+        /// Minimum time in milliseconds between predictions.
+        /// </summary>
+        [DataMember]
+        public double Interval { get; set; }
+
+        /// <summary>
         /// The algorithm used to calculate signals affinity to a scenario.
         /// </summary>
         [DataMember]
         public SimilarityAlgorithmCode SimilarityAlgorithm { get; set; }
-
 
         /// <summary>
         /// Times the localizer try to recover from wrong predictions.
@@ -206,6 +197,11 @@ namespace AttiLA.LocalizationService
     [DataContract]
     public class ServiceException
     {
+        /// <summary>
+        /// The service exception code.
+        /// </summary>
+        public ServiceExceptionCode Code { get; set; }
+
         /// <summary>
         /// Message explaining the failure.
         /// </summary>
@@ -249,5 +245,17 @@ namespace AttiLA.LocalizationService
         /// </summary>
         [EnumMember]
         Notification
+    }
+
+    /// <summary>
+    /// Values for service exception.
+    /// </summary>
+    [DataContract]
+    public enum ServiceExceptionCode
+    {
+        [EnumMember]
+        Settings,
+        [EnumMember]
+        Arguments
     }
 }

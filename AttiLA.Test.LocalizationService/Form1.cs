@@ -75,7 +75,10 @@ namespace AttiLA.Test.LocalizationService
 
         private void btnTrackStart_Click(object sender, EventArgs e)
         {
-            //serviceClient.TrackModeStart();
+            if (SelectedContext != null)
+            {
+                serviceClient.TrackingStart(SelectedContext);
+            }
         }
 
         private void btnTrackStop_Click(object sender, EventArgs e)
@@ -121,7 +124,7 @@ namespace AttiLA.Test.LocalizationService
                 progbarLocalize.Value = 0;
                 btnPrediction.Enabled = false;
                 lstPreferences.Items.Clear();
-                var predictionCall = new Func<IEnumerable<ContextPreference>>(serviceClient.Prediction);
+                var predictionCall = new Func<IEnumerable<ContextPreference>>(serviceClient.GetCloserContexts);
 
                 predictionCall.BeginInvoke(
                     PredictionCallCompleted,
@@ -140,14 +143,9 @@ namespace AttiLA.Test.LocalizationService
         {
         }
 
-        public void TrackModeStarted(DateTime startTime, string contextId)
+        public void ReportTracking(bool enabled, string contextId)
         {
-            MessageBox.Show("Started!");
-        }
-
-        public void TrackModeStopped(DateTime stopTime, string contextId)
-        {
-
+            
         }
 
 
@@ -207,5 +205,9 @@ namespace AttiLA.Test.LocalizationService
             }
         }
 
+        public void ReportPrediction(string contextTd)
+        {
+
+        }
     }
 }

@@ -63,15 +63,15 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="Prediction">
+  <xs:element name="GetCloserContexts">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="PredictionResponse">
+  <xs:element name="GetCloserContextsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="PredictionResult" nillable="true" type="q4:ArrayOfContextPreference" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="GetCloserContextsResult" nillable="true" type="q4:ArrayOfContextPreference" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -111,26 +111,25 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="TrackModeStarted">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="startTime" type="xs:dateTime" />
-        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TrackModeStopped">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" name="stopTime" type="xs:dateTime" />
-        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
-      </xs:sequence>
-    </xs:complexType>
-  </xs:element>
   <xs:element name="ReportLocalizationProgress">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="progress" type="xs:double" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReportPrediction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReportTracking">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="enabled" type="xs:boolean" />
+        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

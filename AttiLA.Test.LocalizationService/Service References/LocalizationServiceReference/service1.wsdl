@@ -73,14 +73,11 @@
   <wsdl:message name="ILocalizationService_SetGlobalSettings_ServiceExceptionFault_FaultMessage">
     <wsdl:part xmlns:q1="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q1:ServiceException" />
   </wsdl:message>
-  <wsdl:message name="ILocalizationService_Prediction_InputMessage">
-    <wsdl:part name="parameters" element="tns:Prediction" />
+  <wsdl:message name="ILocalizationService_GetCloserContexts_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetCloserContexts" />
   </wsdl:message>
-  <wsdl:message name="ILocalizationService_Prediction_OutputMessage">
-    <wsdl:part name="parameters" element="tns:PredictionResponse" />
-  </wsdl:message>
-  <wsdl:message name="ILocalizationService_Prediction_ServiceExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q2:ServiceException" />
+  <wsdl:message name="ILocalizationService_GetCloserContexts_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetCloserContextsResponse" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackingStart_InputMessage">
     <wsdl:part name="parameters" element="tns:TrackingStart" />
@@ -89,7 +86,7 @@
     <wsdl:part name="parameters" element="tns:TrackingStartResponse" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackingStart_ServiceExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q3="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q3:ServiceException" />
+    <wsdl:part xmlns:q2="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q2:ServiceException" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_TrackingStop_InputMessage">
     <wsdl:part name="parameters" element="tns:TrackingStop" />
@@ -97,23 +94,20 @@
   <wsdl:message name="ILocalizationService_TrackingStop_OutputMessage">
     <wsdl:part name="parameters" element="tns:TrackingStopResponse" />
   </wsdl:message>
-  <wsdl:message name="ILocalizationService_TrackingStop_ServiceExceptionFault_FaultMessage">
-    <wsdl:part xmlns:q4="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" name="detail" element="q4:ServiceException" />
-  </wsdl:message>
   <wsdl:message name="ILocalizationService_Silence_InputMessage">
     <wsdl:part name="parameters" element="tns:Silence" />
   </wsdl:message>
   <wsdl:message name="ILocalizationService_Silence_OutputMessage">
     <wsdl:part name="parameters" element="tns:SilenceResponse" />
   </wsdl:message>
-  <wsdl:message name="ILocalizationService_TrackModeStarted_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:TrackModeStarted" />
-  </wsdl:message>
-  <wsdl:message name="ILocalizationService_TrackModeStopped_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:TrackModeStopped" />
-  </wsdl:message>
   <wsdl:message name="ILocalizationService_ReportLocalizationProgress_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:ReportLocalizationProgress" />
+  </wsdl:message>
+  <wsdl:message name="ILocalizationService_ReportPrediction_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ReportPrediction" />
+  </wsdl:message>
+  <wsdl:message name="ILocalizationService_ReportTracking_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ReportTracking" />
   </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="ILocalizationService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
@@ -137,10 +131,9 @@
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/SetGlobalSettingsResponse" message="tns:ILocalizationService_SetGlobalSettings_OutputMessage" />
       <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/SetGlobalSettingsServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_SetGlobalSettings_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Prediction">
-      <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/Prediction" message="tns:ILocalizationService_Prediction_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/PredictionResponse" message="tns:ILocalizationService_Prediction_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/PredictionServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_Prediction_ServiceExceptionFault_FaultMessage" />
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="GetCloserContexts">
+      <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/GetCloserContexts" message="tns:ILocalizationService_GetCloserContexts_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/GetCloserContextsResponse" message="tns:ILocalizationService_GetCloserContexts_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="TrackingStart">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/TrackingStart" message="tns:ILocalizationService_TrackingStart_InputMessage" />
@@ -150,20 +143,19 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="TrackingStop">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/TrackingStop" message="tns:ILocalizationService_TrackingStop_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/TrackingStopResponse" message="tns:ILocalizationService_TrackingStop_OutputMessage" />
-      <wsdl:fault wsaw:Action="http://tempuri.org/ILocalizationService/TrackingStopServiceExceptionFault" name="ServiceExceptionFault" message="tns:ILocalizationService_TrackingStop_ServiceExceptionFault_FaultMessage" />
     </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Silence">
       <wsdl:input wsaw:Action="http://tempuri.org/ILocalizationService/Silence" message="tns:ILocalizationService_Silence_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/SilenceResponse" message="tns:ILocalizationService_Silence_OutputMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="TrackModeStarted">
-      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/TrackModeStarted" message="tns:ILocalizationService_TrackModeStarted_OutputCallbackMessage" />
-    </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="TrackModeStopped">
-      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/TrackModeStopped" message="tns:ILocalizationService_TrackModeStopped_OutputCallbackMessage" />
-    </wsdl:operation>
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReportLocalizationProgress">
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ReportLocalizationProgress" message="tns:ILocalizationService_ReportLocalizationProgress_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReportPrediction">
+      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ReportPrediction" message="tns:ILocalizationService_ReportPrediction_OutputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReportTracking">
+      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ReportTracking" message="tns:ILocalizationService_ReportTracking_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetNamedPipeBinding_ILocalizationService" type="tns:ILocalizationService">
@@ -218,17 +210,14 @@
         <soap12:fault use="literal" name="ServiceExceptionFault" namespace="" />
       </wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="Prediction">
-      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/Prediction" style="document" />
+    <wsdl:operation name="GetCloserContexts">
+      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/GetCloserContexts" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceExceptionFault">
-        <soap12:fault use="literal" name="ServiceExceptionFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="TrackingStart">
       <soap12:operation soapAction="http://tempuri.org/ILocalizationService/TrackingStart" style="document" />
@@ -250,9 +239,6 @@
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>
-      <wsdl:fault name="ServiceExceptionFault">
-        <soap12:fault use="literal" name="ServiceExceptionFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="Silence">
       <soap12:operation soapAction="http://tempuri.org/ILocalizationService/Silence" style="document" />
@@ -263,20 +249,20 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="TrackModeStarted">
-      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/TrackModeStarted" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="TrackModeStopped">
-      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/TrackModeStopped" style="document" />
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
     <wsdl:operation name="ReportLocalizationProgress">
       <soap12:operation soapAction="http://tempuri.org/ILocalizationService/ReportLocalizationProgress" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportPrediction">
+      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/ReportPrediction" style="document" />
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ReportTracking">
+      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/ReportTracking" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

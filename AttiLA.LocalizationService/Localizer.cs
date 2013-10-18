@@ -7,6 +7,7 @@ using AttiLA.Data;
 using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
 using MongoDB.Bson;
+using System.Timers;
 
 namespace AttiLA.LocalizationService
 {
@@ -16,7 +17,8 @@ namespace AttiLA.LocalizationService
     /// </summary>
     public enum LocalizerNotificationCode
     {
-        Progress
+        Progress,
+        Prediction
     }
 
     /// <summary>
@@ -26,22 +28,10 @@ namespace AttiLA.LocalizationService
     {
         private object value;
 
-        public LocalizerNotificationEventArgs(LocalizerNotificationCode code, object value = null)
-        {
-            Code = code;
-
-            switch(code)
-            {
-                case LocalizerNotificationCode.Progress:
-                    this.value = (double)value;
-                    break;
-            }
-        }
-
         /// <summary>
-        /// Value for progress notification event.
+        /// Value casting for progress notification event.
         /// </summary>
-        public double ValueAsProgress
+        public double ProgressValue
         {
             get
             {
@@ -53,6 +43,23 @@ namespace AttiLA.LocalizationService
                 this.value = (double)value;
             }
         }
+
+        /// <summary>
+        /// Value casting for prediction notfication event.
+        /// </summary>
+        public PredictionArgs PredictionValue
+        {
+            get
+            {
+                return (PredictionArgs)value;
+            }
+
+            set
+            {
+                this.value = (PredictionArgs)value;
+            }
+        }
+ 
 
         /// <summary>
         /// A code to identify the notification type.
@@ -67,7 +74,8 @@ namespace AttiLA.LocalizationService
     public enum LocalizerErrorNotificationCode
     {
         DatabaseError,
-        UnknownContext
+        UnknownContext,
+        Prediction
     }
 
 
@@ -96,6 +104,15 @@ namespace AttiLA.LocalizationService
         /// The exception that raised this localizer error.
         /// </summary>
         public Exception Cause { get; set; }
+    }
+
+    /// <summary>
+    /// Data used in prediction notification event.
+    /// </summary>
+    public class PredictionArgs
+    {
+        public Scenario PredictedScenario { get; set; }
+        public Boolean Success { get; set; }
     }
 
     #endregion
@@ -154,7 +171,7 @@ namespace AttiLA.LocalizationService
         }
 
         /// <summary>
-        /// Number of retries on WLAN scan failure.
+        /// Number of retries on failure.
         /// </summary>
         public uint Retries
         {
@@ -174,6 +191,95 @@ namespace AttiLA.LocalizationService
             }
         }
 
+        /// <summary>
+        /// The context set by the user.
+        /// </summary>
+        public string ContextId
+        {
+            get
+            {
+                lock(localizerLock)
+                {
+                    return contextId;
+                }
+            }
+            set
+            {
+                lock(localizerLock)
+                {
+                    if (value != null && !ContextService.IsValidObjectID(value))
+                    {
+                        throw new ArgumentOutOfRangeException("value");
+                    }
+                    contextId = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The interval in milliseconds between predictions.
+        /// </summary>
+        public double Interval
+        {
+            get
+            {
+                lock (localizerLock)
+                {
+                    return localizerTimer.Interval;
+                }
+            }
+            set
+            {
+                lock (localizerTimer)
+                {
+                    localizerTimer.Interval = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Property used to enable/disable the tracker.
+        /// </summary>
+        public bool Enabled
+        {
+            get
+            {
+                lock (localizerLock)
+                {
+                    return localizerTimer.Enabled;
+                }
+            }
+            set
+            {
+                lock (localizerLock)
+                {
+                    localizerTimer.Enabled = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The localizer is allowed to create a new scenario on failure.
+        /// </summary>
+        public bool CreationAllowed
+        {
+            get
+            {
+                lock(localizerTimer)
+                {
+                    return creationAllowed;
+                }
+            }
+
+            set
+            {
+                lock(localizerTimer)
+                {
+                    creationAllowed = value;
+                }
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -181,8 +287,11 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private Object localizerLock = new Object();
 
+        private string contextId;
+
         private Func<Scenario, IDictionary<AccessPoint, int>, double> similarityAlgorithm;
 
+        private bool creationAllowed;
 
         /// <summary>
         /// Samples supplier module.
@@ -194,117 +303,148 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private ScenarioService scenarioService = new ScenarioService();
 
+        /// <summary>
+        /// Service to interact woth contexts in database.
+        /// </summary>
+        private ContextService contextService = new ContextService();
+
         private uint retries;
 
         /// <summary>
-        /// Get a scenario for the requested preference.
+        /// The timer used to perform predictions.
         /// </summary>
-        /// <param name="contextId">The requested preference id.</param>
-        /// <param name="preferences">Similar contexts predicted.</param>
-        /// <returns></returns>
-        public Scenario ChangeContext(string contextId, out IEnumerable<ContextPreference> preferences)
-        {
-            if(contextId == null)
-            {
-                // don't complain, should have been checked
-                throw new ArgumentNullException("contextId");
-            }
+        private Timer localizerTimer = new Timer();
 
-            if (!ContextService.IsValidObjectID(contextId))
-            {
-                // don't complain, should have been checked
-                throw new ArgumentOutOfRangeException("contextId");
-            }
 
-            try
-            {
-                if (scenarioService.GetById(contextId) == null)
-                {
-                    // notify error
-                    if(LocalizerErrorNotification != null)
-                    {
-                        var args = new LocalizerErrorNotificationEventArgs(
-                            LocalizerErrorNotificationCode.UnknownContext);
-                        LocalizerErrorNotification(this, args);
-                    }
-                    preferences = null;
-                    return null;
-                }
-            }
-            catch (Exception ex)
-            {
-                if(LocalizerErrorNotification != null)
-                {
-                    // notify error
-                    var args = new LocalizerErrorNotificationEventArgs(
-                        LocalizerErrorNotificationCode.DatabaseError,ex);
-                    LocalizerErrorNotification(this, args);
-                }
-                preferences = null;
-                return null;
-            }
-
-            // context is valid
-
+        /// <summary>
+        /// Each time this handler is invoked, a new prediction is done.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void localizerTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {   
             lock(localizerLock)
             {
-                Scenario scenario = null;
+                if (LocalizerNotification != null)
+                {
+                    var prediction = this.Prediction();
+                    if (prediction != null)
+                    {
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Prediction,
+                            PredictionValue = prediction
+                        };
+                        LocalizerNotification(this, args);
+                    }
+
+                }
+
+            }
+        }
+
+        /// <summary>
+        /// Try to find a scenario for the target context. On failure, a new
+        /// scenario is created if the creation is allowed, otherwise the
+        /// predicted scenario is returned.
+        /// </summary>
+        /// <returns>A prediction, or null in case of error.</returns>
+        public PredictionArgs Prediction()
+        {
+            lock (localizerLock)
+            {
+
+                if (ContextId == null)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    if (contextService.GetById(ContextId) == null)
+                    {
+                        // notify error
+                        if (LocalizerErrorNotification != null)
+                        {
+                            var args = new LocalizerErrorNotificationEventArgs(
+                                LocalizerErrorNotificationCode.UnknownContext);
+                            LocalizerErrorNotification(this, args);
+                        }
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (LocalizerErrorNotification != null)
+                    {
+                        // notify error
+                        var args = new LocalizerErrorNotificationEventArgs(
+                            LocalizerErrorNotificationCode.DatabaseError, ex);
+                        LocalizerErrorNotification(this, args);
+                    }
+                    return null;
+                }
+
+                // context found in the database
+
+                var prediction = new PredictionArgs
+                {
+                    Success = false
+                };
+
                 IEnumerable<ContextPreference> pref = null;
                 for (var attempts = this.Retries + 1; attempts > 0; attempts--)
                 {
-                    
-                    scenario = Prediction(out pref);
-                    if (scenario == null)
+
+                    prediction.PredictedScenario = GetScenarioForCurrentPosition(out pref);
+                    if (prediction.PredictedScenario == null)
                     {
                         // retry, eventually..
                         continue;
                     }
 
-                    if(contextId.Equals(scenario.ContextId.ToString()))
+                    if (ContextId.Equals(prediction.PredictedScenario.ContextId.ToString()))
                     {
-                        // right prediction
-                        scenarioService.IncreaseAccuracy(scenario);
+                        // correct prediction
+                        scenarioService.IncreaseAccuracy(prediction.PredictedScenario);
+                        prediction.Success = true;
                         break;
                     }
-                    
+
                     // wrong prediction
-                    scenarioService.DecreaseAccuracy(scenario);
-                    scenario = null;
+                    scenarioService.DecreaseAccuracy(prediction.PredictedScenario);
                 }
-                
-                if(scenario == null)
+
+                if (!prediction.Success && CreationAllowed)
                 {
                     // create a new scenario for the requested context
-                    scenario = new Scenario
+                    prediction.PredictedScenario = new Scenario
                     {
-                        ContextId = new ObjectId(contextId),
+                        ContextId = new ObjectId(ContextId),
                         CreationTime = DateTime.Now
                     };
 
                     try
                     {
-                        scenarioService.Create(scenario);
+                        scenarioService.Create(prediction.PredictedScenario);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        if(LocalizerErrorNotification != null)
+                        if (LocalizerErrorNotification != null)
                         {
                             // notify error
                             var args = new LocalizerErrorNotificationEventArgs(
                                 LocalizerErrorNotificationCode.DatabaseError, ex);
                             LocalizerErrorNotification(this, args);
                         }
-                        preferences = null;
                         return null;
                     }
                 }
 
-                // TODO: last preferences are applied for now.
-                // Consider a better alternative, if any.
-                preferences = pref;
-                return null;
+                return prediction;
 
             }
+
         }
 
         /// <summary>
@@ -312,28 +452,22 @@ namespace AttiLA.LocalizationService
         /// </summary>
         /// <param name="preferences">Similar contexts predicted with preference value.</param>
         /// <returns>The most suitable scenario or null.</returns>
-        public Scenario Prediction(out IEnumerable<ContextPreference> preferences)
+        public Scenario GetScenarioForCurrentPosition(out IEnumerable<ContextPreference> preferences)
         {
             lock(localizerLock)
             {
-                List<ScanSignal> signals = null;
-
-                for (var attempts = this.Retries + 1; attempts > 0; attempts--)
-                {
-                    signals = wlanScanner.GetScanSignals();
-                    if (signals.Count > 0)
-                    {
-                        break;
-                    }
-                }
+                List<ScanSignal> signals = wlanScanner.GetScanSignals();
 
                 if (signals.Count == 0)
                 {
                     // send progress notification 
                     if(LocalizerNotification != null)
                     {
-                        var args = new LocalizerNotificationEventArgs(
-                            LocalizerNotificationCode.Progress, 1.0);
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Progress,
+                            ProgressValue = 1.0
+                        };
                         LocalizerNotification(this, args);
                     }
                     preferences = null;
@@ -358,8 +492,11 @@ namespace AttiLA.LocalizationService
                     // send progress notification 
                     if (LocalizerNotification != null)
                     {
-                        var args = new LocalizerNotificationEventArgs(
-                            LocalizerNotificationCode.Progress, 1.0);
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Progress,
+                            ProgressValue = 1.0
+                        };
                         LocalizerNotification(this, args);
                     }
                     preferences = null;
@@ -379,8 +516,11 @@ namespace AttiLA.LocalizationService
                     // send progress notification 
                     if (LocalizerNotification != null)
                     {
-                        var args = new LocalizerNotificationEventArgs(
-                            LocalizerNotificationCode.Progress, (double) scenarioCounter / numScenarios);
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Progress,
+                            ProgressValue = (double)scenarioCounter / numScenarios
+                        };
                         LocalizerNotification(this, args);
                     }
                     var scenario = scenarioEnumerator.Current;
@@ -389,7 +529,7 @@ namespace AttiLA.LocalizationService
                         // skip scenario
                         continue;
                     }
-                    // result for scenario
+                    // prediction for scenario
                     double scenarioSimilarity = SimilarityAlgorithm(scenario, mapSignals);
 
                     // update preference similarity
@@ -424,8 +564,11 @@ namespace AttiLA.LocalizationService
                 // send progress notification 
                 if (LocalizerNotification != null)
                 {
-                    var args = new LocalizerNotificationEventArgs(
-                            LocalizerNotificationCode.Progress, 1.0);
+                    var args = new LocalizerNotificationEventArgs
+                    {
+                        Code = LocalizerNotificationCode.Progress,
+                        ProgressValue = 1.0
+                    };
                     LocalizerNotification(this, args);
                 }
 
@@ -453,12 +596,15 @@ namespace AttiLA.LocalizationService
             }
         }
 
-
-
         public Localizer()
         {
-
+            localizerTimer.Elapsed += localizerTimer_Elapsed;
         }
 
+
+
+
+
+        
     }
 }

@@ -19,13 +19,13 @@
     <xs:sequence>
       <xs:element minOccurs="0" name="Localizer" nillable="true" type="tns:LocalizerSettings" />
       <xs:element minOccurs="0" name="NotificationThreshold" type="xs:unsignedInt" />
-      <xs:element minOccurs="0" name="PredictionInterval" type="xs:double" />
       <xs:element minOccurs="0" name="Tracker" nillable="true" type="tns:TrackerSettings" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="GlobalSettings" nillable="true" type="tns:GlobalSettings" />
   <xs:complexType name="LocalizerSettings">
     <xs:sequence>
+      <xs:element minOccurs="0" name="Interval" type="xs:double" />
       <xs:element minOccurs="0" name="Retries" type="xs:unsignedInt" />
       <xs:element minOccurs="0" name="SimilarityAlgorithm" type="tns:SimilarityAlgorithmCode" />
     </xs:sequence>
@@ -41,8 +41,7 @@
   <xs:element name="SimilarityAlgorithmCode" nillable="true" type="tns:SimilarityAlgorithmCode" />
   <xs:complexType name="TrackerSettings">
     <xs:sequence>
-      <xs:element minOccurs="0" name="CaptureInterval" type="xs:double" />
-      <xs:element minOccurs="0" name="UpdateInterval" type="xs:double" />
+      <xs:element minOccurs="0" name="Interval" type="xs:double" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="TrackerSettings" nillable="true" type="tns:TrackerSettings" />

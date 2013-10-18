@@ -25,31 +25,19 @@ namespace AttiLA.LocalizationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public double TrackerCaptureInterval {
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double TrackerInterval {
             get {
-                return ((double)(this["TrackerCaptureInterval"]));
+                return ((double)(this["TrackerInterval"]));
             }
             set {
-                this["TrackerCaptureInterval"] = value;
+                this["TrackerInterval"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2000")]
-        public double TrackerUpdateInterval {
-            get {
-                return ((double)(this["TrackerUpdateInterval"]));
-            }
-            set {
-                this["TrackerUpdateInterval"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
         public uint LocalizerRetries {
             get {
                 return ((uint)(this["LocalizerRetries"]));
@@ -61,7 +49,7 @@ namespace AttiLA.LocalizationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
         public byte LocalizerSimilarityAlgorithm {
             get {
                 return ((byte)(this["LocalizerSimilarityAlgorithm"]));
@@ -74,12 +62,12 @@ namespace AttiLA.LocalizationService.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("5000")]
-        public double PredictionInterval {
+        public double LocalizerInterval {
             get {
-                return ((double)(this["PredictionInterval"]));
+                return ((double)(this["LocalizerInterval"]));
             }
             set {
-                this["PredictionInterval"] = value;
+                this["LocalizerInterval"] = value;
             }
         }
         

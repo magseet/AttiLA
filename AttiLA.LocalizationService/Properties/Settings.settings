@@ -2,19 +2,16 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AttiLA.LocalizationService.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="TrackerCaptureInterval" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">300</Value>
-    </Setting>
-    <Setting Name="TrackerUpdateInterval" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">2000</Value>
+    <Setting Name="TrackerInterval" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="LocalizerRetries" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">1</Value>
     </Setting>
     <Setting Name="LocalizerSimilarityAlgorithm" Type="System.Byte" Scope="User">
-      <Value Profile="(Default)">0</Value>
+      <Value Profile="(Default)">2</Value>
     </Setting>
-    <Setting Name="PredictionInterval" Type="System.Double" Scope="User">
+    <Setting Name="LocalizerInterval" Type="System.Double" Scope="User">
       <Value Profile="(Default)">5000</Value>
     </Setting>
     <Setting Name="NotificationThreshold" Type="System.UInt32" Scope="User">
