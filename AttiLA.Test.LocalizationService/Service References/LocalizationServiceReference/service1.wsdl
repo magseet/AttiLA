@@ -106,8 +106,8 @@
   <wsdl:message name="ILocalizationService_ReportPrediction_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:ReportPrediction" />
   </wsdl:message>
-  <wsdl:message name="ILocalizationService_ReportTracking_OutputCallbackMessage">
-    <wsdl:part name="parameters" element="tns:ReportTracking" />
+  <wsdl:message name="ILocalizationService_ReportServiceStatus_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ReportServiceStatus" />
   </wsdl:message>
   <wsdl:portType msc:usingSession="true" name="ILocalizationService">
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="Subscribe">
@@ -154,8 +154,8 @@
     <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReportPrediction">
       <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ReportPrediction" message="tns:ILocalizationService_ReportPrediction_OutputCallbackMessage" />
     </wsdl:operation>
-    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReportTracking">
-      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ReportTracking" message="tns:ILocalizationService_ReportTracking_OutputCallbackMessage" />
+    <wsdl:operation msc:isInitiating="true" msc:isTerminating="false" name="ReportServiceStatus">
+      <wsdl:output wsaw:Action="http://tempuri.org/ILocalizationService/ReportServiceStatus" message="tns:ILocalizationService_ReportServiceStatus_OutputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetNamedPipeBinding_ILocalizationService" type="tns:ILocalizationService">
@@ -261,8 +261,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="ReportTracking">
-      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/ReportTracking" style="document" />
+    <wsdl:operation name="ReportServiceStatus">
+      <soap12:operation soapAction="http://tempuri.org/ILocalizationService/ReportServiceStatus" style="document" />
       <wsdl:output>
         <soap12:body use="literal" />
       </wsdl:output>

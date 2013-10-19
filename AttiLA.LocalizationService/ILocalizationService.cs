@@ -163,6 +163,11 @@ namespace AttiLA.LocalizationService
         [DataMember]
         public double Interval { get; set; }
 
+        /// <summary>
+        /// Number of samples required to train a scenario.
+        /// </summary>
+        [DataMember]
+        public uint TrainingThreshold { get; set; }
     }
 
 
@@ -179,16 +184,16 @@ namespace AttiLA.LocalizationService
         public double Interval { get; set; }
 
         /// <summary>
-        /// The algorithm used to calculate signals affinity to a scenario.
-        /// </summary>
-        [DataMember]
-        public SimilarityAlgorithmCode SimilarityAlgorithm { get; set; }
-
-        /// <summary>
         /// Times the localizer try to recover from wrong predictions.
         /// </summary>
         [DataMember]
         public uint Retries { get; set; }
+
+        /// <summary>
+        /// The algorithm used to calculate signals affinity to a scenario.
+        /// </summary>
+        [DataMember]
+        public SimilarityAlgorithmCode SimilarityAlgorithm { get; set; }
     }
 
     /// <summary>
@@ -236,15 +241,20 @@ namespace AttiLA.LocalizationService
         [EnumMember]
         Idle,
         /// <summary>
-        /// The selected context is continously trained.
+        /// The service sends a notification when the context changes.
+        /// </summary>
+        [EnumMember]
+        Notification,
+        /// <summary>
+        /// The service enters in training mode when the context changes.
         /// </summary>
         [EnumMember]
         Tracking,
         /// <summary>
-        /// The service sends a notification when the context changes.
+        /// The service is in traning mode.
         /// </summary>
         [EnumMember]
-        Notification
+        Training
     }
 
     /// <summary>

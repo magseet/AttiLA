@@ -31,7 +31,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.btnLocalizeTrack = new System.Windows.Forms.Button();
+            this.btnTrack = new System.Windows.Forms.Button();
             this.btnTrackStop = new System.Windows.Forms.Button();
             this.btnPrediction = new System.Windows.Forms.Button();
             this.lstPreferences = new System.Windows.Forms.ListView();
@@ -46,6 +46,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.txtSelected = new System.Windows.Forms.TextBox();
             this.btnUpdate = new System.Windows.Forms.Button();
+            this.btnSilence = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -53,15 +54,15 @@
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // btnLocalizeTrack
+            // btnTrack
             // 
-            this.btnLocalizeTrack.Location = new System.Drawing.Point(258, 314);
-            this.btnLocalizeTrack.Name = "btnLocalizeTrack";
-            this.btnLocalizeTrack.Size = new System.Drawing.Size(75, 23);
-            this.btnLocalizeTrack.TabIndex = 7;
-            this.btnLocalizeTrack.Text = "Track";
-            this.btnLocalizeTrack.UseVisualStyleBackColor = true;
-            this.btnLocalizeTrack.Click += new System.EventHandler(this.btnTrackStart_Click);
+            this.btnTrack.Location = new System.Drawing.Point(258, 314);
+            this.btnTrack.Name = "btnTrack";
+            this.btnTrack.Size = new System.Drawing.Size(75, 23);
+            this.btnTrack.TabIndex = 7;
+            this.btnTrack.Text = "Track";
+            this.btnTrack.UseVisualStyleBackColor = true;
+            this.btnTrack.Click += new System.EventHandler(this.btnTrackStart_Click);
             // 
             // btnTrackStop
             // 
@@ -177,11 +178,22 @@
             this.btnUpdate.UseVisualStyleBackColor = true;
             this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
             // 
+            // btnSilence
+            // 
+            this.btnSilence.Location = new System.Drawing.Point(339, 343);
+            this.btnSilence.Name = "btnSilence";
+            this.btnSilence.Size = new System.Drawing.Size(75, 23);
+            this.btnSilence.TabIndex = 17;
+            this.btnSilence.Text = "Silence";
+            this.btnSilence.UseVisualStyleBackColor = true;
+            this.btnSilence.Click += new System.EventHandler(this.btnSilence_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(436, 387);
+            this.Controls.Add(this.btnSilence);
             this.Controls.Add(this.btnUpdate);
             this.Controls.Add(this.txtSelected);
             this.Controls.Add(this.label1);
@@ -190,7 +202,7 @@
             this.Controls.Add(this.lstPreferences);
             this.Controls.Add(this.btnPrediction);
             this.Controls.Add(this.btnTrackStop);
-            this.Controls.Add(this.btnLocalizeTrack);
+            this.Controls.Add(this.btnTrack);
             this.Name = "Form1";
             this.Text = "AttiLA test LocalizationService";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -203,7 +215,7 @@
         #endregion
 
         private System.Windows.Forms.NotifyIcon notifyIcon1;
-        private System.Windows.Forms.Button btnLocalizeTrack;
+        private System.Windows.Forms.Button btnTrack;
         private System.Windows.Forms.Button btnTrackStop;
         private System.Windows.Forms.Button btnPrediction;
         private System.Windows.Forms.ListView lstPreferences;
@@ -218,6 +230,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtSelected;
         private System.Windows.Forms.Button btnUpdate;
+        private System.Windows.Forms.Button btnSilence;
     }
 }
 

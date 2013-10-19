@@ -8,6 +8,8 @@ using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
 using MongoDB.Bson;
 using System.Timers;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace AttiLA.LocalizationService
 {
@@ -144,6 +146,46 @@ namespace AttiLA.LocalizationService
         /// </summary>
         public event LocalizerErrorNotificationEventHandler LocalizerErrorNotification;
         #endregion
+
+        /// <summary>
+        /// The lock used to synchronize access to the localizer.
+        /// </summary>
+        private Object localizerLock = new Object();
+
+        private string contextId;
+
+        private Func<Scenario, IDictionary<AccessPoint, int>, double> similarityAlgorithm;
+
+        private bool creationAllowed;
+
+        /// <summary>
+        /// Samples supplier module.
+        /// </summary>
+        private WlanScanner wlanScanner = WlanScanner.Instance;
+
+        /// <summary>
+        /// Service to interact with scenarios in database.
+        /// </summary>
+        private ScenarioService scenarioService = new ScenarioService();
+
+        /// <summary>
+        /// Service to interact woth contexts in database.
+        /// </summary>
+        private ContextService contextService = new ContextService();
+
+        private uint retries;
+
+        /// <summary>
+        /// The timer used to perform predictions.
+        /// </summary>
+        private System.Timers.Timer localizerTimer = new System.Timers.Timer();
+
+
+        /// <summary>
+        /// The collection used to store the progress values until they are notified.
+        /// </summary>
+        BlockingCollection<double> progressCollection = new BlockingCollection<double>();
+        Task progressTask;
 
         #region Properties
         /// <summary>
@@ -282,39 +324,6 @@ namespace AttiLA.LocalizationService
 
         #endregion
 
-        /// <summary>
-        /// The lock used to synchronize access to the localizer.
-        /// </summary>
-        private Object localizerLock = new Object();
-
-        private string contextId;
-
-        private Func<Scenario, IDictionary<AccessPoint, int>, double> similarityAlgorithm;
-
-        private bool creationAllowed;
-
-        /// <summary>
-        /// Samples supplier module.
-        /// </summary>
-        private WlanScanner wlanScanner = WlanScanner.Instance;
-
-        /// <summary>
-        /// Service to interact with scenarios in database.
-        /// </summary>
-        private ScenarioService scenarioService = new ScenarioService();
-
-        /// <summary>
-        /// Service to interact woth contexts in database.
-        /// </summary>
-        private ContextService contextService = new ContextService();
-
-        private uint retries;
-
-        /// <summary>
-        /// The timer used to perform predictions.
-        /// </summary>
-        private Timer localizerTimer = new Timer();
-
 
         /// <summary>
         /// Each time this handler is invoked, a new prediction is done.
@@ -325,6 +334,9 @@ namespace AttiLA.LocalizationService
         {   
             lock(localizerLock)
             {
+                // suspend
+                localizerTimer.Stop();
+
                 if (LocalizerNotification != null)
                 {
                     var prediction = this.Prediction();
@@ -335,11 +347,14 @@ namespace AttiLA.LocalizationService
                             Code = LocalizerNotificationCode.Prediction,
                             PredictionValue = prediction
                         };
-                        LocalizerNotification(this, args);
+                        var t = new Thread(() => LocalizerNotification(this, args));
+                        t.Start();
                     }
 
                 }
 
+                // resume
+                localizerTimer.Start();
             }
         }
 
@@ -368,7 +383,8 @@ namespace AttiLA.LocalizationService
                         {
                             var args = new LocalizerErrorNotificationEventArgs(
                                 LocalizerErrorNotificationCode.UnknownContext);
-                            LocalizerErrorNotification(this, args);
+                            var t = new Thread(() => LocalizerErrorNotification(this, args));
+                            t.Start();
                         }
                         return null;
                     }
@@ -380,7 +396,8 @@ namespace AttiLA.LocalizationService
                         // notify error
                         var args = new LocalizerErrorNotificationEventArgs(
                             LocalizerErrorNotificationCode.DatabaseError, ex);
-                        LocalizerErrorNotification(this, args);
+                        var t = new Thread(() => LocalizerErrorNotification(this, args));
+                        t.Start();
                     }
                     return null;
                 }
@@ -432,10 +449,12 @@ namespace AttiLA.LocalizationService
                     {
                         if (LocalizerErrorNotification != null)
                         {
+                            
                             // notify error
                             var args = new LocalizerErrorNotificationEventArgs(
                                 LocalizerErrorNotificationCode.DatabaseError, ex);
-                            LocalizerErrorNotification(this, args);
+                            var t = new Thread(() => LocalizerErrorNotification(this, args));
+                            t.Start();
                         }
                         return null;
                     }
@@ -460,16 +479,7 @@ namespace AttiLA.LocalizationService
 
                 if (signals.Count == 0)
                 {
-                    // send progress notification 
-                    if(LocalizerNotification != null)
-                    {
-                        var args = new LocalizerNotificationEventArgs
-                        {
-                            Code = LocalizerNotificationCode.Progress,
-                            ProgressValue = 1.0
-                        };
-                        LocalizerNotification(this, args);
-                    }
+                    progressCollection.Add(1.0);
                     preferences = null;
                     return null;
                 }
@@ -490,15 +500,7 @@ namespace AttiLA.LocalizationService
                     // no suitable scenarios were found.
 
                     // send progress notification 
-                    if (LocalizerNotification != null)
-                    {
-                        var args = new LocalizerNotificationEventArgs
-                        {
-                            Code = LocalizerNotificationCode.Progress,
-                            ProgressValue = 1.0
-                        };
-                        LocalizerNotification(this, args);
-                    }
+                    progressCollection.Add(1.0);
                     preferences = null;
                     return null;
                 }
@@ -514,15 +516,8 @@ namespace AttiLA.LocalizationService
                 for (int scenarioCounter = 0; scenarioCounter < numScenarios; scenarioCounter++, scenarioEnumerator.MoveNext())
                 {
                     // send progress notification 
-                    if (LocalizerNotification != null)
-                    {
-                        var args = new LocalizerNotificationEventArgs
-                        {
-                            Code = LocalizerNotificationCode.Progress,
-                            ProgressValue = (double)scenarioCounter / numScenarios
-                        };
-                        LocalizerNotification(this, args);
-                    }
+                    progressCollection.Add((double)scenarioCounter / numScenarios);
+
                     var scenario = scenarioEnumerator.Current;
                     if (scenario.Features.Count == 0)
                     {
@@ -561,17 +556,8 @@ namespace AttiLA.LocalizationService
                 }
                 scenarioEnumerator.Dispose();
 
-                // send progress notification 
-                if (LocalizerNotification != null)
-                {
-                    var args = new LocalizerNotificationEventArgs
-                    {
-                        Code = LocalizerNotificationCode.Progress,
-                        ProgressValue = 1.0
-                    };
-                    LocalizerNotification(this, args);
-                }
-
+                // send progress notification
+                progressCollection.Add(1.0);
 
                 preferences = (bestScenario == null ? null : mapPreferences.Values);
 
@@ -599,6 +585,23 @@ namespace AttiLA.LocalizationService
         public Localizer()
         {
             localizerTimer.Elapsed += localizerTimer_Elapsed;
+
+            // task to notify localization progress
+            progressTask = Task.Factory.StartNew(() =>
+            {
+                foreach (double progress in progressCollection.GetConsumingEnumerable())
+                {
+                    if(LocalizerNotification != null)
+                    {
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Progress,
+                            ProgressValue = progress
+                        };
+                        LocalizerNotification(this, args);
+                    }
+                }
+            });
         }
 
 

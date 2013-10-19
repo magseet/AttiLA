@@ -8,6 +8,7 @@ using AttiLA.Data.Services;
 using AttiLA.Data;
 using System.Timers;
 using MongoDB.Bson;
+using System.Threading;
 
 namespace AttiLA.LocalizationService
 {
@@ -18,9 +19,9 @@ namespace AttiLA.LocalizationService
     /// </summary>
     public enum TrackerNotificationCode
     {
-        Start,
-        Stop,
-        Update,
+        Started,
+        Stopped,
+        TrainingCompleted,
         NoSignalsDetected
     }
 
@@ -37,11 +38,6 @@ namespace AttiLA.LocalizationService
     /// </summary>
     public class TrackerNotificationEventArgs : EventArgs
     {
-        public TrackerNotificationEventArgs(TrackerNotificationCode code, Scenario targetScenario = null)
-        {
-            Code = code;
-        }
-
         /// <summary>
         /// A code to identify the notification type.
         /// </summary>
@@ -114,6 +110,34 @@ namespace AttiLA.LocalizationService
         /// </summary>
         public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
+
+        /// <summary>
+        /// The lock used to synchronize access to the tracker.
+        /// </summary>
+        private Object trackerLock = new Object();
+
+        /// <summary>
+        /// Samples supplier module.
+        /// </summary>
+        private WlanScanner wlanScanner = WlanScanner.Instance;
+
+        /// <summary>
+        /// Service to interact with scenarios in database.
+        /// </summary>
+        private ScenarioService scenarioService = new ScenarioService();
+
+        /// <summary>
+        /// The timer used to capture WLAN signal samples at a certain rate.
+        /// </summary>
+        private System.Timers.Timer trackerTimer = new System.Timers.Timer();
+
+        /// <summary>
+        /// A copy of the scenario on database used to save informations between updates.
+        /// </summary>
+        private Scenario targetScenario;
+
+        private uint trainingThreshold;
+
 
         #region Properties
 
@@ -201,41 +225,42 @@ namespace AttiLA.LocalizationService
                     // fire the notification event only if the tracker changes state
                     if (beforeState != value && TrackerNotification != null)
                     {
-                        var args = new TrackerNotificationEventArgs(
-                            value ? TrackerNotificationCode.Start : TrackerNotificationCode.Stop,
-                            targetScenario);
-                        TrackerNotification(this, args);
+                        var args = new TrackerNotificationEventArgs
+                        {
+                            Code = value ? TrackerNotificationCode.Started 
+                                : TrackerNotificationCode.Stopped,
+                            TargetScenario = targetScenario
+                        };
+                        var t = new Thread(() => TrackerNotification(this, args));
+                        t.Start();
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The number of samples required to train a scenario.
+        /// </summary>
+        public uint TrainingThreshold
+        {
+            get
+            {
+                lock(trackerLock)
+                {
+                    return trainingThreshold;
+                }
+            }
+            set
+            {
+                lock(trackerLock)
+                {
+                    trainingThreshold = value;
                 }
             }
         }
 
         #endregion
 
-        /// <summary>
-        /// The lock used to synchronize access to the tracker.
-        /// </summary>
-        private Object trackerLock = new Object();
-
-        /// <summary>
-        /// Samples supplier module.
-        /// </summary>
-        private WlanScanner wlanScanner = WlanScanner.Instance;
-
-        /// <summary>
-        /// Service to interact with scenarios in database.
-        /// </summary>
-        private ScenarioService scenarioService = new ScenarioService();
-
-        /// <summary>
-        /// The timer used to capture WLAN signal samples at a certain rate.
-        /// </summary>
-        private Timer trackerTimer = new Timer();
-
-        /// <summary>
-        /// A copy of the scenario on database used to save informations between updates.
-        /// </summary>
-        private Scenario targetScenario;
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="Tracker"/>
@@ -275,8 +300,10 @@ namespace AttiLA.LocalizationService
                     // do not erase staging area and notify an error
                     if (TrackerErrorNotification != null)
                     {
-                        TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
-                            TrackerErrorNotificationCode.DatabaseError, ex));
+                        var args = new TrackerErrorNotificationEventArgs(
+                            TrackerErrorNotificationCode.DatabaseError, ex);
+                        var t = new Thread(() => TrackerErrorNotification(this, args));
+                        t.Start();
                     }
                 }
                 finally
@@ -315,17 +342,37 @@ namespace AttiLA.LocalizationService
                     // notify and ignore signals
                     if (TrackerNotification != null)
                     {
-                        TrackerNotification(this, new TrackerNotificationEventArgs(
-                            TrackerNotificationCode.NoSignalsDetected));
+                        var args = new TrackerNotificationEventArgs
+                        {
+                            Code = TrackerNotificationCode.NoSignalsDetected
+                        };
+                        var t = new Thread(() => TrackerNotification(this, args));
+                        t.Start();
                     }
                 }
                 else
                 {
-                    targetScenario.TrainingSet.Add(new TrainingSetExample
+                    var example = new TrainingSetExample
                     {
                         ScanDateTime = DateTime.Now,
                         ScanSignals = scanSignals
-                    });
+                    };
+
+                    targetScenario.TrainingSet.Add(example);
+
+                    if(targetScenario.TrainingSet.Count == TrainingThreshold)
+                    {
+                        if(TrackerNotification != null)
+                        {
+                            var args = new TrackerNotificationEventArgs
+                            {
+                                Code = TrackerNotificationCode.TrainingCompleted,
+                                TargetScenario = targetScenario
+                            };
+                            var t = new Thread(() => TrackerNotification(this, args));
+                            t.Start();
+                        }
+                    }
                 }
 
                 // resume capture before unlock
@@ -349,7 +396,6 @@ namespace AttiLA.LocalizationService
             trackerTimer.Stop();
         }
         
-
 
     }
 }

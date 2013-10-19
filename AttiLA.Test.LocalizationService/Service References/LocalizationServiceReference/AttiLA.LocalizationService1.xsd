@@ -10,8 +10,9 @@
   <xs:simpleType name="ServiceStateCode">
     <xs:restriction base="xs:string">
       <xs:enumeration value="Idle" />
-      <xs:enumeration value="Tracking" />
       <xs:enumeration value="Notification" />
+      <xs:enumeration value="Tracking" />
+      <xs:enumeration value="Training" />
     </xs:restriction>
   </xs:simpleType>
   <xs:element name="ServiceStateCode" nillable="true" type="tns:ServiceStateCode" />
@@ -42,6 +43,7 @@
   <xs:complexType name="TrackerSettings">
     <xs:sequence>
       <xs:element minOccurs="0" name="Interval" type="xs:double" />
+      <xs:element minOccurs="0" name="TrainingThreshold" type="xs:unsignedInt" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="TrackerSettings" nillable="true" type="tns:TrackerSettings" />

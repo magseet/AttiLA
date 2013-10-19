@@ -13,6 +13,7 @@ using System.ServiceModel;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using MongoDB.Bson;
+using System.Diagnostics;
 
 namespace AttiLA.Test.LocalizationService
 {
@@ -22,7 +23,12 @@ namespace AttiLA.Test.LocalizationService
         )]
     public partial class Form1 : Form, ILocalizationServiceCallback
     {
-        
+
+        System.IO.StreamWriter logFile = new System.IO.StreamWriter("log.txt", true)
+        {
+            AutoFlush = true
+        };
+
         private LocalizationServiceClient serviceClient;
 
         private ContextService contextService = new ContextService();
@@ -34,10 +40,12 @@ namespace AttiLA.Test.LocalizationService
         public Form1()
         {
             InitializeComponent();
+            logFile.WriteLine(" -----------------------------------------------------------");
             _SyncContext = WindowsFormsSynchronizationContext.Current;
             var context = new InstanceContext(this);
             serviceClient = new LocalizationServiceClient(context);
             serviceClient.Subscribe();
+
         }
 
         void Form1_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
@@ -46,32 +54,6 @@ namespace AttiLA.Test.LocalizationService
         }
 
 
-
-        private void btnChange_Click(object sender, EventArgs e)
-        {
-            /*
-            if(!String.IsNullOrWhiteSpace(SelectedContext))
-            {
-                try
-                {
-                    serviceClient.ChangeContext(SelectedContext);
-                }
-                catch(FaultException<ArgumentException>)
-                {
-                    MessageBox.Show("invalid preference");
-                }
-                catch(FaultException<ServiceException> ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }
-                catch
-                {
-                    MessageBox.Show("PD!");
-                }
-            }
-             */
-            
-        }
 
         private void btnTrackStart_Click(object sender, EventArgs e)
         {
@@ -83,7 +65,7 @@ namespace AttiLA.Test.LocalizationService
 
         private void btnTrackStop_Click(object sender, EventArgs e)
         {
-            //serviceClient.TrackModeStop();
+            serviceClient.TrackingStop();
         }
 
 
@@ -143,9 +125,14 @@ namespace AttiLA.Test.LocalizationService
         {
         }
 
-        public void ReportTracking(bool enabled, string contextId)
+        public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
-            
+            Debug.WriteLine("[CLIENT] STATUS: " + serviceStatus.ServiceState.ToString());
+
+            logFile.WriteLine("{0} - report status: {1}, {2}",
+                DateTime.Now.ToString(), 
+                serviceStatus.ServiceState.ToString(), 
+                serviceStatus.ContextId);
         }
 
 
@@ -205,9 +192,17 @@ namespace AttiLA.Test.LocalizationService
             }
         }
 
-        public void ReportPrediction(string contextTd)
+        public void ReportPrediction(string contextId)
         {
+            Debug.WriteLine("[CLIENT] PREDICTION: " + contextId);
+            logFile.WriteLine("{0} - report prediction: {1}",
+                DateTime.Now.ToString(),
+                contextId);
+        }
 
+        private void btnSilence_Click(object sender, EventArgs e)
+        {
+            serviceClient.Silence();
         }
     }
 }

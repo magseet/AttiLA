@@ -125,11 +125,10 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ReportTracking">
+  <xs:element name="ReportServiceStatus">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="enabled" type="xs:boolean" />
-        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="serviceStatus" nillable="true" type="q5:ServiceStatus" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

@@ -26,13 +26,11 @@ namespace AttiLA.LocalizationService
         [OperationContract(IsOneWay = true)]
         void ReportPrediction(string contextId);
 
-
         /// <summary>
-        /// Notification callback informin about tracking status.
+        /// Notification callback informing about the service status.
         /// </summary>
-        /// <param name="enabled">Tracking is enabled.</param>
-        /// <param name="contextId">The context involved in tracking.</param>
+        /// <param name="serviceStatus"></param>
         [OperationContract(IsOneWay = true)]
-        void ReportTracking(bool enabled, string contextId);
+        void ReportServiceStatus(ServiceStatus serviceStatus);
     }
 }

@@ -12,10 +12,16 @@
       <Value Profile="(Default)">2</Value>
     </Setting>
     <Setting Name="LocalizerInterval" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">5000</Value>
+      <Value Profile="(Default)">1000</Value>
     </Setting>
     <Setting Name="NotificationThreshold" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">5</Value>
+    </Setting>
+    <Setting Name="TrackerTrainingThreshold" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="ServiceLog" Type="System.String" Scope="User">
+      <Value Profile="(Default)">service.log</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -82,10 +82,13 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         Idle = 0,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Tracking = 1,
+        Notification = 1,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Notification = 2,
+        Tracking = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Training = 3,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -254,6 +257,9 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         [System.Runtime.Serialization.OptionalFieldAttribute()]
         private double IntervalField;
         
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private uint TrainingThresholdField;
+        
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
             get {
@@ -273,6 +279,19 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
                 if ((this.IntervalField.Equals(value) != true)) {
                     this.IntervalField = value;
                     this.RaisePropertyChanged("Interval");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public uint TrainingThreshold {
+            get {
+                return this.TrainingThresholdField;
+            }
+            set {
+                if ((this.TrainingThresholdField.Equals(value) != true)) {
+                    this.TrainingThresholdField = value;
+                    this.RaisePropertyChanged("TrainingThreshold");
                 }
             }
         }
@@ -477,8 +496,8 @@ namespace AttiLA.Test.LocalizationService.LocalizationServiceReference {
         [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportPrediction")]
         void ReportPrediction(string contextId);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportTracking")]
-        void ReportTracking(bool enabled, string contextId);
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportServiceStatus")]
+        void ReportServiceStatus(AttiLA.Test.LocalizationService.LocalizationServiceReference.ServiceStatus serviceStatus);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

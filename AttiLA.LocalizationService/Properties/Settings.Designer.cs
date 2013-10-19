@@ -61,7 +61,7 @@ namespace AttiLA.LocalizationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
         public double LocalizerInterval {
             get {
                 return ((double)(this["LocalizerInterval"]));
@@ -80,6 +80,30 @@ namespace AttiLA.LocalizationService.Properties {
             }
             set {
                 this["NotificationThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public uint TrackerTrainingThreshold {
+            get {
+                return ((uint)(this["TrackerTrainingThreshold"]));
+            }
+            set {
+                this["TrackerTrainingThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("service.log")]
+        public string ServiceLog {
+            get {
+                return ((string)(this["ServiceLog"]));
+            }
+            set {
+                this["ServiceLog"] = value;
             }
         }
     }
