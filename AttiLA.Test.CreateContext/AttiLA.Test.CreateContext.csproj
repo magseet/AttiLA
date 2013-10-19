@@ -90,10 +90,6 @@
       <Project>{ee8e2895-5075-41b6-8742-2711dce3b573}</Project>
       <Name>AttiLA.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BleDA.ActionService\BleDA.ActionService.csproj">
-      <Project>{8aec47c7-a86f-40fc-955c-87af00c2f030}</Project>
-      <Name>BleDA.ActionService</Name>
-    </ProjectReference>
     <ProjectReference Include="..\managedwifi-1.1\ManagedWifi.csproj">
       <Project>{6aa425c9-ea6a-4b01-aaed-5ff122e8b663}</Project>
       <Name>ManagedWifi</Name>

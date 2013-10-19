@@ -5,7 +5,7 @@ using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BleDA.ActionService
+namespace BleDA.Actions
 {
     public class Services
     {

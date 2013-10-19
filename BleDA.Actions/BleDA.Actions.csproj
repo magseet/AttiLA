@@ -7,8 +7,8 @@
     <ProjectGuid>{8AEC47C7-A86F-40FC-955C-87AF00C2F030}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BleDA.ActionService</RootNamespace>
-    <AssemblyName>BleDA.ActionService</AssemblyName>
+    <RootNamespace>BleDA.Actions</RootNamespace>
+    <AssemblyName>BleDA.Actions</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

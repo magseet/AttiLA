@@ -11,16 +11,15 @@ using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using AttiLA.Data;
 using NativeWifi;
-using BleDA.ActionService;
 
 
 namespace AttiLA.Test.CreateContext
 {
     public partial class Form1 : Form
     {
-        ContextService contextService;
+        private ContextService _contextService;
 
-        string ContextName { 
+        private string ContextName { 
             get
             {
                 return textBoxName.Text;
@@ -34,7 +33,7 @@ namespace AttiLA.Test.CreateContext
         public Form1()
         {
             InitializeComponent();
-            contextService = new ContextService();
+            _contextService = new ContextService();
             //prova();
         }
 
@@ -42,12 +41,6 @@ namespace AttiLA.Test.CreateContext
 
         void prova()
         {
-            var processes = Processes.GetUserProcesses();
-            foreach(var process in processes)
-            {
-                Console.WriteLine((string)process.ManagementObject["CommandLine"]);
-            }
-
 
             WlanClient client = new WlanClient();
             foreach(var wlanIface in client.Interfaces)
@@ -73,7 +66,7 @@ namespace AttiLA.Test.CreateContext
             };
             try
             {
-                contextService.Create(c);
+                _contextService.Create(c);
             }
             catch(DatabaseException)
             {

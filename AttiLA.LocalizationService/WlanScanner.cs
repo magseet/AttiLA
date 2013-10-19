@@ -15,44 +15,61 @@ namespace AttiLA.LocalizationService
     /// </summary>
     public sealed class WlanScanner
     {
+
+        #region Static members
+
         /// <summary>
         /// Static inizialization of the private instance.
         /// </summary>
-        private static readonly WlanScanner instance = new WlanScanner();
+        private static readonly WlanScanner _instance = new WlanScanner();
+
+        #endregion
+
+        #region Private members
 
         /// <summary>
         /// The lock used to synchronize access to the scanner.
         /// </summary>
-        private Object scannerLock = new Object();
+        private Object _scannerLock = new Object();
 
         /// <summary>
         /// Managed Wifi object
         /// </summary>
-        private WlanClient wlanClient = new WlanClient();
+        private WlanClient _wlanClient = new WlanClient();
 
         /// <summary>
         /// For each interface scan complete events are monitored.
         /// </summary>
-        private Dictionary<Guid, AutoResetEvent> wlanEventScanComplete = new Dictionary<Guid, AutoResetEvent>();
+        private Dictionary<Guid, AutoResetEvent> _wlanEventScanComplete = new Dictionary<Guid, AutoResetEvent>();
 
-        private uint retries = 3;
+        private uint _retries = 3;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Number of times the service try to recover from a no signal scan.
+        /// </summary>
         private uint Retries 
         { 
             get
             {
-                lock(scannerLock)
+                lock(_scannerLock)
                 {
-                    return retries;
+                    return _retries;
                 }
             }
             set
             {
-                lock(scannerLock)
+                lock(_scannerLock)
                 {
-                    retries = value;
+                    _retries = value;
                 }
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Performs a scan of the WLAN interfaces and returns a list of <see cref="AccessPoint"/> elements.
@@ -62,16 +79,16 @@ namespace AttiLA.LocalizationService
         {
             var scanSignals = new List<ScanSignal>();
 
-            lock(scannerLock)
+            lock(_scannerLock)
             {
-                foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
+                foreach (WlanClient.WlanInterface wlanIface in _wlanClient.Interfaces)
                 {
                     Wlan.WlanBssEntry[] wlanBssEntries = null;
                     for (var attempts = this.Retries + 1; attempts > 0; attempts--)
                     {
                         // scan for new bss and wait for notification
                         wlanIface.Scan();
-                        wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
+                        _wlanEventScanComplete[wlanIface.InterfaceGuid].WaitOne();
                         wlanBssEntries = wlanIface.GetNetworkBssList();
                         
                         if (wlanBssEntries.Count() > 0)
@@ -126,7 +143,7 @@ namespace AttiLA.LocalizationService
                 {
                     case Wlan.WlanNotificationCodeAcm.ScanComplete:
                         // signal scan completion by the interface
-                        wlanEventScanComplete[notifyData.interfaceGuid].Set();
+                        _wlanEventScanComplete[notifyData.interfaceGuid].Set();
                         break;
                 }
             }
@@ -135,10 +152,10 @@ namespace AttiLA.LocalizationService
 
         private WlanScanner()
         {
-            foreach (WlanClient.WlanInterface wlanIface in wlanClient.Interfaces)
+            foreach (WlanClient.WlanInterface wlanIface in _wlanClient.Interfaces)
             {
                 // create events for the interface
-                wlanEventScanComplete.Add(wlanIface.InterfaceGuid, new AutoResetEvent(false));
+                _wlanEventScanComplete.Add(wlanIface.InterfaceGuid, new AutoResetEvent(false));
                 // set wlan notifications handler
                 wlanIface.WlanNotification += wlanIface_WlanNotification;
             }
@@ -149,7 +166,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         public static WlanScanner Instance
         {
-            get { return instance; }
+            get { return _instance; }
         }
     }
 }

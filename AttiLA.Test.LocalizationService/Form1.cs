@@ -23,34 +23,39 @@ namespace AttiLA.Test.LocalizationService
         )]
     public partial class Form1 : Form, ILocalizationServiceCallback
     {
+        #region Private members
 
-        System.IO.StreamWriter logFile = new System.IO.StreamWriter("log.txt", true)
+        System.IO.StreamWriter _logFile = new System.IO.StreamWriter("log.txt", true)
         {
             AutoFlush = true
         };
 
-        private LocalizationServiceClient serviceClient;
+        private LocalizationServiceClient _serviceClient;
 
-        private ContextService contextService = new ContextService();
+        private ContextService _contextService = new ContextService();
 
-        SynchronizationContext _SyncContext = null;
+        private SynchronizationContext _syncContext = null;
 
         private string SelectedContext { get; set; }
-        
+
+        #endregion
+
+        public delegate TV MyFunc<in T, TU, out TV>(T input, out TU output);
+
         public Form1()
         {
             InitializeComponent();
-            logFile.WriteLine(" -----------------------------------------------------------");
-            _SyncContext = WindowsFormsSynchronizationContext.Current;
+            _logFile.WriteLine(" -----------------------------------------------------------");
+            _syncContext = WindowsFormsSynchronizationContext.Current;
             var context = new InstanceContext(this);
-            serviceClient = new LocalizationServiceClient(context);
-            serviceClient.Subscribe();
+            _serviceClient = new LocalizationServiceClient(context);
+            _serviceClient.Subscribe();
 
         }
 
         void Form1_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
         {
-            serviceClient.Unsubscribe();
+            _serviceClient.Unsubscribe();
         }
 
 
@@ -59,13 +64,13 @@ namespace AttiLA.Test.LocalizationService
         {
             if (SelectedContext != null)
             {
-                serviceClient.TrackingStart(SelectedContext);
+                _serviceClient.TrackingStart(SelectedContext);
             }
         }
 
         private void btnTrackStop_Click(object sender, EventArgs e)
         {
-            serviceClient.TrackingStop();
+            _serviceClient.TrackingStop();
         }
 
 
@@ -85,7 +90,7 @@ namespace AttiLA.Test.LocalizationService
                     {
 
                         var lvi = new ListViewItem();
-                        var contextName = contextService.GetById(preference.ContextId.ToString()).ContextName;
+                        var contextName = _contextService.GetById(preference.ContextId.ToString()).ContextName;
                         lvi.Text = preference.ContextId.ToString();
                         lvi.SubItems.Add(contextName);
                         lvi.SubItems.Add(preference.Value.ToString());
@@ -94,11 +99,11 @@ namespace AttiLA.Test.LocalizationService
                 }
             };
 
-            _SyncContext.Post(setList, null);
+            _syncContext.Post(setList, null);
         }
 
        
-        public delegate TV MyFunc<in T, TU, out TV>(T input, out TU output);
+        
         private void btnPrediction_Click(object sender, EventArgs e)
         {
             try
@@ -106,7 +111,7 @@ namespace AttiLA.Test.LocalizationService
                 progbarLocalize.Value = 0;
                 btnPrediction.Enabled = false;
                 lstPreferences.Items.Clear();
-                var predictionCall = new Func<IEnumerable<ContextPreference>>(serviceClient.GetCloserContexts);
+                var predictionCall = new Func<IEnumerable<ContextPreference>>(_serviceClient.GetCloserContexts);
 
                 predictionCall.BeginInvoke(
                     PredictionCallCompleted,
@@ -129,7 +134,7 @@ namespace AttiLA.Test.LocalizationService
         {
             Debug.WriteLine("[CLIENT] STATUS: " + serviceStatus.ServiceState.ToString());
 
-            logFile.WriteLine("{0} - report status: {1}, {2}",
+            _logFile.WriteLine("{0} - report status: {1}, {2}",
                 DateTime.Now.ToString(), 
                 serviceStatus.ServiceState.ToString(), 
                 serviceStatus.ContextId);
@@ -152,7 +157,7 @@ namespace AttiLA.Test.LocalizationService
                 }
             };
 
-            _SyncContext.Post(setProgressBar, null);
+            _syncContext.Post(setProgressBar, null);
         }
 
         private void lstRecent_SelectedIndexChanged(object sender, EventArgs e)
@@ -181,7 +186,7 @@ namespace AttiLA.Test.LocalizationService
         private void LoadRecentContexts(int limit)
         {
             lstRecent.Items.Clear();
-            var contexts = contextService.GetMoreRecent(limit);
+            var contexts = _contextService.GetMoreRecent(limit);
             foreach(var context in contexts)
             {
                 var lvi = new ListViewItem();
@@ -195,14 +200,14 @@ namespace AttiLA.Test.LocalizationService
         public void ReportPrediction(string contextId)
         {
             Debug.WriteLine("[CLIENT] PREDICTION: " + contextId);
-            logFile.WriteLine("{0} - report prediction: {1}",
+            _logFile.WriteLine("{0} - report prediction: {1}",
                 DateTime.Now.ToString(),
                 contextId);
         }
 
         private void btnSilence_Click(object sender, EventArgs e)
         {
-            serviceClient.Silence();
+            _serviceClient.Silence();
         }
     }
 }

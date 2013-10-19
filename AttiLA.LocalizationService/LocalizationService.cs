@@ -24,20 +24,12 @@ namespace AttiLA.LocalizationService
     public class LocalizationService : ILocalizationService
     {
 
-        #region Locks
-
-        /// <summary>
-        /// The lock used to synchronize access to the service status.
-        /// </summary>
-        private Object lockStatus = new Object();
-        #endregion
-
         #region Events
 
 
         #endregion
 
-        #region Static modules
+        #region Static members
         /// <summary>
         /// Service to interact with scenarios in database.
         /// </summary>
@@ -56,6 +48,39 @@ namespace AttiLA.LocalizationService
 
         #endregion
 
+        #region Private members
+
+        /// <summary>
+        /// The lock used to synchronize access to the service status.
+        /// </summary>
+        private Object _lockStatus = new Object();
+
+        /// <summary>
+        /// The tracking module.
+        /// </summary>
+        private Tracker _tracker = new Tracker
+        {
+            Interval = Properties.Settings.Default.TrackerInterval,
+            Enabled = false,
+            ScenarioId = null,
+            TrainingThreshold = Properties.Settings.Default.TrackerTrainingThreshold
+        };
+
+        /// <summary>
+        /// The localization module.
+        /// </summary>
+        private Localizer _localizer = new Localizer
+        {
+            ContextId = null,
+            CreationAllowed = false,
+            Enabled = false,
+            Interval = Properties.Settings.Default.LocalizerInterval,
+            Retries = Properties.Settings.Default.LocalizerRetries,
+            SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(
+                (SimilarityAlgorithmCode)Properties.Settings.Default.LocalizerSimilarityAlgorithm)
+        };
+        #endregion
+
         #region Properties
 
         /// <summary>
@@ -69,34 +94,6 @@ namespace AttiLA.LocalizationService
 
         #endregion
 
-
-
-        /// <summary>
-        /// The tracking module.
-        /// </summary>
-        private Tracker tracker = new Tracker 
-        { 
-            Interval = Properties.Settings.Default.TrackerInterval,
-            Enabled = false,
-            ScenarioId = null,
-            TrainingThreshold = Properties.Settings.Default.TrackerTrainingThreshold
-        };
-
-        /// <summary>
-        /// The localization module.
-        /// </summary>
-        private Localizer localizer = new Localizer
-        {
-            ContextId = null,
-            CreationAllowed = false,
-            Enabled = false,
-            Interval = Properties.Settings.Default.LocalizerInterval,
-            Retries = Properties.Settings.Default.LocalizerRetries,
-            SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(
-                (SimilarityAlgorithmCode)Properties.Settings.Default.LocalizerSimilarityAlgorithm)   
-        };
-
-
         /// <summary>
         /// Service initialization.
         /// </summary>
@@ -106,11 +103,13 @@ namespace AttiLA.LocalizationService
             ConsecutiveCorrectPredictions = 0;
             NotificationThreshold = Properties.Settings.Default.NotificationThreshold;
             ServiceState = ServiceStateCode.Idle;
-  
+
             // enable handlers
-            tracker.TrackerNotification += tracker_TrackerNotification;
-            localizer.LocalizerNotification += localizer_LocalizerNotification;
+            _tracker.TrackerNotification += tracker_TrackerNotification;
+            _localizer.LocalizerNotification += localizer_LocalizerNotification;
         }
+        
+
 
         /// <summary>
         /// Handler for notifications by the localizer.
@@ -120,11 +119,11 @@ namespace AttiLA.LocalizationService
         void localizer_LocalizerNotification(object sender, LocalizerNotificationEventArgs e)
         {
             // requires a lock since it's running on a different thread
-            lock(lockStatus)
+            lock(_lockStatus)
             {
                 // suspend prediction timer
-                bool previousLocalizerStatus = localizer.Enabled;
-                localizer.Enabled = false;
+                bool previousLocalizerStatus = _localizer.Enabled;
+                _localizer.Enabled = false;
 
                 switch (e.Code)
                 {
@@ -151,14 +150,14 @@ namespace AttiLA.LocalizationService
                         // dispatch prediction
                         if(ServiceState == ServiceStateCode.Tracking)
                         {
-                            tracker.Update();
+                            _tracker.Update();
                         }
                         DispatchPrediction(e.PredictionValue);
                         break;
                 }
 
                 // restore localizer status
-                localizer.Enabled = previousLocalizerStatus;
+                _localizer.Enabled = previousLocalizerStatus;
             }
         }
 
@@ -169,7 +168,7 @@ namespace AttiLA.LocalizationService
         /// <param name="e"></param>
         void tracker_TrackerNotification(object sender, TrackerNotificationEventArgs e)
         {
-            lock(lockStatus)
+            lock(_lockStatus)
             {
                 switch (e.Code)
                 {
@@ -181,7 +180,7 @@ namespace AttiLA.LocalizationService
                         
                         // from tracking to training mode
                         Debug.WriteLine("TRACKER STARTED (training). ");
-                        localizer.Enabled = false;
+                        _localizer.Enabled = false;
 
                         // notify all subscribers
                         foreach (var subscriber in subscribers)
@@ -190,7 +189,7 @@ namespace AttiLA.LocalizationService
                             {
                                 var serviceStatus = new ServiceStatus
                                 {
-                                    ContextId = localizer.ContextId,
+                                    ContextId = _localizer.ContextId,
                                     ServiceState = ServiceStateCode.Training
                                 };
                                 subscriber.ReportServiceStatus(serviceStatus);
@@ -214,7 +213,7 @@ namespace AttiLA.LocalizationService
                             {
                                 var serviceStatus = new ServiceStatus
                                 {
-                                    ContextId = localizer.ContextId,
+                                    ContextId = _localizer.ContextId,
                                     ServiceState = ServiceStateCode.Notification
                                 };
                                 subscriber.ReportServiceStatus(serviceStatus);
@@ -230,7 +229,7 @@ namespace AttiLA.LocalizationService
 
                         // from training to tracking mode
                         Debug.WriteLine("TRAINING COMPLETED.");
-                        localizer.Enabled = true;
+                        _localizer.Enabled = true;
 
                         // notify all subscribers
                         foreach (var subscriber in subscribers)
@@ -239,7 +238,7 @@ namespace AttiLA.LocalizationService
                             {
                                 var serviceStatus = new ServiceStatus
                                 {
-                                    ContextId = localizer.ContextId,
+                                    ContextId = _localizer.ContextId,
                                     ServiceState = ServiceStateCode.Tracking
                                 };
                                 subscriber.ReportServiceStatus(serviceStatus);
@@ -304,11 +303,11 @@ namespace AttiLA.LocalizationService
         /// <returns></returns>
         public ServiceStatus GetServiceStatus()
         {
-            lock(lockStatus)
+            lock(_lockStatus)
             {
                 return new ServiceStatus
                 {
-                    ContextId = localizer.ContextId,
+                    ContextId = _localizer.ContextId,
                     ServiceState = this.ServiceState
                 };
             }
@@ -345,16 +344,16 @@ namespace AttiLA.LocalizationService
         public bool SetGlobalSettings(GlobalSettings newSettings)
         {
             Silence();
-            lock(lockStatus)
+            lock(_lockStatus)
             {
                 try
                 {
                     // apply settings
-                    tracker.Interval = newSettings.Tracker.Interval;
-                    tracker.TrainingThreshold = newSettings.Tracker.TrainingThreshold;
-                    localizer.Interval = newSettings.Localizer.Interval;
-                    localizer.SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(newSettings.Localizer.SimilarityAlgorithm);
-                    localizer.Retries = newSettings.Localizer.Retries;
+                    _tracker.Interval = newSettings.Tracker.Interval;
+                    _tracker.TrainingThreshold = newSettings.Tracker.TrainingThreshold;
+                    _localizer.Interval = newSettings.Localizer.Interval;
+                    _localizer.SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(newSettings.Localizer.SimilarityAlgorithm);
+                    _localizer.Retries = newSettings.Localizer.Retries;
                     NotificationThreshold = newSettings.NotificationThreshold;
                 }
                 catch
@@ -390,22 +389,22 @@ namespace AttiLA.LocalizationService
                 throw new FaultException<ServiceException>(detail);
             }
 
-            lock(lockStatus)
+            lock(_lockStatus)
             {
 
                 var previousState = ServiceState;
 
                 try
                 {
-                    if(contextId == localizer.ContextId && previousState == ServiceStateCode.Tracking)
+                    if(contextId == _localizer.ContextId && previousState == ServiceStateCode.Tracking)
                     {
                         // do nothing
                         return true;
                     }
 
                     // prepare for tracking
-                    tracker.ScenarioId = null;
-                    localizer.Enabled = false;
+                    _tracker.ScenarioId = null;
+                    _localizer.Enabled = false;
                     ServiceState = ServiceStateCode.Tracking;
 
                     // notify all subscribers
@@ -426,23 +425,23 @@ namespace AttiLA.LocalizationService
                         }
                     }
 
-                    if(contextId != localizer.ContextId)
+                    if(contextId != _localizer.ContextId)
                     {
                         // prepare for new context
                         ConsecutiveCorrectPredictions = 0;
-                        localizer.ContextId = contextId;
+                        _localizer.ContextId = contextId;
                     }
 
                     // perform a first prediction
-                    localizer.CreationAllowed = true;
-                    var prediction = localizer.Prediction();
+                    _localizer.CreationAllowed = true;
+                    var prediction = _localizer.Prediction();
                     if(prediction == null || prediction.PredictedScenario == null)
                     {
                         return false;
                     }
                     DispatchPrediction(prediction);
                     // enable localizer timer for the next predictions
-                    localizer.Enabled = true;
+                    _localizer.Enabled = true;
                     
                 }
                 catch(ArgumentException)
@@ -477,7 +476,7 @@ namespace AttiLA.LocalizationService
                 return;
             }
 
-            lock(lockStatus)
+            lock(_lockStatus)
             {
                 if(ServiceState == ServiceStateCode.Idle || ServiceState == ServiceStateCode.Training)
                 {
@@ -522,16 +521,16 @@ namespace AttiLA.LocalizationService
                     {
                         Debug.WriteLine("DISPATCH: success in tracking state.");
                         // no need to track
-                        tracker.Enabled = false;
+                        _tracker.Enabled = false;
                     }
                     else
                     {
                         Debug.WriteLine("DISPATCH: failure in tracking state.");
                         // training needed
-                        tracker.ScenarioId = 
+                        _tracker.ScenarioId = 
                             prediction.PredictedScenario == null
                             ? null : prediction.PredictedScenario.Id.ToString();
-                        tracker.Enabled = true;
+                        _tracker.Enabled = true;
                     }
                 }
 
@@ -547,10 +546,10 @@ namespace AttiLA.LocalizationService
         /// <returns></returns>
         public bool TrackingStop()
         {
-            tracker.Enabled = false;
-            lock(lockStatus)
+            _tracker.Enabled = false;
+            lock(_lockStatus)
             {
-                localizer.CreationAllowed = false;
+                _localizer.CreationAllowed = false;
                 if(ServiceState == ServiceStateCode.Tracking)
                 {
                     ServiceState = ServiceStateCode.Notification;
@@ -566,7 +565,7 @@ namespace AttiLA.LocalizationService
         public IEnumerable<ContextPreference> GetCloserContexts()
         {
             IEnumerable<ContextPreference> preferences;
-            localizer.GetScenarioForCurrentPosition(out preferences);
+            _localizer.GetScenarioForCurrentPosition(out preferences);
             if (preferences == null)
             {
                 return new List<ContextPreference>();
@@ -580,12 +579,12 @@ namespace AttiLA.LocalizationService
         /// <returns></returns>
         public void Silence()
         {
-            tracker.Enabled = false;
+            _tracker.Enabled = false;
 
-            lock(lockStatus)
+            lock(_lockStatus)
             {
                 Debug.WriteLine("SILENCE");
-                localizer.Enabled = false;
+                _localizer.Enabled = false;
                 ServiceState = ServiceStateCode.Idle;
                 // notify all subscribers
                 foreach (var subscriber in subscribers)
@@ -594,7 +593,7 @@ namespace AttiLA.LocalizationService
                     {
                         var serviceStatus = new ServiceStatus
                         {
-                            ContextId = localizer.ContextId,
+                            ContextId = _localizer.ContextId,
                             ServiceState = ServiceStateCode.Idle
                         };
                         subscriber.ReportServiceStatus(serviceStatus);

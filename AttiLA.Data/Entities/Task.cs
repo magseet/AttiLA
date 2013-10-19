@@ -22,5 +22,11 @@ namespace AttiLA.Data.Entities
         /// The list of contexts using the task.
         /// </summary>
         public List<ObjectId> Contexts { get; set; }
+
+        public Task()
+        {
+            Actions = new List<Action>();
+            Contexts = new List<ObjectId>();
+        }
     }
 }

@@ -111,33 +111,36 @@ namespace AttiLA.LocalizationService
         public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
 
+        #region Private members
+
         /// <summary>
         /// The lock used to synchronize access to the tracker.
         /// </summary>
-        private Object trackerLock = new Object();
+        private Object _trackerLock = new Object();
 
         /// <summary>
         /// Samples supplier module.
         /// </summary>
-        private WlanScanner wlanScanner = WlanScanner.Instance;
+        private WlanScanner _wlanScanner = WlanScanner.Instance;
 
         /// <summary>
         /// Service to interact with scenarios in database.
         /// </summary>
-        private ScenarioService scenarioService = new ScenarioService();
+        private ScenarioService _scenarioService = new ScenarioService();
 
         /// <summary>
         /// The timer used to capture WLAN signal samples at a certain rate.
         /// </summary>
-        private System.Timers.Timer trackerTimer = new System.Timers.Timer();
+        private System.Timers.Timer _trackerTimer = new System.Timers.Timer();
 
         /// <summary>
         /// A copy of the scenario on database used to save informations between updates.
         /// </summary>
-        private Scenario targetScenario;
+        private Scenario _targetScenario;
 
-        private uint trainingThreshold;
+        private uint _trainingThreshold;
 
+        #endregion
 
         #region Properties
 
@@ -148,34 +151,34 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    return (targetScenario == null ? null : targetScenario.Id.ToString());
+                    return (_targetScenario == null ? null : _targetScenario.Id.ToString());
                 }
             }
             set
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
                     if (value == null)
                     {
-                        targetScenario = null;
+                        _targetScenario = null;
                     }
-                    else if (targetScenario == null || !targetScenario.Id.ToString().Equals(value))
+                    else if (_targetScenario == null || !_targetScenario.Id.ToString().Equals(value))
                     {
                         if(!ScenarioService.IsValidObjectID(value))
                         {
                             throw new ArgumentOutOfRangeException("value");
                         }
                         // get scenario from database
-                        targetScenario = scenarioService.GetById(value);
-                        if (targetScenario == null)
+                        _targetScenario = _scenarioService.GetById(value);
+                        if (_targetScenario == null)
                         {
                             throw new ArgumentOutOfRangeException("value", Properties.Resources.MsgErrorInvalidScenarioId);
                         }
 
                         // use this object as container for new sampling data
-                        targetScenario.TrainingSet.Clear();
+                        _targetScenario.TrainingSet.Clear();
                     }
                 }
             }
@@ -188,16 +191,16 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    return trackerTimer.Interval;
+                    return _trackerTimer.Interval;
                 }
             }
             set
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    trackerTimer.Interval = value;
+                    _trackerTimer.Interval = value;
                 }
             }
         }
@@ -210,17 +213,17 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    return trackerTimer.Enabled;
+                    return _trackerTimer.Enabled;
                 }
             }
             set
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    var beforeState = trackerTimer.Enabled;
-                    trackerTimer.Enabled = value;
+                    var beforeState = _trackerTimer.Enabled;
+                    _trackerTimer.Enabled = value;
 
                     // fire the notification event only if the tracker changes state
                     if (beforeState != value && TrackerNotification != null)
@@ -229,7 +232,7 @@ namespace AttiLA.LocalizationService
                         {
                             Code = value ? TrackerNotificationCode.Started 
                                 : TrackerNotificationCode.Stopped,
-                            TargetScenario = targetScenario
+                            TargetScenario = _targetScenario
                         };
                         var t = new Thread(() => TrackerNotification(this, args));
                         t.Start();
@@ -245,16 +248,16 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock(trackerLock)
+                lock(_trackerLock)
                 {
-                    return trainingThreshold;
+                    return _trainingThreshold;
                 }
             }
             set
             {
-                lock(trackerLock)
+                lock(_trackerLock)
                 {
-                    trainingThreshold = value;
+                    _trainingThreshold = value;
                 }
             }
         }
@@ -267,7 +270,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         public Tracker()
         {
-            trackerTimer.Elapsed += trackerTimer_Elapsed;
+            _trackerTimer.Elapsed += trackerTimer_Elapsed;
         }
 
         /// <summary>
@@ -275,11 +278,11 @@ namespace AttiLA.LocalizationService
         /// </summary>
         public void Update()
         {
-            lock (trackerLock)
+            lock (_trackerLock)
             {
                 // no more examples will be added until unlock
 
-                if (targetScenario == null || targetScenario.TrainingSet.Count == 0)
+                if (_targetScenario == null || _targetScenario.TrainingSet.Count == 0)
                 {
                     // nothing to do
                     return;
@@ -288,12 +291,12 @@ namespace AttiLA.LocalizationService
                 suspend();
                 try
                 {
-                    scenarioService.AddScanExamples(
-                        targetScenario.Id.ToString(),
-                        targetScenario.TrainingSet);
+                    _scenarioService.AddScanExamples(
+                        _targetScenario.Id.ToString(),
+                        _targetScenario.TrainingSet);
 
                     // erase staging area if no error detected
-                    targetScenario.TrainingSet.Clear();
+                    _targetScenario.TrainingSet.Clear();
                 }
                 catch (DatabaseException ex)
                 {
@@ -325,18 +328,18 @@ namespace AttiLA.LocalizationService
         /// <param name="e"></param>
         void trackerTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            lock(trackerLock)
+            lock(_trackerLock)
             {
-                if(targetScenario == null)
+                if(_targetScenario == null)
                 {
                     // nothing to do
                     return;
                 }
 
                 // suspend capture until completion
-                trackerTimer.Stop();
+                _trackerTimer.Stop();
 
-                var scanSignals = wlanScanner.GetScanSignals();
+                var scanSignals = _wlanScanner.GetScanSignals();
                 if(scanSignals.Count == 0)
                 {
                     // notify and ignore signals
@@ -358,16 +361,16 @@ namespace AttiLA.LocalizationService
                         ScanSignals = scanSignals
                     };
 
-                    targetScenario.TrainingSet.Add(example);
+                    _targetScenario.TrainingSet.Add(example);
 
-                    if(targetScenario.TrainingSet.Count == TrainingThreshold)
+                    if(_targetScenario.TrainingSet.Count == TrainingThreshold)
                     {
                         if(TrackerNotification != null)
                         {
                             var args = new TrackerNotificationEventArgs
                             {
                                 Code = TrackerNotificationCode.TrainingCompleted,
-                                TargetScenario = targetScenario
+                                TargetScenario = _targetScenario
                             };
                             var t = new Thread(() => TrackerNotification(this, args));
                             t.Start();
@@ -376,7 +379,7 @@ namespace AttiLA.LocalizationService
                 }
 
                 // resume capture before unlock
-                trackerTimer.Start();
+                _trackerTimer.Start();
             }
         }
 
@@ -385,7 +388,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private void resume()
         {
-            trackerTimer.Start();
+            _trackerTimer.Start();
         }
 
         /// <summary>
@@ -393,7 +396,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private void suspend()
         {
-            trackerTimer.Stop();
+            _trackerTimer.Stop();
         }
         
 

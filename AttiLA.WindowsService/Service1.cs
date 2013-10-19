@@ -23,7 +23,7 @@ namespace AttiLA.WindowsService
         /// <summary>
         /// The hosted WCF service.
         /// </summary>
-        ServiceHost serviceHost;
+        private ServiceHost _serviceHost;
 
         public AttiLAWindowsService()
         {
@@ -51,15 +51,15 @@ namespace AttiLA.WindowsService
 #if ! DEBUG
             eventLog.WriteEntry(Properties.Resources.LogMsgServiceStarted);
 #endif
-            if(serviceHost != null)
+            if(_serviceHost != null)
             {
-                serviceHost.Close();
+                _serviceHost.Close();
             }
             // Create a URI to serve as the base address
             Uri baseAddr = new Uri(Properties.Settings.Default.ServiceHostURI);
             
             // Create ServiceHost
-            serviceHost = new ServiceHost(
+            _serviceHost = new ServiceHost(
                 typeof(AttiLA.LocalizationService.LocalizationService), 
                 baseAddr);
 
@@ -77,32 +77,32 @@ namespace AttiLA.WindowsService
 #endif
                 
                 binding.Name = Properties.Settings.Default.BindingPipeName;
-                serviceHost.AddServiceEndpoint(
+                _serviceHost.AddServiceEndpoint(
                     typeof(AttiLA.LocalizationService.ILocalizationService), 
                     binding,
                     Properties.Settings.Default.LocalizationServicePipe);
 
                 // Enable metadata exchange
-                ServiceMetadataBehavior smb = serviceHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
+                ServiceMetadataBehavior smb = _serviceHost.Description.Behaviors.Find<ServiceMetadataBehavior>();
                 if (smb == null)
                 {
                     smb = new ServiceMetadataBehavior();
-                    serviceHost.Description.Behaviors.Add(smb);
+                    _serviceHost.Description.Behaviors.Add(smb);
                 }
                 
                 // Add MEX endpoint
-                serviceHost.AddServiceEndpoint(
+                _serviceHost.AddServiceEndpoint(
                     ServiceMetadataBehavior.MexContractName,
                     MetadataExchangeBindings.CreateMexNamedPipeBinding(),
                     Properties.Settings.Default.MessageServicePipe);
 
                 // Start the Service
-                serviceHost.Open();
+                _serviceHost.Open();
 
             }
             catch(CommunicationException)
             {
-                serviceHost.Abort();
+                _serviceHost.Abort();
                 Thread.CurrentThread.Abort();
             }
         }
@@ -112,10 +112,10 @@ namespace AttiLA.WindowsService
 #if ! DEBUG
             eventLog.WriteEntry(Properties.Resources.LogMsgServiceStopped);
 #endif
-            if(serviceHost != null)
+            if(_serviceHost != null)
             {
-                serviceHost.Close();
-                serviceHost = null;
+                _serviceHost.Close();
+                _serviceHost = null;
             }
         }
     }

@@ -9,7 +9,7 @@ using System.Security.Authentication;
 using System.Diagnostics;
 using AttiLA.Data.Entities;
 
-namespace BleDA.ActionService
+namespace BleDA.Actions
 {
     public class ProcessManagementObject
     {
