@@ -185,7 +185,7 @@ namespace AttiLA.LocalizationService
         /// The collection used to store the progress values until they are notified.
         /// </summary>
         BlockingCollection<double> progressCollection = new BlockingCollection<double>();
-        Task progressTask;
+        System.Threading.Tasks.Task progressTask;
 
         #region Properties
         /// <summary>
@@ -587,7 +587,7 @@ namespace AttiLA.LocalizationService
             localizerTimer.Elapsed += localizerTimer_Elapsed;
 
             // task to notify localization progress
-            progressTask = Task.Factory.StartNew(() =>
+            progressTask = System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
                 foreach (double progress in progressCollection.GetConsumingEnumerable())
                 {

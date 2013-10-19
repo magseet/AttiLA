@@ -10,7 +10,6 @@ using AttiLA.Data;
 using MongoDB.Bson;
 using System.Diagnostics;
 
-
 namespace AttiLA.LocalizationService
 {
 
@@ -107,7 +106,7 @@ namespace AttiLA.LocalizationService
             ConsecutiveCorrectPredictions = 0;
             NotificationThreshold = Properties.Settings.Default.NotificationThreshold;
             ServiceState = ServiceStateCode.Idle;
-            
+  
             // enable handlers
             tracker.TrackerNotification += tracker_TrackerNotification;
             localizer.LocalizerNotification += localizer_LocalizerNotification;

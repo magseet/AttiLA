@@ -45,8 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\Action.cs" />
+    <Compile Include="Entities\ClosingAction.cs" />
+    <Compile Include="Entities\NotificationAction.cs" />
     <Compile Include="Entities\FeatureKey.cs" />
     <Compile Include="Entities\FeatureValue.cs" />
+    <Compile Include="Entities\OpeningAction.cs" />
     <Compile Include="Entities\ScanSignal.cs" />
     <Compile Include="Entities\AccessPoint.cs" />
     <Compile Include="Entities\Context.cs" />
@@ -54,6 +58,8 @@
     <Compile Include="Entities\Feature.cs" />
     <Compile Include="Entities\IMongoEntity.cs" />
     <Compile Include="Entities\MongoEntity.cs" />
+    <Compile Include="Entities\Task.cs" />
+    <Compile Include="Entities\ServiceAction.cs" />
     <Compile Include="Entities\TrainingSetExample.cs" />
     <Compile Include="Entities\Scenario.cs" />
     <Compile Include="MongoConnectionHandler.cs" />
@@ -74,6 +80,7 @@
     <Compile Include="Services\FeatureService.cs" />
     <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\ScenarioService.cs" />
+    <Compile Include="Services\TaskService.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

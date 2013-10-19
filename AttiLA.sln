@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.20617.1 PREVIEW
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttiLA.WindowsService", "AttiLA.WindowsService\AttiLA.WindowsService.csproj", "{83A83622-5725-4DCF-8502-C4302CB84622}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedWifi", "managedwifi-1.1\ManagedWifi.csproj", "{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}"
@@ -20,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttiLA.Test.LocalizationSer
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BleDA", "BleDA\BleDA.csproj", "{30B898CC-C3DD-48DB-85EA-68CF260C44CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BleDA.ActionService", "BleDA.ActionService\BleDA.ActionService.csproj", "{8AEC47C7-A86F-40FC-955C-87AF00C2F030}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -55,6 +59,10 @@ Global
 		{30B898CC-C3DD-48DB-85EA-68CF260C44CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30B898CC-C3DD-48DB-85EA-68CF260C44CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30B898CC-C3DD-48DB-85EA-68CF260C44CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AEC47C7-A86F-40FC-955C-87AF00C2F030}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AEC47C7-A86F-40FC-955C-87AF00C2F030}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AEC47C7-A86F-40FC-955C-87AF00C2F030}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AEC47C7-A86F-40FC-955C-87AF00C2F030}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

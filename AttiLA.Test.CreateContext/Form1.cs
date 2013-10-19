@@ -10,6 +10,9 @@ using System.Windows.Forms;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using AttiLA.Data;
+using NativeWifi;
+using BleDA.ActionService;
+
 
 namespace AttiLA.Test.CreateContext
 {
@@ -32,6 +35,33 @@ namespace AttiLA.Test.CreateContext
         {
             InitializeComponent();
             contextService = new ContextService();
+            //prova();
+        }
+
+       
+
+        void prova()
+        {
+            var processes = Processes.GetUserProcesses();
+            foreach(var process in processes)
+            {
+                Console.WriteLine((string)process.ManagementObject["CommandLine"]);
+            }
+
+
+            WlanClient client = new WlanClient();
+            foreach(var wlanIface in client.Interfaces)
+            {
+                //wlanIface.Connect(Wlan.WlanConnectionMode.Auto,Wlan.Dot11BssType.Any)
+                var profiles = wlanIface.GetProfiles();
+                foreach(var profile in profiles)
+                {
+                    var profileXml = wlanIface.GetProfileXml(profile.profileName);
+                    MessageBox.Show(profileXml);
+                    
+                }
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
