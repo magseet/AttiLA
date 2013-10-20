@@ -14,6 +14,11 @@ namespace AttiLA.Data.Entities
         public string TaskName { get; set; }
 
         /// <summary>
+        /// The task creation time.
+        /// </summary>
+        public DateTime CreationDateTime { get; set; }
+
+        /// <summary>
         /// The list of actions to be executed in the specified order.
         /// </summary>
         public List<Action> Actions { get; set; }

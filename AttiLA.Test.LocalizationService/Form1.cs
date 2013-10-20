@@ -186,7 +186,7 @@ namespace AttiLA.Test.LocalizationService
         private void LoadRecentContexts(int limit)
         {
             lstRecent.Items.Clear();
-            var contexts = _contextService.GetMoreRecent(limit);
+            var contexts = _contextService.GetMostRecent(limit);
             foreach(var context in contexts)
             {
                 var lvi = new ListViewItem();

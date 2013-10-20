@@ -12,5 +12,6 @@ namespace AttiLA.Data.Entities
         /// The message of the notification.
         /// </summary>
         public string Message { get; set; }
+
     }
 }

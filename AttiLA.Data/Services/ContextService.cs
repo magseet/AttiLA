@@ -15,8 +15,6 @@ namespace AttiLA.Data.Services
     {
         public override void Update(Context entity)
         {
-            //// TODO
-            throw new NotImplementedException();
         }
 
         public ContextService()
@@ -26,7 +24,12 @@ namespace AttiLA.Data.Services
                 IndexOptions.SetUnique(true));
         }
 
-        public IEnumerable<Context> GetMoreRecent(int limit)
+        /// <summary>
+        /// Get the most recent contexts in the database.
+        /// </summary>
+        /// <param name="limit">The maximum number of contexts to be returned.</param>
+        /// <returns></returns>
+        public IEnumerable<Context> GetMostRecent(int limit)
         {
             return this.MongoConnectionHandler.MongoCollection
                 .Find(new QueryDocument())

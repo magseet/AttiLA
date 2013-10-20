@@ -25,5 +25,6 @@ namespace AttiLA.Data.Entities
         /// </summary>
         [BsonRepresentation(BsonType.String)]
         public ServiceActionType ServiceActionType { get; set; }
+
     }
 }

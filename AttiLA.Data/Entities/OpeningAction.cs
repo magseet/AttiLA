@@ -17,5 +17,6 @@ namespace AttiLA.Data.Entities
         /// Arguments passed to executable on load.
         /// </summary>
         public string Arguments { get; set; }
+
     }
 }
