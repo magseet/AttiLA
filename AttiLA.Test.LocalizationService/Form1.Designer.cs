@@ -31,20 +31,22 @@
         {
             this.components = new System.ComponentModel.Container();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
-            this.label2 = new System.Windows.Forms.Label();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBoxContextId = new System.Windows.Forms.TextBox();
-            this.buttonChangeContextId = new System.Windows.Forms.Button();
-            this.buttonTrackStart = new System.Windows.Forms.Button();
-            this.buttonTrackStop = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
-            this.buttonLocalize = new System.Windows.Forms.Button();
-            this.listViewContexts = new System.Windows.Forms.ListView();
+            this.btnTrack = new System.Windows.Forms.Button();
+            this.btnTrackStop = new System.Windows.Forms.Button();
+            this.btnPrediction = new System.Windows.Forms.Button();
+            this.lstPreferences = new System.Windows.Forms.ListView();
             this.columnHeaderContextId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeaderSimilarity = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeaderName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeaderPreference = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.progbarLocalize = new System.Windows.Forms.ProgressBar();
+            this.lstRecent = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label1 = new System.Windows.Forms.Label();
+            this.txtSelected = new System.Windows.Forms.TextBox();
+            this.btnUpdate = new System.Windows.Forms.Button();
+            this.btnSilence = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // notifyIcon1
@@ -52,144 +54,158 @@
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // label2
+            // btnTrack
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 43);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(100, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Localization interval";
+            this.btnTrack.Location = new System.Drawing.Point(258, 314);
+            this.btnTrack.Name = "btnTrack";
+            this.btnTrack.Size = new System.Drawing.Size(75, 23);
+            this.btnTrack.TabIndex = 7;
+            this.btnTrack.Text = "Track";
+            this.btnTrack.UseVisualStyleBackColor = true;
+            this.btnTrack.Click += new System.EventHandler(this.btnTrackStart_Click);
             // 
-            // checkBox1
+            // btnTrackStop
             // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(339, 39);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.checkBox1.Size = new System.Drawing.Size(86, 17);
-            this.checkBox1.TabIndex = 2;
-            this.checkBox1.Text = "Auto localize";
-            this.checkBox1.UseVisualStyleBackColor = true;
+            this.btnTrackStop.Location = new System.Drawing.Point(339, 314);
+            this.btnTrackStop.Name = "btnTrackStop";
+            this.btnTrackStop.Size = new System.Drawing.Size(75, 23);
+            this.btnTrackStop.TabIndex = 8;
+            this.btnTrackStop.Text = "Stop";
+            this.btnTrackStop.UseVisualStyleBackColor = true;
+            this.btnTrackStop.Click += new System.EventHandler(this.btnTrackStop_Click);
             // 
-            // textBox1
+            // btnPrediction
             // 
-            this.textBox1.Location = new System.Drawing.Point(137, 35);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(172, 20);
-            this.textBox1.TabIndex = 3;
+            this.btnPrediction.Location = new System.Drawing.Point(11, 156);
+            this.btnPrediction.Name = "btnPrediction";
+            this.btnPrediction.Size = new System.Drawing.Size(94, 23);
+            this.btnPrediction.TabIndex = 10;
+            this.btnPrediction.Text = "Prediction";
+            this.btnPrediction.UseVisualStyleBackColor = true;
+            this.btnPrediction.Click += new System.EventHandler(this.btnPrediction_Click);
             // 
-            // label1
+            // lstPreferences
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 86);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(57, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Context ID";
-            // 
-            // textBoxContextId
-            // 
-            this.textBoxContextId.Location = new System.Drawing.Point(137, 79);
-            this.textBoxContextId.Name = "textBoxContextId";
-            this.textBoxContextId.Size = new System.Drawing.Size(172, 20);
-            this.textBoxContextId.TabIndex = 5;
-            // 
-            // buttonChangeContextId
-            // 
-            this.buttonChangeContextId.Location = new System.Drawing.Point(339, 79);
-            this.buttonChangeContextId.Name = "buttonChangeContextId";
-            this.buttonChangeContextId.Size = new System.Drawing.Size(94, 20);
-            this.buttonChangeContextId.TabIndex = 6;
-            this.buttonChangeContextId.Text = "Change";
-            this.buttonChangeContextId.UseVisualStyleBackColor = true;
-            this.buttonChangeContextId.Click += new System.EventHandler(this.buttonChangeContextId_Click);
-            // 
-            // buttonTrackStart
-            // 
-            this.buttonTrackStart.Location = new System.Drawing.Point(137, 132);
-            this.buttonTrackStart.Name = "buttonTrackStart";
-            this.buttonTrackStart.Size = new System.Drawing.Size(75, 23);
-            this.buttonTrackStart.TabIndex = 7;
-            this.buttonTrackStart.Text = "Start";
-            this.buttonTrackStart.UseVisualStyleBackColor = true;
-            this.buttonTrackStart.Click += new System.EventHandler(this.buttonTrackStart_Click);
-            // 
-            // buttonTrackStop
-            // 
-            this.buttonTrackStop.Location = new System.Drawing.Point(234, 132);
-            this.buttonTrackStop.Name = "buttonTrackStop";
-            this.buttonTrackStop.Size = new System.Drawing.Size(75, 23);
-            this.buttonTrackStop.TabIndex = 8;
-            this.buttonTrackStop.Text = "Stop";
-            this.buttonTrackStop.UseVisualStyleBackColor = true;
-            this.buttonTrackStop.Click += new System.EventHandler(this.buttonTrackStop_Click);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 142);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(64, 13);
-            this.label3.TabIndex = 9;
-            this.label3.Text = "Track mode";
-            // 
-            // buttonLocalize
-            // 
-            this.buttonLocalize.Location = new System.Drawing.Point(29, 184);
-            this.buttonLocalize.Name = "buttonLocalize";
-            this.buttonLocalize.Size = new System.Drawing.Size(94, 23);
-            this.buttonLocalize.TabIndex = 10;
-            this.buttonLocalize.Text = "Localize";
-            this.buttonLocalize.UseVisualStyleBackColor = true;
-            this.buttonLocalize.Click += new System.EventHandler(this.buttonLocalize_Click);
-            // 
-            // listViewContexts
-            // 
-            this.listViewContexts.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.lstPreferences.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeaderContextId,
             this.columnHeaderName,
-            this.columnHeaderSimilarity});
-            this.listViewContexts.Location = new System.Drawing.Point(34, 219);
-            this.listViewContexts.Name = "listViewContexts";
-            this.listViewContexts.Size = new System.Drawing.Size(398, 119);
-            this.listViewContexts.TabIndex = 11;
-            this.listViewContexts.UseCompatibleStateImageBehavior = false;
-            this.listViewContexts.View = System.Windows.Forms.View.Details;
+            this.columnHeaderPreference});
+            this.lstPreferences.Location = new System.Drawing.Point(11, 195);
+            this.lstPreferences.MultiSelect = false;
+            this.lstPreferences.Name = "lstPreferences";
+            this.lstPreferences.Size = new System.Drawing.Size(403, 97);
+            this.lstPreferences.TabIndex = 11;
+            this.lstPreferences.UseCompatibleStateImageBehavior = false;
+            this.lstPreferences.View = System.Windows.Forms.View.Details;
+            this.lstPreferences.SelectedIndexChanged += new System.EventHandler(this.lstPreferences_SelectedIndexChanged);
             // 
             // columnHeaderContextId
             // 
             this.columnHeaderContextId.Text = "Context ID";
             this.columnHeaderContextId.Width = 166;
             // 
-            // columnHeaderSimilarity
-            // 
-            this.columnHeaderSimilarity.Text = "Similarity";
-            // 
             // columnHeaderName
             // 
             this.columnHeaderName.Text = "Name";
+            // 
+            // columnHeaderPreference
+            // 
+            this.columnHeaderPreference.Text = "Preference";
+            this.columnHeaderPreference.Width = 113;
+            // 
+            // progbarLocalize
+            // 
+            this.progbarLocalize.Location = new System.Drawing.Point(119, 156);
+            this.progbarLocalize.Maximum = 10000;
+            this.progbarLocalize.Name = "progbarLocalize";
+            this.progbarLocalize.Size = new System.Drawing.Size(295, 23);
+            this.progbarLocalize.Step = 1;
+            this.progbarLocalize.TabIndex = 12;
+            // 
+            // lstRecent
+            // 
+            this.lstRecent.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3});
+            this.lstRecent.Location = new System.Drawing.Point(11, 47);
+            this.lstRecent.MultiSelect = false;
+            this.lstRecent.Name = "lstRecent";
+            this.lstRecent.Size = new System.Drawing.Size(403, 92);
+            this.lstRecent.TabIndex = 13;
+            this.lstRecent.UseCompatibleStateImageBehavior = false;
+            this.lstRecent.View = System.Windows.Forms.View.Details;
+            this.lstRecent.SelectedIndexChanged += new System.EventHandler(this.lstRecent_SelectedIndexChanged);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Context ID";
+            this.columnHeader1.Width = 166;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Name";
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Created";
+            this.columnHeader3.Width = 135;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 320);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(52, 13);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "Selected:";
+            // 
+            // txtSelected
+            // 
+            this.txtSelected.Location = new System.Drawing.Point(74, 316);
+            this.txtSelected.Name = "txtSelected";
+            this.txtSelected.ReadOnly = true;
+            this.txtSelected.Size = new System.Drawing.Size(178, 20);
+            this.txtSelected.TabIndex = 15;
+            // 
+            // btnUpdate
+            // 
+            this.btnUpdate.Location = new System.Drawing.Point(12, 12);
+            this.btnUpdate.Name = "btnUpdate";
+            this.btnUpdate.Size = new System.Drawing.Size(94, 20);
+            this.btnUpdate.TabIndex = 16;
+            this.btnUpdate.Text = "Update";
+            this.btnUpdate.UseVisualStyleBackColor = true;
+            this.btnUpdate.Click += new System.EventHandler(this.btnUpdate_Click);
+            // 
+            // btnSilence
+            // 
+            this.btnSilence.Location = new System.Drawing.Point(339, 343);
+            this.btnSilence.Name = "btnSilence";
+            this.btnSilence.Size = new System.Drawing.Size(75, 23);
+            this.btnSilence.TabIndex = 17;
+            this.btnSilence.Text = "Silence";
+            this.btnSilence.UseVisualStyleBackColor = true;
+            this.btnSilence.Click += new System.EventHandler(this.btnSilence_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(504, 376);
-            this.Controls.Add(this.listViewContexts);
-            this.Controls.Add(this.buttonLocalize);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.buttonTrackStop);
-            this.Controls.Add(this.buttonTrackStart);
-            this.Controls.Add(this.buttonChangeContextId);
-            this.Controls.Add(this.textBoxContextId);
+            this.ClientSize = new System.Drawing.Size(436, 387);
+            this.Controls.Add(this.btnSilence);
+            this.Controls.Add(this.btnUpdate);
+            this.Controls.Add(this.txtSelected);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.checkBox1);
-            this.Controls.Add(this.label2);
+            this.Controls.Add(this.lstRecent);
+            this.Controls.Add(this.progbarLocalize);
+            this.Controls.Add(this.lstPreferences);
+            this.Controls.Add(this.btnPrediction);
+            this.Controls.Add(this.btnTrackStop);
+            this.Controls.Add(this.btnTrack);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "AttiLA test LocalizationService";
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.FormClosing += Form1_FormClosing;
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -199,20 +215,22 @@
         #endregion
 
         private System.Windows.Forms.NotifyIcon notifyIcon1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBoxContextId;
-        private System.Windows.Forms.Button buttonChangeContextId;
-        private System.Windows.Forms.Button buttonTrackStart;
-        private System.Windows.Forms.Button buttonTrackStop;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Button buttonLocalize;
-        private System.Windows.Forms.ListView listViewContexts;
+        private System.Windows.Forms.Button btnTrack;
+        private System.Windows.Forms.Button btnTrackStop;
+        private System.Windows.Forms.Button btnPrediction;
+        private System.Windows.Forms.ListView lstPreferences;
         private System.Windows.Forms.ColumnHeader columnHeaderContextId;
-        private System.Windows.Forms.ColumnHeader columnHeaderSimilarity;
+        private System.Windows.Forms.ColumnHeader columnHeaderPreference;
         private System.Windows.Forms.ColumnHeader columnHeaderName;
+        private System.Windows.Forms.ProgressBar progbarLocalize;
+        private System.Windows.Forms.ListView lstRecent;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox txtSelected;
+        private System.Windows.Forms.Button btnUpdate;
+        private System.Windows.Forms.Button btnSilence;
     }
 }
 

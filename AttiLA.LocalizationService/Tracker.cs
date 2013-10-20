@@ -8,24 +8,25 @@ using AttiLA.Data.Services;
 using AttiLA.Data;
 using System.Timers;
 using MongoDB.Bson;
+using System.Threading;
 
 namespace AttiLA.LocalizationService
 {
     
     #region Notification classes
     /// <summary>
-    /// The notification codes.
+    /// The tracker notification codes.
     /// </summary>
     public enum TrackerNotificationCode
     {
-        Start,
-        Stop,
-        Update,
+        Started,
+        Stopped,
+        TrainingCompleted,
         NoSignalsDetected
     }
 
     /// <summary>
-    /// The notification deltaSimilarity2 codes.
+    /// The tracker notification error codes.
     /// </summary>
     public enum TrackerErrorNotificationCode
     {
@@ -33,24 +34,23 @@ namespace AttiLA.LocalizationService
     }
 
     /// <summary>
-    /// Data for to notification event handler.
+    /// Arguments of tracker notifications.
     /// </summary>
     public class TrackerNotificationEventArgs : EventArgs
     {
-        public TrackerNotificationEventArgs(TrackerNotificationCode code)
-        {
-            Code = code;
-        }
-
         /// <summary>
         /// A code to identify the notification type.
         /// </summary>
-        public TrackerNotificationCode Code { get; private set; }
+        public TrackerNotificationCode Code { get; set; }
 
+        /// <summary>
+        /// The scenario used by the tracker.
+        /// </summary>
+        public Scenario TargetScenario { get; set; }
     }
 
     /// <summary>
-    /// Data for deltaSimilarity2 notification event handler.
+    /// Data for tracker error notification event handler.
     /// </summary>
     public class TrackerErrorNotificationEventArgs : EventArgs
     {
@@ -66,12 +66,12 @@ namespace AttiLA.LocalizationService
         }
 
         /// <summary>
-        /// A code to identify the deltaSimilarity2 notification type.
+        /// A code to identify the tracker error notification type.
         /// </summary>
         public TrackerErrorNotificationCode Code { get; set; }
 
         /// <summary>
-        /// The exception that raised this deltaSimilarity2.
+        /// The exception that raised this tracker error.
         /// </summary>
         public Exception Cause { get; set; }
     }
@@ -106,40 +106,43 @@ namespace AttiLA.LocalizationService
         public event TrackerNotificationEventHandler TrackerNotification;
 
         /// <summary>
-        /// Tracker deltaSimilarity2 notification event.
+        /// Tracker error notification event.
         /// </summary>
         public event TrackerErrorNotificationEventHandler TrackerErrorNotification;
         #endregion
 
-        /// <summary>
-        /// Samples supplier module.
-        /// </summary>
-        private WlanScanner wlanScanner = WlanScanner.Instance;
-
-        /// <summary>
-        /// Service to interact with scenarios in database.
-        /// </summary>
-        private ScenarioService scenarioService = new ScenarioService();
-
-        /// <summary>
-        /// The timer used to capture WLAN signal samples at a certain rate.
-        /// </summary>
-        private Timer captureTimer = new Timer();
-
-        /// <summary>
-        /// The timer used to save all the captured samples in the scenario on the database.
-        /// </summary>
-        private Timer updateTimer = new Timer();
+        #region Private members
 
         /// <summary>
         /// The lock used to synchronize access to the tracker.
         /// </summary>
-        private Object trackerLock = new Object();
+        private Object _trackerLock = new Object();
+
+        /// <summary>
+        /// Samples supplier module.
+        /// </summary>
+        private WlanScanner _wlanScanner = WlanScanner.Instance;
+
+        /// <summary>
+        /// Service to interact with scenarios in database.
+        /// </summary>
+        private ScenarioService _scenarioService = new ScenarioService();
+
+        /// <summary>
+        /// The timer used to capture WLAN signal samples at a certain rate.
+        /// </summary>
+        private System.Timers.Timer _trackerTimer = new System.Timers.Timer();
 
         /// <summary>
         /// A copy of the scenario on database used to save informations between updates.
         /// </summary>
-        private Scenario targetScenario;
+        private Scenario _targetScenario;
+
+        private uint _trainingThreshold;
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// The target scenario ID.
@@ -148,35 +151,34 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    if (targetScenario == null)
-                    {
-                        return null;
-                    }
-                    return targetScenario.Id.ToString();
-                    
+                    return (_targetScenario == null ? null : _targetScenario.Id.ToString());
                 }
             }
             set
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    if(value == null)
+                    if (value == null)
                     {
-                        targetScenario = null;
+                        _targetScenario = null;
                     }
-                    else if(targetScenario == null || !targetScenario.Id.ToString().Equals(value))
+                    else if (_targetScenario == null || !_targetScenario.Id.ToString().Equals(value))
                     {
+                        if(!ScenarioService.IsValidObjectID(value))
+                        {
+                            throw new ArgumentOutOfRangeException("value");
+                        }
                         // get scenario from database
-                        targetScenario = scenarioService.GetById(value);
-                        if(targetScenario == null)
+                        _targetScenario = _scenarioService.GetById(value);
+                        if (_targetScenario == null)
                         {
                             throw new ArgumentOutOfRangeException("value", Properties.Resources.MsgErrorInvalidScenarioId);
                         }
 
                         // use this object as container for new sampling data
-                        targetScenario.TrainingSet.Clear();
+                        _targetScenario.TrainingSet.Clear();
                     }
                 }
             }
@@ -185,41 +187,20 @@ namespace AttiLA.LocalizationService
         /// <summary>
         /// The interval in milliseconds between captures.
         /// </summary>
-        public double CaptureInterval
+        public double Interval
         {
             get
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    return captureTimer.Interval;
+                    return _trackerTimer.Interval;
                 }
             }
             set
             {
-                lock(trackerLock)
+                lock (_trackerLock)
                 {
-                    captureTimer.Interval = value;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The interval in milliseconds between updates.
-        /// </summary>
-        public double UpdateInterval
-        {
-            get
-            {
-                lock(trackerLock)
-                { 
-                    return updateTimer.Interval;
-                }
-            }
-            set
-            {
-                lock(trackerLock)
-                {
-                    updateTimer.Interval = value;
+                    _trackerTimer.Interval = value;
                 }
             }
         }
@@ -232,76 +213,112 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock (trackerLock)
+                lock (_trackerLock)
                 {
-                    return captureTimer.Enabled;
+                    return _trackerTimer.Enabled;
                 }
             }
             set
             {
-                lock(trackerLock)
+                lock (_trackerLock)
                 {
-                    captureTimer.Enabled = value;
-                    updateTimer.Enabled = value;
+                    var beforeState = _trackerTimer.Enabled;
+                    _trackerTimer.Enabled = value;
+
+                    // fire the notification event only if the tracker changes state
+                    if (beforeState != value && TrackerNotification != null)
+                    {
+                        var args = new TrackerNotificationEventArgs
+                        {
+                            Code = value ? TrackerNotificationCode.Started 
+                                : TrackerNotificationCode.Stopped,
+                            TargetScenario = _targetScenario
+                        };
+                        var t = new Thread(() => TrackerNotification(this, args));
+                        t.Start();
+                    }
                 }
             }
         }
+
+        /// <summary>
+        /// The number of samples required to train a scenario.
+        /// </summary>
+        public uint TrainingThreshold
+        {
+            get
+            {
+                lock(_trackerLock)
+                {
+                    return _trainingThreshold;
+                }
+            }
+            set
+            {
+                lock(_trackerLock)
+                {
+                    _trainingThreshold = value;
+                }
+            }
+        }
+
+        #endregion
+
 
         /// <summary>
         /// Initialize a new instance of the class <see cref="Tracker"/>
         /// </summary>
         public Tracker()
         {
-            captureTimer.Elapsed += captureTimer_Elapsed;
-            updateTimer.Elapsed += updateTimer_Elapsed;
+            _trackerTimer.Elapsed += trackerTimer_Elapsed;
         }
 
         /// <summary>
-        /// Each time this handler is invoked, all the examples in the staging
-        /// area are stored in the database.
+        /// All the examples in the staging area are stored in the database.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void updateTimer_Elapsed(object sender, ElapsedEventArgs e)
+        public void Update()
         {
-            lock(trackerLock)
+            lock (_trackerLock)
             {
                 // no more examples will be added until unlock
 
-                if(targetScenario == null || targetScenario.TrainingSet.Count == 0)
+                if (_targetScenario == null || _targetScenario.TrainingSet.Count == 0)
                 {
                     // nothing to do
                     return;
                 }
-                // suspend timers and store staging area in the database
+                // suspend timer and store staging area in the database
                 suspend();
                 try
                 {
-                    scenarioService.AddScanExamples(
-                        targetScenario.Id.ToString(),
-                        targetScenario.TrainingSet);
+                    _scenarioService.AddScanExamples(
+                        _targetScenario.Id.ToString(),
+                        _targetScenario.TrainingSet);
 
-                    // erase staging area if no deltaSimilarity2 detected
-                    targetScenario.TrainingSet.Clear();
+                    // erase staging area if no error detected
+                    _targetScenario.TrainingSet.Clear();
                 }
-                catch(DatabaseException ex)
+                catch (DatabaseException ex)
                 {
-                    // do not erase staging area and notify an deltaSimilarity2
-                    if(TrackerErrorNotification != null)
+                    // do not erase staging area and notify an error
+                    if (TrackerErrorNotification != null)
                     {
-                        TrackerErrorNotification(this, new TrackerErrorNotificationEventArgs(
-                            TrackerErrorNotificationCode.DatabaseError, ex));
+                        var args = new TrackerErrorNotificationEventArgs(
+                            TrackerErrorNotificationCode.DatabaseError, ex);
+                        var t = new Thread(() => TrackerErrorNotification(this, args));
+                        t.Start();
                     }
                 }
                 finally
                 {
-                    // resume timers before unlock
+                    // resume timer before unlock
                     resume();
                 }
 
             }
-            
+
         }
+
 
         /// <summary>
         /// Each time this handler is invoked, a new WLAN scan is performed
@@ -309,40 +326,60 @@ namespace AttiLA.LocalizationService
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void captureTimer_Elapsed(object sender, ElapsedEventArgs e)
+        void trackerTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            lock(trackerLock)
+            lock(_trackerLock)
             {
-                if(targetScenario == null)
+                if(_targetScenario == null)
                 {
                     // nothing to do
                     return;
                 }
 
                 // suspend capture until completion
-                captureTimer.Stop();
+                _trackerTimer.Stop();
 
-                var scanSignals = wlanScanner.GetScanSignals();
+                var scanSignals = _wlanScanner.GetScanSignals();
                 if(scanSignals.Count == 0)
                 {
                     // notify and ignore signals
                     if (TrackerNotification != null)
                     {
-                        TrackerNotification(this, new TrackerNotificationEventArgs(
-                            TrackerNotificationCode.NoSignalsDetected));
+                        var args = new TrackerNotificationEventArgs
+                        {
+                            Code = TrackerNotificationCode.NoSignalsDetected
+                        };
+                        var t = new Thread(() => TrackerNotification(this, args));
+                        t.Start();
                     }
                 }
                 else
                 {
-                    targetScenario.TrainingSet.Add(new TrainingSetExample
+                    var example = new TrainingSetExample
                     {
                         ScanDateTime = DateTime.Now,
                         ScanSignals = scanSignals
-                    });
+                    };
+
+                    _targetScenario.TrainingSet.Add(example);
+
+                    if(_targetScenario.TrainingSet.Count == TrainingThreshold)
+                    {
+                        if(TrackerNotification != null)
+                        {
+                            var args = new TrackerNotificationEventArgs
+                            {
+                                Code = TrackerNotificationCode.TrainingCompleted,
+                                TargetScenario = _targetScenario
+                            };
+                            var t = new Thread(() => TrackerNotification(this, args));
+                            t.Start();
+                        }
+                    }
                 }
 
                 // resume capture before unlock
-                captureTimer.Start();
+                _trackerTimer.Start();
             }
         }
 
@@ -351,8 +388,7 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private void resume()
         {
-            captureTimer.Start();
-            updateTimer.Start();
+            _trackerTimer.Start();
         }
 
         /// <summary>
@@ -360,11 +396,9 @@ namespace AttiLA.LocalizationService
         /// </summary>
         private void suspend()
         {
-            captureTimer.Stop();
-            updateTimer.Stop();
+            _trackerTimer.Stop();
         }
         
-
 
     }
 }

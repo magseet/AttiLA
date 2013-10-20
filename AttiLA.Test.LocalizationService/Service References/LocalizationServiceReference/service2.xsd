@@ -25,6 +25,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetServiceStatus">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetServiceStatusResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="GetServiceStatusResult" nillable="true" type="q1:ServiceStatus" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="GetGlobalSettings">
     <xs:complexType>
       <xs:sequence />
@@ -33,80 +45,90 @@
   <xs:element name="GetGlobalSettingsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="GetGlobalSettingsResult" nillable="true" type="q1:GlobalSettings" />
+        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="GetGlobalSettingsResult" nillable="true" type="q2:GlobalSettings" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetGlobalSettings">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q2="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="newSettings" nillable="true" type="q2:GlobalSettings" />
+        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="newSettings" nillable="true" type="q3:GlobalSettings" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetGlobalSettingsResponse">
     <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="ChangeContext">
-    <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="newContextId" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="SetGlobalSettingsResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="ChangeContextResponse">
+  <xs:element name="GetCloserContexts">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="Localize">
+  <xs:element name="GetCloserContextsResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="changeContext" type="xs:boolean" />
+        <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="GetCloserContextsResult" nillable="true" type="q4:ArrayOfContextPreference" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="LocalizeResponse">
+  <xs:element name="TrackingStart">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="LocalizeResult" nillable="true" type="xs:string" />
-        <xs:element xmlns:q3="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="similarContexts" nillable="true" type="q3:ArrayOfContextSimilarity" />
+        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="TrackModeStart">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TrackModeStartResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TrackModeStop">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TrackModeStopResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="TrackModeStarted">
+  <xs:element name="TrackingStartResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="startTime" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="TrackingStartResult" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="TrackModeStopped">
+  <xs:element name="TrackingStop">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TrackingStopResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="stopTime" type="xs:dateTime" />
+        <xs:element minOccurs="0" name="TrackingStopResult" type="xs:boolean" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Silence">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SilenceResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReportLocalizationProgress">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="progress" type="xs:double" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReportPrediction">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="contextId" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReportServiceStatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService" minOccurs="0" name="serviceStatus" nillable="true" type="q5:ServiceStatus" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

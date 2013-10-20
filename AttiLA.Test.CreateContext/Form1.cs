@@ -10,14 +10,16 @@ using System.Windows.Forms;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using AttiLA.Data;
+using NativeWifi;
+
 
 namespace AttiLA.Test.CreateContext
 {
     public partial class Form1 : Form
     {
-        ContextService contextService;
+        private ContextService _contextService;
 
-        string ContextName { 
+        private string ContextName { 
             get
             {
                 return textBoxName.Text;
@@ -31,10 +33,28 @@ namespace AttiLA.Test.CreateContext
         public Form1()
         {
             InitializeComponent();
-            contextService = new ContextService();
+            _contextService = new ContextService();
+            //prova();
+        }
 
-            var prova = new ScenarioService();
-            prova.prova();
+       
+
+        void prova()
+        {
+
+            WlanClient client = new WlanClient();
+            foreach(var wlanIface in client.Interfaces)
+            {
+                //wlanIface.Connect(Wlan.WlanConnectionMode.Auto,Wlan.Dot11BssType.Any)
+                var profiles = wlanIface.GetProfiles();
+                foreach(var profile in profiles)
+                {
+                    var profileXml = wlanIface.GetProfileXml(profile.profileName);
+                    MessageBox.Show(profileXml);
+                    
+                }
+            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -46,7 +66,7 @@ namespace AttiLA.Test.CreateContext
             };
             try
             {
-                contextService.Create(c);
+                _contextService.Create(c);
             }
             catch(DatabaseException)
             {

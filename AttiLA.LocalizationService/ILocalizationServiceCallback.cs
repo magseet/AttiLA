@@ -13,18 +13,24 @@ namespace AttiLA.LocalizationService
     public interface ILocalizationServiceCallback
     {
         /// <summary>
-        /// Notification callback informing that the tracker has been started.
+        /// Notification callback informing about progress of localization.
         /// </summary>
-        /// <param name="startTime"></param>
+        /// <param name="progress">Progress value between 0.0 and 1.0</param>
         [OperationContract(IsOneWay = true)]
-        void TrackModeStarted(DateTime startTime);
-
+        void ReportLocalizationProgress(double progress);
 
         /// <summary>
-        /// Notification callback informing that the tracker has been stopped.
+        /// Notification callback informing about predicted context.
         /// </summary>
-        /// <param name="stopTime"></param>
+        /// <param name="contextId">The predicted context id.</param>
         [OperationContract(IsOneWay = true)]
-        void TrackModeStopped(DateTime stopTime);
+        void ReportPrediction(string contextId);
+
+        /// <summary>
+        /// Notification callback informing about the service status.
+        /// </summary>
+        /// <param name="serviceStatus"></param>
+        [OperationContract(IsOneWay = true)]
+        void ReportServiceStatus(ServiceStatus serviceStatus);
     }
 }

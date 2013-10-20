@@ -1,315 +1,614 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AttiLA.Data;
 using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
+using MongoDB.Bson;
+using System.Timers;
+using System.Threading;
+using System.Collections.Concurrent;
 
 namespace AttiLA.LocalizationService
 {
-    public class Localizer
+    #region Notification classes
+    /// <summary>
+    /// The localizer notification codes.
+    /// </summary>
+    public enum LocalizerNotificationCode
     {
+        Progress,
+        Prediction
+    }
 
-        public Func<IEnumerable<Feature>, IDictionary<AccessPoint, int>, double> SimilarityAlgorithm { get; set; }
-
-
-        private static readonly Dictionary<SimilarityAlgorithmType, Func<IEnumerable<Feature>, IDictionary<AccessPoint, int>, double>>
-            algorithms = new Dictionary<SimilarityAlgorithmType, Func<IEnumerable<Feature>, IDictionary<AccessPoint, int>, double>>();
-
-        /// <summary>
-        /// Samples supplier module.
-        /// </summary>
-        private WlanScanner wlanScanner = WlanScanner.Instance;
-
-        /// <summary>
-        /// Service to interact with scenarios in database.
-        /// </summary>
-        private ScenarioService scenarioService = new ScenarioService();
-
-        private int retries;
+    /// <summary>
+    /// Arguments of localizer notifications.
+    /// </summary>
+    public class LocalizerNotificationEventArgs : EventArgs
+    {
+        private object value;
 
         /// <summary>
-        /// Number of retries on WLAN scan failure.
+        /// Value casting for progress notification event.
         /// </summary>
-        public int Retries {
-            get { return retries; }
+        public double ProgressValue
+        {
+            get
+            {
+                return (double)value;
+            }
+
             set
             {
-                retries = (value > 0 ? value : 0);
+                this.value = (double)value;
             }
         }
 
         /// <summary>
-        /// Get a scenario for the requested context.
+        /// Value casting for prediction notfication event.
         /// </summary>
-        /// <param name="contextId">The requested context id.</param>
-        /// <param name="similarContexts">Similar contexts predicted.</param>
-        /// <returns></returns>
-        public Scenario ChangeContext(string contextId, out IEnumerable<ContextSimilarity> similarContexts)
+        public PredictionArgs PredictionValue
         {
-            // prediction
+            get
+            {
+                return (PredictionArgs)value;
+            }
+
+            set
+            {
+                this.value = (PredictionArgs)value;
+            }
+        }
+ 
+
+        /// <summary>
+        /// A code to identify the notification type.
+        /// </summary>
+        public LocalizerNotificationCode Code { get; set; }
+
+    }
+
+    /// <summary>
+    /// The localizer notification error codes.
+    /// </summary>
+    public enum LocalizerErrorNotificationCode
+    {
+        DatabaseError,
+        UnknownContext,
+        Prediction
+    }
 
 
+    /// <summary>
+    /// Data for localizer error notification event handler.
+    /// </summary>
+    public class LocalizerErrorNotificationEventArgs : EventArgs
+    {
+        public LocalizerErrorNotificationEventArgs(LocalizerErrorNotificationCode code)
+        {
+            Code = code;
+        }
 
-            similarContexts = null;
-            return null;
+        public LocalizerErrorNotificationEventArgs(LocalizerErrorNotificationCode code, Exception cause)
+        {
+            Code = code;
+            Cause = cause;
+        }
+
+        /// <summary>
+        /// A code to identify the localizer error notification type.
+        /// </summary>
+        public LocalizerErrorNotificationCode Code { get; set; }
+
+        /// <summary>
+        /// The exception that raised this localizer error.
+        /// </summary>
+        public Exception Cause { get; set; }
+    }
+
+    /// <summary>
+    /// Data used in prediction notification event.
+    /// </summary>
+    public class PredictionArgs
+    {
+        public Scenario PredictedScenario { get; set; }
+        public Boolean Success { get; set; }
+    }
+
+    #endregion
+
+    public class Localizer
+    {
+        #region Events
+        /// <summary>
+        /// Represents a method that will handle <see cref="LocalizerNotificationEvent"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public delegate void LocalizerNotificationEventHandler(object sender, LocalizerNotificationEventArgs e);
+
+        /// <summary>
+        /// Represents a method that will handle <see cref="LocalizerErrorNotificationEvent"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public delegate void LocalizerErrorNotificationEventHandler(object sender, LocalizerErrorNotificationEventArgs e);
+
+        /// <summary>
+        /// Localizer notification event.
+        /// </summary>
+        public event LocalizerNotificationEventHandler LocalizerNotification;
+
+        /// <summary>
+        /// Localizer error notification event.
+        /// </summary>
+        public event LocalizerErrorNotificationEventHandler LocalizerErrorNotification;
+        #endregion
+
+        #region Private members
+        /// <summary>
+        /// The lock used to synchronize access to the localizer.
+        /// </summary>
+        private Object _localizerLock = new Object();
+
+        private string _contextId;
+
+        private Func<Scenario, IDictionary<AccessPoint, int>, double> _similarityAlgorithm;
+
+        private bool _creationAllowed;
+
+        /// <summary>
+        /// Samples supplier module.
+        /// </summary>
+        private WlanScanner _wlanScanner = WlanScanner.Instance;
+
+        /// <summary>
+        /// Service to interact with scenarios in database.
+        /// </summary>
+        private ScenarioService _scenarioService = new ScenarioService();
+
+        /// <summary>
+        /// Service to interact woth contexts in database.
+        /// </summary>
+        private ContextService _contextService = new ContextService();
+
+        private uint _retries;
+
+        /// <summary>
+        /// The timer used to perform predictions.
+        /// </summary>
+        private System.Timers.Timer _localizerTimer = new System.Timers.Timer();
+
+
+        /// <summary>
+        /// The collection used to store the progress values until they are notified.
+        /// </summary>
+        BlockingCollection<double> _progressCollection = new BlockingCollection<double>();
+
+        System.Threading.Tasks.Task _progressTask;
+
+        #endregion
+
+        #region Properties
+        /// <summary>
+        /// Similarity algorithm used to perform matching between a scenario and signal example.
+        /// </summary>
+        public Func<Scenario, IDictionary<AccessPoint, int>, double> SimilarityAlgorithm
+        {
+            private get
+            {
+                lock(_localizerLock)
+                {
+                    return 
+                        _similarityAlgorithm != null 
+                        ? _similarityAlgorithm 
+                        : (scenario, signals) => 0.0;
+                }
+            }
+            set
+            {
+                lock(_localizerLock)
+                {
+                    _similarityAlgorithm = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Number of retries on failure.
+        /// </summary>
+        public uint Retries
+        {
+            get
+            {
+                lock (_localizerLock)
+                {
+                    return _retries;
+                }
+            }
+            set
+            {
+                lock(_localizerLock)
+                {
+                    _retries = (value > 0 ? value : 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The context set by the user.
+        /// </summary>
+        public string ContextId
+        {
+            get
+            {
+                lock(_localizerLock)
+                {
+                    return _contextId;
+                }
+            }
+            set
+            {
+                lock(_localizerLock)
+                {
+                    if (value != null && !ContextService.IsValidObjectID(value))
+                    {
+                        throw new ArgumentOutOfRangeException("value");
+                    }
+                    _contextId = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The interval in milliseconds between predictions.
+        /// </summary>
+        public double Interval
+        {
+            get
+            {
+                lock (_localizerLock)
+                {
+                    return _localizerTimer.Interval;
+                }
+            }
+            set
+            {
+                lock (_localizerTimer)
+                {
+                    _localizerTimer.Interval = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Property used to enable/disable the tracker.
+        /// </summary>
+        public bool Enabled
+        {
+            get
+            {
+                lock (_localizerLock)
+                {
+                    return _localizerTimer.Enabled;
+                }
+            }
+            set
+            {
+                lock (_localizerLock)
+                {
+                    _localizerTimer.Enabled = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The localizer is allowed to create a new scenario on failure.
+        /// </summary>
+        public bool CreationAllowed
+        {
+            get
+            {
+                lock(_localizerTimer)
+                {
+                    return _creationAllowed;
+                }
+            }
+
+            set
+            {
+                lock(_localizerTimer)
+                {
+                    _creationAllowed = value;
+                }
+            }
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Each time this handler is invoked, a new prediction is done.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void localizerTimer_Elapsed(object sender, ElapsedEventArgs e)
+        {   
+            lock(_localizerLock)
+            {
+                // suspend
+                _localizerTimer.Stop();
+
+                if (LocalizerNotification != null)
+                {
+                    var prediction = this.Prediction();
+                    if (prediction != null)
+                    {
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Prediction,
+                            PredictionValue = prediction
+                        };
+                        var t = new Thread(() => LocalizerNotification(this, args));
+                        t.Start();
+                    }
+
+                }
+
+                // resume
+                _localizerTimer.Start();
+            }
+        }
+
+        /// <summary>
+        /// Try to find a scenario for the target context. On failure, a new
+        /// scenario is created if the creation is allowed, otherwise the
+        /// predicted scenario is returned.
+        /// </summary>
+        /// <returns>A prediction, or null in case of error.</returns>
+        public PredictionArgs Prediction()
+        {
+            lock (_localizerLock)
+            {
+
+                if (ContextId == null)
+                {
+                    return null;
+                }
+
+                try
+                {
+                    if (_contextService.GetById(ContextId) == null)
+                    {
+                        // notify error
+                        if (LocalizerErrorNotification != null)
+                        {
+                            var args = new LocalizerErrorNotificationEventArgs(
+                                LocalizerErrorNotificationCode.UnknownContext);
+                            var t = new Thread(() => LocalizerErrorNotification(this, args));
+                            t.Start();
+                        }
+                        return null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (LocalizerErrorNotification != null)
+                    {
+                        // notify error
+                        var args = new LocalizerErrorNotificationEventArgs(
+                            LocalizerErrorNotificationCode.DatabaseError, ex);
+                        var t = new Thread(() => LocalizerErrorNotification(this, args));
+                        t.Start();
+                    }
+                    return null;
+                }
+
+                // context found in the database
+
+                var prediction = new PredictionArgs
+                {
+                    Success = false
+                };
+
+                IEnumerable<ContextPreference> pref = null;
+                for (var attempts = this.Retries + 1; attempts > 0; attempts--)
+                {
+
+                    prediction.PredictedScenario = GetScenarioForCurrentPosition(out pref);
+                    if (prediction.PredictedScenario == null)
+                    {
+                        // retry, eventually..
+                        continue;
+                    }
+
+                    if (ContextId.Equals(prediction.PredictedScenario.ContextId.ToString()))
+                    {
+                        // correct prediction
+                        _scenarioService.IncreaseAccuracy(prediction.PredictedScenario);
+                        prediction.Success = true;
+                        break;
+                    }
+
+                    // wrong prediction
+                    _scenarioService.DecreaseAccuracy(prediction.PredictedScenario);
+                }
+
+                if (!prediction.Success && CreationAllowed)
+                {
+                    // create a new scenario for the requested context
+                    prediction.PredictedScenario = new Scenario
+                    {
+                        ContextId = new ObjectId(ContextId),
+                        CreationTime = DateTime.Now
+                    };
+
+                    try
+                    {
+                        _scenarioService.Create(prediction.PredictedScenario);
+                    }
+                    catch (Exception ex)
+                    {
+                        if (LocalizerErrorNotification != null)
+                        {
+                            
+                            // notify error
+                            var args = new LocalizerErrorNotificationEventArgs(
+                                LocalizerErrorNotificationCode.DatabaseError, ex);
+                            var t = new Thread(() => LocalizerErrorNotification(this, args));
+                            t.Start();
+                        }
+                        return null;
+                    }
+                }
+
+                return prediction;
+
+            }
+
         }
 
         /// <summary>
         /// Get the most suitable scenario based on the releaved signals.
         /// </summary>
-        /// <param name="similarContexts">Similar contexts predicted.</param>
+        /// <param name="preferences">Similar contexts predicted with preference value.</param>
         /// <returns>The most suitable scenario or null.</returns>
-        public Scenario Prediction(out IEnumerable<ContextSimilarity> similarContexts)
+        public Scenario GetScenarioForCurrentPosition(out IEnumerable<ContextPreference> preferences)
         {
-            List<ScanSignal> signals = null;
-            int retries = this.Retries;
-
-            for (var attempts = this.Retries + 1; attempts > 0; attempts--)
+            lock(_localizerLock)
             {
-                signals = wlanScanner.GetScanSignals();
-                if(signals.Count > 0)
+                List<ScanSignal> signals = _wlanScanner.GetScanSignals();
+
+                if (signals.Count == 0)
                 {
-                    break;
-                }
-            }
-
-            if (signals.Count == 0)
-            {
-                similarContexts = null;
-                return null;
-            }
-
-
-            // create map of signals for searches
-            var mapSignals = new Dictionary<AccessPoint, int>();
-            foreach (var signal in signals)
-            {
-                mapSignals.Add(signal.AP, signal.RSSI);
-            }
-
-            var similarScenarios = scenarioService.GetByPossibleAccessPoints(mapSignals.Keys);
-
-            if(similarScenarios.Count() == 0)
-            {
-                // no suitable scenarios were found.
-                similarContexts = null;
-                return null;
-            }
-
-            // create map with context id as key.
-            var mapContextSimilarities = new Dictionary<string, ContextSimilarity>();
-            double bestScenarioSimilarity = -1.0; // min value will be 0.0
-            Scenario bestScenario = null;
-
-            foreach (var scenario in similarScenarios)
-            {
-                if(scenario.Features.Count == 0)
-                {
-                    // skip scenario
-                    continue;
+                    _progressCollection.Add(1.0);
+                    preferences = null;
+                    return null;
                 }
 
-                double similarity2 = 0;
-                double reliability2 = 0;
-                double naiveSimilarity = 1;
 
-                foreach(var feature in scenario.Features)
+                // create map of signals for searches
+                var mapSignals = new Dictionary<AccessPoint, int>();
+                foreach (var signal in signals)
                 {
-                    // Reliability represents the maximum similarity2
-                    int evidence;
-                    double featureSimilarityWhenFound;
-                    double featureSimilarityWhenNotFound;
-                    double featureSimilarity;
-                    //double featureMaxSimilarity = feature.Value.Reliability * featureMaxSimilarityWhenFound;      // consider only first addend
+                    mapSignals.Add(signal.AP, signal.RSSI);
+                }
 
-                    if(!mapSignals.TryGetValue(feature.Key.AP, out evidence))
+                var similarScenarios = _scenarioService.GetByPossibleAccessPoints(mapSignals.Keys);
+
+                var numScenarios = similarScenarios.Count();
+                if (numScenarios == 0)
+                {
+                    // no suitable scenarios were found.
+
+                    // send progress notification 
+                    _progressCollection.Add(1.0);
+                    preferences = null;
+                    return null;
+                }
+
+                // create map with preference id as key.
+                var mapPreferences = new Dictionary<string, ContextPreference>();
+                double bestScenarioSimilarity = -1.0; // min value will be 0.0
+                Scenario bestScenario = null;
+
+                // index loop suitable for progress notification
+                var scenarioEnumerator = similarScenarios.GetEnumerator();
+                scenarioEnumerator.MoveNext();
+                for (int scenarioCounter = 0; scenarioCounter < numScenarios; scenarioCounter++, scenarioEnumerator.MoveNext())
+                {
+                    // send progress notification 
+                    _progressCollection.Add((double)scenarioCounter / numScenarios);
+
+                    var scenario = scenarioEnumerator.Current;
+                    if (scenario.Features.Count == 0)
                     {
-                        // no evidence for this feature
-                        featureSimilarityWhenFound = 0;
-                        featureSimilarityWhenNotFound = 1;
+                        // skip scenario
+                        continue;
                     }
-                    else if (feature.Value.Variance == 0)
+                    // prediction for scenario
+                    double scenarioSimilarity = SimilarityAlgorithm(scenario, mapSignals);
+
+                    // update preference similarity
+                    ContextPreference preference;
+                    if (mapPreferences.TryGetValue(scenario.ContextId.ToString(), out preference))
                     {
-                        // evidence found - feature is a delta function
-                        featureSimilarityWhenFound = (evidence == feature.Value.Avg ? 1 : 0);
-                        featureSimilarityWhenNotFound = (evidence < feature.Value.Avg ? 1 : 0);
+                        if (scenarioSimilarity > preference.Value)
+                        {
+                            // new best scenario for the preference
+                            preference.Value = scenarioSimilarity;
+                        }
                     }
                     else
                     {
-                        // evindence found - feature is a gaussian function
-                        double Z = evidence - feature.Value.Avg;
-                        Z = Z * Z;
-                        Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
-                        featureSimilarityWhenFound = Math.Exp(Z);
-                        featureSimilarityWhenNotFound = 1.0 - Phi((evidence - feature.Value.Avg) / feature.Value.Variance);
+                        // new suitable preference found
+                        mapPreferences.Add(scenario.ContextId.ToString(), new ContextPreference
+                        {
+                            ContextId = scenario.ContextId.ToString(),
+                            Value = scenarioSimilarity
+                        });
                     }
-                    featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound + (1.0 - feature.Value.Reliability) * featureSimilarityWhenNotFound;
-                    //featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound;   // consider only first addend
 
-                    similarity2 += featureSimilarity * featureSimilarity;
-                    //reliability2 += featureMaxSimilarity * featureMaxSimilarity;
-                    reliability2++;
-
-                    naiveSimilarity *= featureSimilarity;
-                }
-
-                // result for scenario
-                //double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / reliability2));
-                double scenarioSimilarity = naiveSimilarity;
-
-                // update context similarity
-                ContextSimilarity context;
-                if(mapContextSimilarities.TryGetValue(scenario.ContextId.ToString(), out context))
-                {
-                    if(scenarioSimilarity > context.Similarity)
+                    // update best scenario
+                    if (scenarioSimilarity > bestScenarioSimilarity)
                     {
-                        // new best scenario for the context
-                        context.Similarity = scenarioSimilarity;
+                        bestScenario = scenario;
+                        bestScenarioSimilarity = scenarioSimilarity;
                     }
                 }
-                else
+                scenarioEnumerator.Dispose();
+
+                // send progress notification
+                _progressCollection.Add(1.0);
+
+                preferences = (bestScenario == null ? null : mapPreferences.Values);
+
+                if (preferences != null)
                 {
-                    // new suitable context found
-                    mapContextSimilarities.Add(scenario.ContextId.ToString(), new ContextSimilarity
+                    double global = 0;
+                    foreach (var context in preferences)
                     {
-                        ContextId = scenario.ContextId.ToString(),
-                        Similarity = scenarioSimilarity
-                    });
+                        global += context.Value;
+                    }
+                    if (global > 0)
+                    {
+                        foreach (var context in preferences)
+                        {
+                            context.Value /= global;
+                        }
+                    }
                 }
 
-                // update best scenario
-                if(scenarioSimilarity > bestScenarioSimilarity)
-                {
-                    bestScenario = scenario;
-                    bestScenarioSimilarity = scenarioSimilarity;
-                }
+                return bestScenario;
+
             }
-
-            similarContexts = (bestScenario == null ? null : mapContextSimilarities.Values);
-            return bestScenario;
         }
-
-
 
         public Localizer()
         {
+            _localizerTimer.Elapsed += localizerTimer_Elapsed;
 
-        }
-
-        private static double Phi(double x)
-        {
-            // constants
-            const double a1 = 0.254829592;
-            const double a2 = -0.284496736;
-            const double a3 = 1.421413741;
-            const double a4 = -1.453152027;
-            const double a5 = 1.061405429;
-            const double p = 0.3275911;
-
-            // Save the sign of x
-            int sign = Math.Sign(x);
-            x = Math.Abs(x) / Math.Sqrt(2.0);
-
-            // A&S formula 7.1.26
-            double t = 1.0 / (1.0 + p * x);
-            double y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.Exp(-x * x);
-
-            return 0.5 * (1.0 + sign * y);
-        }
-
-        private static double NaiveBayesSimilarity(IEnumerable<Feature> features, IDictionary<AccessPoint, int> mapSignals)
-        {
-            double naiveSimilarity = 1;
-            foreach(var feature in features)
+            // task to notify localization progress
+            _progressTask = System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
-                // Reliability represents the maximum similarity2
-                int evidence;
-                double featureSimilarityWhenFound;
-                double featureSimilarityWhenNotFound;
-                double featureSimilarity;
-
-                if(!mapSignals.TryGetValue(feature.Key.AP, out evidence))
+                foreach (double progress in _progressCollection.GetConsumingEnumerable())
                 {
-                    // no evidence for this feature
-                    featureSimilarityWhenFound = 0;
-                    featureSimilarityWhenNotFound = 1;
+                    if(LocalizerNotification != null)
+                    {
+                        var args = new LocalizerNotificationEventArgs
+                        {
+                            Code = LocalizerNotificationCode.Progress,
+                            ProgressValue = progress
+                        };
+                        LocalizerNotification(this, args);
+                    }
                 }
-                else if (feature.Value.Variance == 0)
-                {
-                    // evidence found - feature is a delta function
-                    featureSimilarityWhenFound = (evidence == feature.Value.Avg ? 1 : 0);
-                    featureSimilarityWhenNotFound = (evidence < feature.Value.Avg ? 1 : 0);
-                }
-                else
-                {
-                    // evindence found - feature is a gaussian function
-                    double Z = evidence - feature.Value.Avg;
-                    Z = Z * Z;
-                    Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
-                    featureSimilarityWhenFound = Math.Exp(Z);
-                    featureSimilarityWhenNotFound = 1.0 - Phi((evidence - feature.Value.Avg) / feature.Value.Variance);
-                }
-                featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound + (1.0 - feature.Value.Reliability) * featureSimilarityWhenNotFound;
-                naiveSimilarity *= featureSimilarity;
-            }
-            return naiveSimilarity;
-        }
-
-        private static double RelativeErrorSimilarity(IEnumerable<Feature> features, IDictionary<AccessPoint, int> mapSignals)
-        {
-            double similarity2 = 0;
-            double reliability2 = 0;
-            double naiveSimilarity = 1;
-
-            foreach (var feature in features)
-            {
-                // Reliability represents the maximum similarity2
-                int evidence;
-                double featureSimilarityWhenFound;
-                double featureSimilarityWhenNotFound;
-                double featureSimilarity;
-                //double featureMaxSimilarity = feature.Value.Reliability * featureMaxSimilarityWhenFound;      // consider only first addend
-
-                if (!mapSignals.TryGetValue(feature.Key.AP, out evidence))
-                {
-                    // no evidence for this feature
-                    featureSimilarityWhenFound = 0;
-                    featureSimilarityWhenNotFound = 1;
-                }
-                else if (feature.Value.Variance == 0)
-                {
-                    // evidence found - feature is a delta function
-                    featureSimilarityWhenFound = (evidence == feature.Value.Avg ? 1 : 0);
-                    featureSimilarityWhenNotFound = (evidence < feature.Value.Avg ? 1 : 0);
-                }
-                else
-                {
-                    // evindence found - feature is a gaussian function
-                    double Z = evidence - feature.Value.Avg;
-                    Z = Z * Z;
-                    Z = -(Z / (2 * feature.Value.Variance * feature.Value.Variance));
-                    featureSimilarityWhenFound = Math.Exp(Z);
-                    featureSimilarityWhenNotFound = 1.0 - Phi((evidence - feature.Value.Avg) / feature.Value.Variance);
-                }
-                featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound + (1.0 - feature.Value.Reliability) * featureSimilarityWhenNotFound;
-                //featureSimilarity = feature.Value.Reliability * featureSimilarityWhenFound;   // consider only first addend
-
-                similarity2 += featureSimilarity * featureSimilarity;
-                //reliability2 += featureMaxSimilarity * featureMaxSimilarity;
-                reliability2++;
-
-                naiveSimilarity *= featureSimilarity;
-            }
-
-            // result for scenario
-            //double scenarioSimilarity = (similarity2 == 0 ? 0 : Math.Sqrt(similarity2 / reliability2));
-            double scenarioSimilarity = naiveSimilarity;
-            return scenarioSimilarity;
+            });
         }
 
 
+
+
+
+        
     }
 }

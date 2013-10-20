@@ -34,7 +34,7 @@ namespace AttiLA.WindowsService.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Localization")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Localizer")]
         public string LocalizationServicePipe {
             get {
                 return ((string)(this["LocalizationServicePipe"]));

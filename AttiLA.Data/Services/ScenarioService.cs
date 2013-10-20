@@ -64,7 +64,7 @@ namespace AttiLA.Data.Services
             }
             if(accessPoints.Count() == 0)
             {
-                return new List<Scenario>();
+                return new List<Scenario>().AsEnumerable();
             }
 
             //// Get all ids of scenarios containing at least one access point in the list
@@ -224,7 +224,7 @@ namespace AttiLA.Data.Services
             if(scenarios.Count == 0)
             {
                 // no suitable scenarios found
-                return scenarios;
+                return scenarios.AsEnumerable();
             }
 
 
@@ -237,11 +237,14 @@ namespace AttiLA.Data.Services
             string signalValue = Utils<ScanSignal>.MemberName(s => s.RSSI);
             string scenarioId = Utils<FeatureKey>.MemberName(f => f.ScenarioId);
             string map = @"
-                function map() {
+                function map() 
+                {
 	                var ts_length = this." + ts + @".length;
 	                var scenario_id = this._id;
-	                this." + ts + @".forEach(function(ts) {
-		                ts." + signals + @".forEach(function(signal) {
+	                this." + ts + @".forEach(function(ts) 
+                    {
+		                ts." + signals + @".forEach(function(signal) 
+                        {
 			                emit(
                             {
                                 " + scenarioId + @": scenario_id,
@@ -260,9 +263,11 @@ namespace AttiLA.Data.Services
                 }";
 
             string reduce = @"
-                function reduce(key, values) {
+                function reduce(key, values) 
+                {
                     var a = values[0]; // will reduce into here
-                    for (var i=1/*!*/; i < values.length; i++){
+                    for (var i=1/*!*/; i < values.length; i++)
+                    {
                         var b = values[i]; // will merge 'b' into 'a'
 
                         // temp helpers
@@ -286,7 +291,8 @@ namespace AttiLA.Data.Services
             string reliability = Utils<FeatureValue>.MemberName(f => f.Reliability);
 
             string finalize=@"
-                function finalize(key, value) { 
+                function finalize(key, value) 
+                { 
 	                var res = new Object();
                     res." + avg + @" = value.sum / value.count;
                     res." + variance + @" = value.diff / value.count;
@@ -333,25 +339,61 @@ namespace AttiLA.Data.Services
                 }
             }
 
-            return scenarios;
-        }
-
-        public void prova()
-        {
-
-            var accessPoints = new List<AccessPoint>
-            {
-                new AccessPoint{MAC = "00146C58355E", SSID = "NETGEAR"},
-                new AccessPoint{MAC = "4494FC43DA9E", SSID = "StudioL"},
-                new AccessPoint{MAC = "F07D686BC630", SSID = "D-Link"},
-            };
-
-            GetByPossibleAccessPoints(accessPoints);
+            return scenarios.AsEnumerable();
         }
 
         public override void Update(Scenario entity)
         {
+            
             throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Update the accuracy parameters of the scenario.
+        /// </summary>
+        /// <param name="entity"></param>
+        public void IncreaseAccuracy(Scenario scenario)
+        {
+            if(scenario == null)
+            {
+                throw new ArgumentNullException("scenario");
+            }
+
+            var query = Query<Scenario>.EQ(s => s.Id, scenario.Id);
+            try
+            {
+                var update = Update<Scenario>.Inc(s => s.TruePositives, 1.0);
+                this.MongoConnectionHandler.MongoCollection.FindAndModify(query, SortBy.Null, update);
+
+            }
+            catch(MongoException ex)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorUpdate + scenario.Id.ToString(), ex);
+            }
+        }
+
+        /// <summary>
+        /// Update the accuracy parameters of the scenario.
+        /// </summary>
+        /// <param name="entity"></param>
+        public void DecreaseAccuracy(Scenario scenario)
+        {
+            if (scenario == null)
+            {
+                throw new ArgumentNullException("scenario");
+            }
+
+            var query = Query<Scenario>.EQ(s => s.Id, scenario.Id);
+            try
+            {
+                var update = Update<Scenario>.Inc(s => s.FalsePositives, 1.0);
+                this.MongoConnectionHandler.MongoCollection.FindAndModify(query, SortBy.Null, update);
+
+            }
+            catch (MongoException ex)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorUpdate + scenario.Id.ToString(), ex);
+            }
         }
     }
 }

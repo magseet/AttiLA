@@ -25,34 +25,22 @@ namespace AttiLA.LocalizationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300")]
-        public double TrackerCaptureInterval {
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public double TrackerInterval {
             get {
-                return ((double)(this["TrackerCaptureInterval"]));
+                return ((double)(this["TrackerInterval"]));
             }
             set {
-                this["TrackerCaptureInterval"] = value;
+                this["TrackerInterval"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("2000")]
-        public double TrackerUpdateInterval {
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public uint LocalizerRetries {
             get {
-                return ((double)(this["TrackerUpdateInterval"]));
-            }
-            set {
-                this["TrackerUpdateInterval"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
-        public int LocalizerRetries {
-            get {
-                return ((int)(this["LocalizerRetries"]));
+                return ((uint)(this["LocalizerRetries"]));
             }
             set {
                 this["LocalizerRetries"] = value;
@@ -61,13 +49,61 @@ namespace AttiLA.LocalizationService.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool TrackerEnabledOnStartup {
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public byte LocalizerSimilarityAlgorithm {
             get {
-                return ((bool)(this["TrackerEnabledOnStartup"]));
+                return ((byte)(this["LocalizerSimilarityAlgorithm"]));
             }
             set {
-                this["TrackerEnabledOnStartup"] = value;
+                this["LocalizerSimilarityAlgorithm"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public double LocalizerInterval {
+            get {
+                return ((double)(this["LocalizerInterval"]));
+            }
+            set {
+                this["LocalizerInterval"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        public uint NotificationThreshold {
+            get {
+                return ((uint)(this["NotificationThreshold"]));
+            }
+            set {
+                this["NotificationThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public uint TrackerTrainingThreshold {
+            get {
+                return ((uint)(this["TrackerTrainingThreshold"]));
+            }
+            set {
+                this["TrackerTrainingThreshold"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("service.log")]
+        public string ServiceLog {
+            get {
+                return ((string)(this["ServiceLog"]));
+            }
+            set {
+                this["ServiceLog"] = value;
             }
         }
     }

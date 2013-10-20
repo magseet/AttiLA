@@ -2,17 +2,26 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AttiLA.LocalizationService.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="TrackerCaptureInterval" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">300</Value>
+    <Setting Name="TrackerInterval" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="TrackerUpdateInterval" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">2000</Value>
+    <Setting Name="LocalizerRetries" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">1</Value>
     </Setting>
-    <Setting Name="LocalizerRetries" Type="System.Int32" Scope="User">
+    <Setting Name="LocalizerSimilarityAlgorithm" Type="System.Byte" Scope="User">
+      <Value Profile="(Default)">2</Value>
+    </Setting>
+    <Setting Name="LocalizerInterval" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">1000</Value>
+    </Setting>
+    <Setting Name="NotificationThreshold" Type="System.UInt32" Scope="User">
       <Value Profile="(Default)">5</Value>
     </Setting>
-    <Setting Name="TrackerEnabledOnStartup" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+    <Setting Name="TrackerTrainingThreshold" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="ServiceLog" Type="System.String" Scope="User">
+      <Value Profile="(Default)">service.log</Value>
     </Setting>
   </Settings>
 </SettingsFile>

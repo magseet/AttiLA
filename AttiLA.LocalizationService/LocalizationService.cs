@@ -8,7 +8,7 @@ using AttiLA.Data.Entities;
 using AttiLA.Data.Services;
 using AttiLA.Data;
 using MongoDB.Bson;
-using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace AttiLA.LocalizationService
 {
@@ -24,54 +24,12 @@ namespace AttiLA.LocalizationService
     public class LocalizationService : ILocalizationService
     {
 
-        #region Locks
-        private System.Object lockTracking = new System.Object();
-        #endregion
-
         #region Events
-        /// <summary>
-        /// Represents a method that will handle <see cref="TrackerStartNotification"/>
-        /// </summary>
-        /// <param name="scenario">The scenario to be tracked.</param>
-        public delegate void TrackerStartNotificationHandler(Context context);
 
-        /// <summary>
-        /// Represents a method that will handle <see cref="TrackerStartNotification"/>
-        /// </summary>
-        /// <param name="previousContext">The scenario that was tracked.</param>
-        public delegate void TrackerStopNotificationHandler(Context previousContext);
-
-        /// <summary>
-        /// Occurs when there is a request to enter in track mode.
-        /// </summary>
-        public event TrackerStartNotificationHandler TrackerStartNotification;
-
-        /// <summary>
-        /// Occurs when there is a request to leave the track mode.
-        /// </summary>
-        public event TrackerStopNotificationHandler TrackerStopNotification;
 
         #endregion
 
-        /// <summary>
-        /// The tracking module.
-        /// </summary>
-        private Tracker tracker = new Tracker 
-        { 
-            CaptureInterval = Properties.Settings.Default.TrackerCaptureInterval,
-            UpdateInterval = Properties.Settings.Default.TrackerUpdateInterval,
-            Enabled = Properties.Settings.Default.TrackerEnabledOnStartup
-        };
-
-        /// <summary>
-        /// The localization module.
-        /// </summary>
-        private Localizer localizer = new Localizer
-        {
-            Retries = Properties.Settings.Default.LocalizerRetries,
-            //SimilarityAlgorithm = new SimilarityAlgorithm()[Properties.Settings.Default.]
-        };
-
+        #region Static members
         /// <summary>
         /// Service to interact with scenarios in database.
         /// </summary>
@@ -83,66 +41,224 @@ namespace AttiLA.LocalizationService
         private static readonly ContextService contextService = new ContextService();
 
         /// <summary>
-        /// Record the subscribers to the callback service.
+        /// Record the subscribers to the subscriber service.
         /// </summary>
-        private static readonly List<ILocalizationServiceCallback> 
+        private static readonly List<ILocalizationServiceCallback>
             subscribers = new List<ILocalizationServiceCallback>();
 
+        #endregion
 
+        #region Private members
+
+        /// <summary>
+        /// The lock used to synchronize access to the service status.
+        /// </summary>
+        private Object _lockStatus = new Object();
+
+        /// <summary>
+        /// The tracking module.
+        /// </summary>
+        private Tracker _tracker = new Tracker
+        {
+            Interval = Properties.Settings.Default.TrackerInterval,
+            Enabled = false,
+            ScenarioId = null,
+            TrainingThreshold = Properties.Settings.Default.TrackerTrainingThreshold
+        };
+
+        /// <summary>
+        /// The localization module.
+        /// </summary>
+        private Localizer _localizer = new Localizer
+        {
+            ContextId = null,
+            CreationAllowed = false,
+            Enabled = false,
+            Interval = Properties.Settings.Default.LocalizerInterval,
+            Retries = Properties.Settings.Default.LocalizerRetries,
+            SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(
+                (SimilarityAlgorithmCode)Properties.Settings.Default.LocalizerSimilarityAlgorithm)
+        };
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// The service state.
+        /// </summary>
+        public ServiceStateCode ServiceState { get; private set; }
+
+        public uint NotificationThreshold { get; private set; }
+
+        private uint ConsecutiveCorrectPredictions { get; set; }
+
+        #endregion
+
+        /// <summary>
+        /// Service initialization.
+        /// </summary>
         public LocalizationService()
         {
-            tracker.TrackerNotification += tracker_TrackerNotification;
+            // initialize properties
+            ConsecutiveCorrectPredictions = 0;
+            NotificationThreshold = Properties.Settings.Default.NotificationThreshold;
+            ServiceState = ServiceStateCode.Idle;
+
+            // enable handlers
+            _tracker.TrackerNotification += tracker_TrackerNotification;
+            _localizer.LocalizerNotification += localizer_LocalizerNotification;
+        }
+        
+
+
+        /// <summary>
+        /// Handler for notifications by the localizer.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void localizer_LocalizerNotification(object sender, LocalizerNotificationEventArgs e)
+        {
+            // requires a lock since it's running on a different thread
+            lock(_lockStatus)
+            {
+                // suspend prediction timer
+                bool previousLocalizerStatus = _localizer.Enabled;
+                _localizer.Enabled = false;
+
+                switch (e.Code)
+                {
+                    case LocalizerNotificationCode.Progress:
+
+                        // notify all subscribers about localization progress
+                        foreach (var subscriber in subscribers)
+                        {
+                            if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                            {
+                                subscriber.ReportLocalizationProgress(e.ProgressValue);
+                            }
+                            else
+                            {
+                                subscribers.Remove(subscriber);
+                            }
+                        }
+                        break;
+
+                    case LocalizerNotificationCode.Prediction:
+
+                        Debug.WriteLine("PREDICTION: " + e.PredictionValue.PredictedScenario.ToString() +
+                            " success: " + e.PredictionValue.Success.ToString());
+                        // dispatch prediction
+                        if(ServiceState == ServiceStateCode.Tracking)
+                        {
+                            _tracker.Update();
+                        }
+                        DispatchPrediction(e.PredictionValue);
+                        break;
+                }
+
+                // restore localizer status
+                _localizer.Enabled = previousLocalizerStatus;
+            }
         }
 
         /// <summary>
-        /// Handler for notifications from tracker.
+        /// Handler for notifications by the tracker.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void tracker_TrackerNotification(object sender, TrackerNotificationEventArgs e)
         {
-            switch(e.Code)
+            lock(_lockStatus)
             {
-                case TrackerNotificationCode.NoSignalsDetected:
-                    break;
+                switch (e.Code)
+                {
+                    case TrackerNotificationCode.NoSignalsDetected:
+                        Debug.WriteLine("NO SIGNAL DETECTED.");
+                        break;
 
-                case TrackerNotificationCode.Start:
-                    // notify all subscribers about tracker start
-                    var startTime = DateTime.Now;
-                    subscribers.ForEach(delegate(ILocalizationServiceCallback callback)
-                    {
-                        if (((ICommunicationObject)callback).State == CommunicationState.Opened)
-                        {
-                            callback.TrackModeStarted(startTime);
-                        }
-                        else
-                        {
-                            subscribers.Remove(callback);
-                        }
-                    });
-                    break;
+                    case TrackerNotificationCode.Started:
+                        
+                        // from tracking to training mode
+                        Debug.WriteLine("TRACKER STARTED (training). ");
+                        _localizer.Enabled = false;
 
-                case TrackerNotificationCode.Stop:
-                    // notify all subscribers about tracker stop
-                    var stopTime = DateTime.Now;
-                    subscribers.ForEach(delegate(ILocalizationServiceCallback callback)
-                    {
-                        if (((ICommunicationObject)callback).State == CommunicationState.Opened)
+                        // notify all subscribers
+                        foreach (var subscriber in subscribers)
                         {
-                            callback.TrackModeStopped(stopTime);
+                            if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                            {
+                                var serviceStatus = new ServiceStatus
+                                {
+                                    ContextId = _localizer.ContextId,
+                                    ServiceState = ServiceStateCode.Training
+                                };
+                                subscriber.ReportServiceStatus(serviceStatus);
+                            }
+                            else
+                            {
+                                subscribers.Remove(subscriber);
+                            }
                         }
-                        else
+                        break;
+
+                    case TrackerNotificationCode.Stopped:
+
+                        // from tracking to notification mode
+                        Debug.WriteLine("TRACKER STOPPED.");
+
+                        // notify all subscribers
+                        foreach (var subscriber in subscribers)
                         {
-                            subscribers.Remove(callback);
+                            if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                            {
+                                var serviceStatus = new ServiceStatus
+                                {
+                                    ContextId = _localizer.ContextId,
+                                    ServiceState = ServiceStateCode.Notification
+                                };
+                                subscriber.ReportServiceStatus(serviceStatus);
+                            }
+                            else
+                            {
+                                subscribers.Remove(subscriber);
+                            }
+                        } 
+                        break;
+
+                    case TrackerNotificationCode.TrainingCompleted:
+
+                        // from training to tracking mode
+                        Debug.WriteLine("TRAINING COMPLETED.");
+                        _localizer.Enabled = true;
+
+                        // notify all subscribers
+                        foreach (var subscriber in subscribers)
+                        {
+                            if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                            {
+                                var serviceStatus = new ServiceStatus
+                                {
+                                    ContextId = _localizer.ContextId,
+                                    ServiceState = ServiceStateCode.Tracking
+                                };
+                                subscriber.ReportServiceStatus(serviceStatus);
+                            }
+                            else
+                            {
+                                subscribers.Remove(subscriber);
+                            }
                         }
-                    });
-                    break;
-                
+                        break;
+                }
+
             }
         }
 
 
-
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
         public bool Subscribe()
         {
             try
@@ -161,6 +277,10 @@ namespace AttiLA.LocalizationService
             }
         }
 
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
         public bool Unsubscribe()
         {
             try
@@ -177,88 +297,313 @@ namespace AttiLA.LocalizationService
             }
         }
 
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
+        public ServiceStatus GetServiceStatus()
+        {
+            lock(_lockStatus)
+            {
+                return new ServiceStatus
+                {
+                    ContextId = _localizer.ContextId,
+                    ServiceState = this.ServiceState
+                };
+            }
+        }
+
+
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
         public GlobalSettings GetGlobalSettings()
         {
-            // TODO..
-            return null;
-        }
-
-        public void SetGlobalSettings(GlobalSettings newSettings)
-        {
-            // TODO..
-        }
-
-        public void ChangeContext(string newContextId)
-        {
-
-            if(newContextId == null || !IsValidObjectId(newContextId))
+            return new GlobalSettings
             {
-                throw new FaultException<ArgumentException>(
-                    new ArgumentException("newContextId"));
-            }
-
-            // TODO.. localize and check if prediction was right
-
-            // dummy case
-            var context = contextService.GetById(newContextId);
-            if(context == null)
-            {
-                throw new FaultException<ServiceException>(
-                    new ServiceException
-                    {
-                        Message = Properties.Resources.MsgFaultContextNotFound
-                    });
-            }
-
-            var scenario = new Scenario
-            {
-                CreationTime = DateTime.Now,
-                ContextId = context.Id
+                Localizer = new LocalizerSettings
+                {
+                    Interval = Properties.Settings.Default.LocalizerInterval,
+                    Retries = Properties.Settings.Default.LocalizerRetries,
+                    SimilarityAlgorithm = (SimilarityAlgorithmCode) Properties.Settings.Default.LocalizerSimilarityAlgorithm
+                },
+                Tracker = new TrackerSettings
+                {
+                    Interval = Properties.Settings.Default.TrackerInterval,
+                },
+                NotificationThreshold = Properties.Settings.Default.NotificationThreshold
             };
+        }
 
-            try
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <param name="newSettings"></param>
+        /// <returns></returns>
+        public bool SetGlobalSettings(GlobalSettings newSettings)
+        {
+            Silence();
+            lock(_lockStatus)
             {
-                scenarioService.Create(scenario);
+                try
+                {
+                    // apply settings
+                    _tracker.Interval = newSettings.Tracker.Interval;
+                    _tracker.TrainingThreshold = newSettings.Tracker.TrainingThreshold;
+                    _localizer.Interval = newSettings.Localizer.Interval;
+                    _localizer.SimilarityAlgorithm = SimilarityAlgorithms.PredefinedAlgorithm(newSettings.Localizer.SimilarityAlgorithm);
+                    _localizer.Retries = newSettings.Localizer.Retries;
+                    NotificationThreshold = newSettings.NotificationThreshold;
+                }
+                catch
+                {
+                    // error applying settings
+                    return false;
+                }
+                // save new settings
+                Properties.Settings.Default.TrackerInterval = newSettings.Tracker.Interval;
+                Properties.Settings.Default.TrackerTrainingThreshold = newSettings.Tracker.TrainingThreshold;
+                Properties.Settings.Default.LocalizerInterval = newSettings.Localizer.Interval;
+                Properties.Settings.Default.LocalizerRetries = newSettings.Localizer.Retries;
+                Properties.Settings.Default.LocalizerSimilarityAlgorithm = (byte)newSettings.Localizer.SimilarityAlgorithm;
+                Properties.Settings.Default.NotificationThreshold = newSettings.NotificationThreshold;
+                return true;
             }
-            catch(DatabaseException)
+        }
+
+
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <param name="contextId"></param>
+        /// <returns></returns>
+        public bool TrackingStart(string contextId)
+        {
+            if (contextId == null || !ContextService.IsValidObjectID(contextId))
             {
-                throw new FaultException<ServiceException>(
-                    new ServiceException
+                var detail = new ServiceException
+                {
+                    Code = ServiceExceptionCode.Arguments
+                };
+                throw new FaultException<ServiceException>(detail);
+            }
+
+            lock(_lockStatus)
+            {
+
+                var previousState = ServiceState;
+
+                try
+                {
+                    if(contextId == _localizer.ContextId && previousState == ServiceStateCode.Tracking)
                     {
-                        Message = Properties.Resources.MsgFaultDatabaseError
-                    });
+                        // do nothing
+                        return true;
+                    }
+
+                    // prepare for tracking
+                    _tracker.ScenarioId = null;
+                    _localizer.Enabled = false;
+                    ServiceState = ServiceStateCode.Tracking;
+
+                    // notify all subscribers
+                    foreach (var subscriber in subscribers)
+                    {
+                        if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                        {
+                            var serviceStatus = new ServiceStatus
+                            {
+                                ContextId = contextId,
+                                ServiceState = ServiceStateCode.Tracking
+                            };
+                            subscriber.ReportServiceStatus(serviceStatus);
+                        }
+                        else
+                        {
+                            subscribers.Remove(subscriber);
+                        }
+                    }
+
+                    if(contextId != _localizer.ContextId)
+                    {
+                        // prepare for new context
+                        ConsecutiveCorrectPredictions = 0;
+                        _localizer.ContextId = contextId;
+                    }
+
+                    // perform a first prediction
+                    _localizer.CreationAllowed = true;
+                    var prediction = _localizer.Prediction();
+                    if(prediction == null || prediction.PredictedScenario == null)
+                    {
+                        return false;
+                    }
+                    DispatchPrediction(prediction);
+                    // enable localizer timer for the next predictions
+                    _localizer.Enabled = true;
+                    
+                }
+                catch(ArgumentException)
+                {
+                    Silence();
+                    var detail = new ServiceException
+                    {
+                        Code = ServiceExceptionCode.Arguments
+                    };
+                    throw new FaultException<ServiceException>(detail);
+                }
+                catch
+                {
+                    Silence();
+                    return false;
+                }
+
+                return true;      
             }
-
-            tracker.ScenarioId = scenario.Id.ToString();
-
-            
         }
 
-        public void TrackModeStart()
+        /// <summary>
+        /// Perform actions based on current status and prediction.
+        /// </summary>
+        /// <param name="prediction"></param>
+        private void DispatchPrediction(PredictionArgs prediction)
         {
-            tracker.Enabled = true;
-        }
-
-        public void TrackModeStop()
-        {
-            tracker.Enabled = false;
-        }
-
-        public string Localize(bool changeContext, out IEnumerable<ContextSimilarity> similarContexts)
-        {
-            Scenario scenario = localizer.Prediction(out similarContexts);
-            if(changeContext)
+            if(prediction == null)
             {
-                tracker.ScenarioId = (scenario == null ? null : scenario.Id.ToString());
+                Debug.WriteLine("DISPATCH: null prediction");
+                // do nothing
+                return;
             }
 
-            return scenario == null ? null : scenario.Id.ToString();
+            lock(_lockStatus)
+            {
+                if(ServiceState == ServiceStateCode.Idle || ServiceState == ServiceStateCode.Training)
+                {
+                    Debug.WriteLine("DISPATCH: skip state " + ServiceState.ToString());
+                    // do nothing
+                    return;
+                }
+
+                // update prediction counter
+                var previousCounter = ConsecutiveCorrectPredictions;
+                var currentCounter = (prediction.Success ? previousCounter + 1 : 0);
+                ConsecutiveCorrectPredictions = currentCounter;
+
+                if(
+                    (previousCounter >= NotificationThreshold && currentCounter == 0) ||
+                    (previousCounter < NotificationThreshold && currentCounter == NotificationThreshold))
+                {
+                    Debug.WriteLine("DISPATCH: prediction threshold passed");
+
+                    // notify all subscribers about prediction
+                    foreach (var subscriber in subscribers)
+                    {
+                        if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                        {
+                            var contextId = 
+                                prediction.PredictedScenario == null 
+                                ? null : prediction.PredictedScenario.ContextId.ToString();
+
+                            subscriber.ReportPrediction(contextId);
+                        }
+                        else
+                        {
+                            subscribers.Remove(subscriber);
+                        }
+                    }
+
+                }
+
+                if(ServiceState == ServiceStateCode.Tracking)
+                {
+                    if(prediction.Success)
+                    {
+                        Debug.WriteLine("DISPATCH: success in tracking state.");
+                        // no need to track
+                        _tracker.Enabled = false;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("DISPATCH: failure in tracking state.");
+                        // training needed
+                        _tracker.ScenarioId = 
+                            prediction.PredictedScenario == null
+                            ? null : prediction.PredictedScenario.Id.ToString();
+                        _tracker.Enabled = true;
+                    }
+                }
+
+
+
+            }
+
         }
 
-
-        private static bool IsValidObjectId(string id)
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
+        public bool TrackingStop()
         {
-            return Regex.Match(id, "^[0-9a-fA-F]{24}$").Success;
+            _tracker.Enabled = false;
+            lock(_lockStatus)
+            {
+                _localizer.CreationAllowed = false;
+                if(ServiceState == ServiceStateCode.Tracking)
+                {
+                    ServiceState = ServiceStateCode.Notification;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ContextPreference> GetCloserContexts()
+        {
+            IEnumerable<ContextPreference> preferences;
+            _localizer.GetScenarioForCurrentPosition(out preferences);
+            if (preferences == null)
+            {
+                return new List<ContextPreference>();
+            }
+            return preferences;
+        }
+
+        /// <summary>
+        /// Implementation of service operation.
+        /// </summary>
+        /// <returns></returns>
+        public void Silence()
+        {
+            _tracker.Enabled = false;
+
+            lock(_lockStatus)
+            {
+                Debug.WriteLine("SILENCE");
+                _localizer.Enabled = false;
+                ServiceState = ServiceStateCode.Idle;
+                // notify all subscribers
+                foreach (var subscriber in subscribers)
+                {
+                    if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                    {
+                        var serviceStatus = new ServiceStatus
+                        {
+                            ContextId = _localizer.ContextId,
+                            ServiceState = ServiceStateCode.Idle
+                        };
+                        subscriber.ReportServiceStatus(serviceStatus);
+                    }
+                    else
+                    {
+                        subscribers.Remove(subscriber);
+                    }
+                }
+            }
         }
     }
 }
