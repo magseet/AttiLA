@@ -14,7 +14,7 @@
                               BorderBrush="Gray" 
                               BorderThickness="0.5,0.5,0.5,0.5" 
                               CornerRadius="1,1,0,0" >
-                                    <ContentPresenter x:Name="ContentSite"
+                                <ContentPresenter x:Name="ContentSite"
                                     VerticalAlignment="Center"
                                     HorizontalAlignment="Center"
                                     ContentSource="Header"
@@ -71,17 +71,21 @@
             <TabItem Width="100">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal" Height="60">
-                        <Image Height="24" Source="cheese.jpg" />
+                        <Image Height="24" />
                         <TextBlock FontSize="18" Text="Locate" Margin="2,0,0,0" VerticalAlignment="Center" Foreground="#FF3E3333" />
                     </StackPanel>
                 </TabItem.Header>
-                <Button  Height="50" Width="100" Content="Localize!" FontSize="20" Margin="870,474,122,22" VerticalAlignment="Top"/>
-                
+                <Canvas>
+
+                    <Button Canvas.Left="987" Canvas.Top="429" Height="85" Width="85">Localize!</Button>
+                    <TextBlock Canvas.Left="10" TextWrapping="Wrap" Canvas.Top="15" Text="Context Name"/>
+                    <TextBox Height="23" Canvas.Left="108" TextWrapping="Wrap" Text="Insert here name" Width="142" Canvas.Top="10"/>
+                </Canvas>
             </TabItem>
             <TabItem Width="100">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="cheese.jpg" />
+                        <Image Height="24" />
                         <TextBlock FontSize="18" Text="Settings" Margin="2,0,0,0" VerticalAlignment="Center" Foreground="#FF3E3333" />
                     </StackPanel>
                 </TabItem.Header>
@@ -89,7 +93,7 @@
             <TabItem Width="100">
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
-                        <Image Height="24" Source="cheese.jpg" />
+                        <Image Height="24" />
                         <TextBlock FontSize="18" Text="About" Margin="2,0,0,0" VerticalAlignment="Center" Foreground="#FF3E3333" />
                     </StackPanel>
                 </TabItem.Header>
