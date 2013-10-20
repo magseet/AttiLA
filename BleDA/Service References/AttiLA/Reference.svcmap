@@ -26,7 +26,6 @@
     <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="bc754e96-6ddf-46f6-a48e-a8eab4e456c3" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
     <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="08bfe9a4-0b2a-4092-aba5-0d0b2177bdf8" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
     <MetadataFile FileName="AttiLA.LocalizationService.xsd" MetadataType="Schema" ID="c4612935-b660-4b98-a2cf-4b5fde25b54d" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
-    <MetadataFile FileName="System.xsd" MetadataType="Schema" ID="a87da48a-c5d9-4263-b39f-f4afc87db5da" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

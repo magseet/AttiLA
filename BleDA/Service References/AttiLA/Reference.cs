@@ -15,15 +15,18 @@ namespace BleDA.AttiLA {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="GlobalSettings", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ServiceStatus", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
     [System.SerializableAttribute()]
-    public partial class GlobalSettings : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class ServiceStatus : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private BleDA.AttiLA.TrackerSettings TrackingField;
+        private string ContextIdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private BleDA.AttiLA.ServiceStateCode ServiceStateField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -36,14 +39,198 @@ namespace BleDA.AttiLA {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public BleDA.AttiLA.TrackerSettings Tracking {
+        public string ContextId {
             get {
-                return this.TrackingField;
+                return this.ContextIdField;
             }
             set {
-                if ((object.ReferenceEquals(this.TrackingField, value) != true)) {
-                    this.TrackingField = value;
-                    this.RaisePropertyChanged("Tracking");
+                if ((object.ReferenceEquals(this.ContextIdField, value) != true)) {
+                    this.ContextIdField = value;
+                    this.RaisePropertyChanged("ContextId");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public BleDA.AttiLA.ServiceStateCode ServiceState {
+            get {
+                return this.ServiceStateField;
+            }
+            set {
+                if ((this.ServiceStateField.Equals(value) != true)) {
+                    this.ServiceStateField = value;
+                    this.RaisePropertyChanged("ServiceState");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ServiceStateCode", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    public enum ServiceStateCode : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Idle = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Notification = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Tracking = 2,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        Training = 3,
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="GlobalSettings", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    [System.SerializableAttribute()]
+    public partial class GlobalSettings : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private BleDA.AttiLA.LocalizerSettings LocalizerField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private uint NotificationThresholdField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private BleDA.AttiLA.TrackerSettings TrackerField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public BleDA.AttiLA.LocalizerSettings Localizer {
+            get {
+                return this.LocalizerField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.LocalizerField, value) != true)) {
+                    this.LocalizerField = value;
+                    this.RaisePropertyChanged("Localizer");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public uint NotificationThreshold {
+            get {
+                return this.NotificationThresholdField;
+            }
+            set {
+                if ((this.NotificationThresholdField.Equals(value) != true)) {
+                    this.NotificationThresholdField = value;
+                    this.RaisePropertyChanged("NotificationThreshold");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public BleDA.AttiLA.TrackerSettings Tracker {
+            get {
+                return this.TrackerField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.TrackerField, value) != true)) {
+                    this.TrackerField = value;
+                    this.RaisePropertyChanged("Tracker");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="LocalizerSettings", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    [System.SerializableAttribute()]
+    public partial class LocalizerSettings : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+        
+        [System.NonSerializedAttribute()]
+        private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private double IntervalField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private uint RetriesField;
+        
+        [System.Runtime.Serialization.OptionalFieldAttribute()]
+        private BleDA.AttiLA.SimilarityAlgorithmCode SimilarityAlgorithmField;
+        
+        [global::System.ComponentModel.BrowsableAttribute(false)]
+        public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
+            get {
+                return this.extensionDataField;
+            }
+            set {
+                this.extensionDataField = value;
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double Interval {
+            get {
+                return this.IntervalField;
+            }
+            set {
+                if ((this.IntervalField.Equals(value) != true)) {
+                    this.IntervalField = value;
+                    this.RaisePropertyChanged("Interval");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public uint Retries {
+            get {
+                return this.RetriesField;
+            }
+            set {
+                if ((this.RetriesField.Equals(value) != true)) {
+                    this.RetriesField = value;
+                    this.RaisePropertyChanged("Retries");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public BleDA.AttiLA.SimilarityAlgorithmCode SimilarityAlgorithm {
+            get {
+                return this.SimilarityAlgorithmField;
+            }
+            set {
+                if ((this.SimilarityAlgorithmField.Equals(value) != true)) {
+                    this.SimilarityAlgorithmField = value;
+                    this.RaisePropertyChanged("SimilarityAlgorithm");
                 }
             }
         }
@@ -68,13 +255,10 @@ namespace BleDA.AttiLA {
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double CaptureIntervalField;
+        private double IntervalField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private bool EnabledOnStartupField;
-        
-        [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double UpdateIntervalField;
+        private uint TrainingThresholdField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -87,40 +271,27 @@ namespace BleDA.AttiLA {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public double CaptureInterval {
+        public double Interval {
             get {
-                return this.CaptureIntervalField;
+                return this.IntervalField;
             }
             set {
-                if ((this.CaptureIntervalField.Equals(value) != true)) {
-                    this.CaptureIntervalField = value;
-                    this.RaisePropertyChanged("CaptureInterval");
+                if ((this.IntervalField.Equals(value) != true)) {
+                    this.IntervalField = value;
+                    this.RaisePropertyChanged("Interval");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool EnabledOnStartup {
+        public uint TrainingThreshold {
             get {
-                return this.EnabledOnStartupField;
+                return this.TrainingThresholdField;
             }
             set {
-                if ((this.EnabledOnStartupField.Equals(value) != true)) {
-                    this.EnabledOnStartupField = value;
-                    this.RaisePropertyChanged("EnabledOnStartup");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double UpdateInterval {
-            get {
-                return this.UpdateIntervalField;
-            }
-            set {
-                if ((this.UpdateIntervalField.Equals(value) != true)) {
-                    this.UpdateIntervalField = value;
-                    this.RaisePropertyChanged("UpdateInterval");
+                if ((this.TrainingThresholdField.Equals(value) != true)) {
+                    this.TrainingThresholdField = value;
+                    this.RaisePropertyChanged("TrainingThreshold");
                 }
             }
         }
@@ -133,6 +304,20 @@ namespace BleDA.AttiLA {
                 propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
+    }
+    
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="SimilarityAlgorithmCode", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    public enum SimilarityAlgorithmCode : int {
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        NaiveBayes = 0,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        RelativeErrorExtended = 1,
+        
+        [System.Runtime.Serialization.EnumMemberAttribute()]
+        RelativeError = 2,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -182,9 +367,9 @@ namespace BleDA.AttiLA {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="ContextSimilarity", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="ContextPreference", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
     [System.SerializableAttribute()]
-    public partial class ContextSimilarity : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
+    public partial class ContextPreference : object, System.Runtime.Serialization.IExtensibleDataObject, System.ComponentModel.INotifyPropertyChanged {
         
         [System.NonSerializedAttribute()]
         private System.Runtime.Serialization.ExtensionDataObject extensionDataField;
@@ -193,7 +378,7 @@ namespace BleDA.AttiLA {
         private string ContextIdField;
         
         [System.Runtime.Serialization.OptionalFieldAttribute()]
-        private double SimilarityField;
+        private double ValueField;
         
         [global::System.ComponentModel.BrowsableAttribute(false)]
         public System.Runtime.Serialization.ExtensionDataObject ExtensionData {
@@ -219,14 +404,14 @@ namespace BleDA.AttiLA {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public double Similarity {
+        public double Value {
             get {
-                return this.SimilarityField;
+                return this.ValueField;
             }
             set {
-                if ((this.SimilarityField.Equals(value) != true)) {
-                    this.SimilarityField = value;
-                    this.RaisePropertyChanged("Similarity");
+                if ((this.ValueField.Equals(value) != true)) {
+                    this.ValueField = value;
+                    this.RaisePropertyChanged("Value");
                 }
             }
         }
@@ -257,6 +442,12 @@ namespace BleDA.AttiLA {
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Unsubscribe", ReplyAction="http://tempuri.org/ILocalizationService/UnsubscribeResponse")]
         System.Threading.Tasks.Task<bool> UnsubscribeAsync();
         
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetServiceStatus", ReplyAction="http://tempuri.org/ILocalizationService/GetServiceStatusResponse")]
+        BleDA.AttiLA.ServiceStatus GetServiceStatus();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetServiceStatus", ReplyAction="http://tempuri.org/ILocalizationService/GetServiceStatusResponse")]
+        System.Threading.Tasks.Task<BleDA.AttiLA.ServiceStatus> GetServiceStatusAsync();
+        
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetGlobalSettings", ReplyAction="http://tempuri.org/ILocalizationService/GetGlobalSettingsResponse")]
         BleDA.AttiLA.GlobalSettings GetGlobalSettings();
         
@@ -265,86 +456,48 @@ namespace BleDA.AttiLA {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/SetGlobalSettings", ReplyAction="http://tempuri.org/ILocalizationService/SetGlobalSettingsResponse")]
         [System.ServiceModel.FaultContractAttribute(typeof(BleDA.AttiLA.ServiceException), Action="http://tempuri.org/ILocalizationService/SetGlobalSettingsServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
-        void SetGlobalSettings(BleDA.AttiLA.GlobalSettings newSettings);
+        bool SetGlobalSettings(BleDA.AttiLA.GlobalSettings newSettings);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/SetGlobalSettings", ReplyAction="http://tempuri.org/ILocalizationService/SetGlobalSettingsResponse")]
-        System.Threading.Tasks.Task SetGlobalSettingsAsync(BleDA.AttiLA.GlobalSettings newSettings);
+        System.Threading.Tasks.Task<bool> SetGlobalSettingsAsync(BleDA.AttiLA.GlobalSettings newSettings);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/ChangeContext", ReplyAction="http://tempuri.org/ILocalizationService/ChangeContextResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(BleDA.AttiLA.ServiceException), Action="http://tempuri.org/ILocalizationService/ChangeContextServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
-        [System.ServiceModel.FaultContractAttribute(typeof(System.ArgumentException), Action="http://tempuri.org/ILocalizationService/ChangeContextArgumentExceptionFault", Name="ArgumentException", Namespace="http://schemas.datacontract.org/2004/07/System")]
-        void ChangeContext(string newContextId);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetCloserContexts", ReplyAction="http://tempuri.org/ILocalizationService/GetCloserContextsResponse")]
+        BleDA.AttiLA.ContextPreference[] GetCloserContexts();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/ChangeContext", ReplyAction="http://tempuri.org/ILocalizationService/ChangeContextResponse")]
-        System.Threading.Tasks.Task ChangeContextAsync(string newContextId);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/GetCloserContexts", ReplyAction="http://tempuri.org/ILocalizationService/GetCloserContextsResponse")]
+        System.Threading.Tasks.Task<BleDA.AttiLA.ContextPreference[]> GetCloserContextsAsync();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Localize", ReplyAction="http://tempuri.org/ILocalizationService/LocalizeResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(BleDA.AttiLA.ServiceException), Action="http://tempuri.org/ILocalizationService/LocalizeServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
-        BleDA.AttiLA.LocalizeResponse Localize(BleDA.AttiLA.LocalizeRequest request);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStartResponse")]
+        [System.ServiceModel.FaultContractAttribute(typeof(BleDA.AttiLA.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackingStartServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
+        bool TrackingStart(string contextId);
         
-        // CODEGEN: Generating message contract since the operation has multiple return values.
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Localize", ReplyAction="http://tempuri.org/ILocalizationService/LocalizeResponse")]
-        System.Threading.Tasks.Task<BleDA.AttiLA.LocalizeResponse> LocalizeAsync(BleDA.AttiLA.LocalizeRequest request);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStartResponse")]
+        System.Threading.Tasks.Task<bool> TrackingStartAsync(string contextId);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStartResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(BleDA.AttiLA.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackModeStartServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
-        void TrackModeStart();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStopResponse")]
+        bool TrackingStop();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStart", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStartResponse")]
-        System.Threading.Tasks.Task TrackModeStartAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackingStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackingStopResponse")]
+        System.Threading.Tasks.Task<bool> TrackingStopAsync();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStopResponse")]
-        [System.ServiceModel.FaultContractAttribute(typeof(BleDA.AttiLA.ServiceException), Action="http://tempuri.org/ILocalizationService/TrackModeStopServiceExceptionFault", Name="ServiceException", Namespace="http://schemas.datacontract.org/2004/07/AttiLA.LocalizationService")]
-        void TrackModeStop();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Silence", ReplyAction="http://tempuri.org/ILocalizationService/SilenceResponse")]
+        void Silence();
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/TrackModeStop", ReplyAction="http://tempuri.org/ILocalizationService/TrackModeStopResponse")]
-        System.Threading.Tasks.Task TrackModeStopAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ILocalizationService/Silence", ReplyAction="http://tempuri.org/ILocalizationService/SilenceResponse")]
+        System.Threading.Tasks.Task SilenceAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public interface ILocalizationServiceCallback {
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStarted")]
-        void TrackModeStarted(System.DateTime startTime);
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportLocalizationProgress")]
+        void ReportLocalizationProgress(double progress);
         
-        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/TrackModeStopped")]
-        void TrackModeStopped(System.DateTime stopTime);
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="Localize", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class LocalizeRequest {
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportPrediction")]
+        void ReportPrediction(string contextId);
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public bool changeContext;
-        
-        public LocalizeRequest() {
-        }
-        
-        public LocalizeRequest(bool changeContext) {
-            this.changeContext = changeContext;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.MessageContractAttribute(WrapperName="LocalizeResponse", WrapperNamespace="http://tempuri.org/", IsWrapped=true)]
-    public partial class LocalizeResponse {
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=0)]
-        public string LocalizeResult;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://tempuri.org/", Order=1)]
-        public BleDA.AttiLA.ContextSimilarity[] similarContexts;
-        
-        public LocalizeResponse() {
-        }
-        
-        public LocalizeResponse(string LocalizeResult, BleDA.AttiLA.ContextSimilarity[] similarContexts) {
-            this.LocalizeResult = LocalizeResult;
-            this.similarContexts = similarContexts;
-        }
+        [System.ServiceModel.OperationContractAttribute(IsOneWay=true, Action="http://tempuri.org/ILocalizationService/ReportServiceStatus")]
+        void ReportServiceStatus(BleDA.AttiLA.ServiceStatus serviceStatus);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -391,6 +544,14 @@ namespace BleDA.AttiLA {
             return base.Channel.UnsubscribeAsync();
         }
         
+        public BleDA.AttiLA.ServiceStatus GetServiceStatus() {
+            return base.Channel.GetServiceStatus();
+        }
+        
+        public System.Threading.Tasks.Task<BleDA.AttiLA.ServiceStatus> GetServiceStatusAsync() {
+            return base.Channel.GetServiceStatusAsync();
+        }
+        
         public BleDA.AttiLA.GlobalSettings GetGlobalSettings() {
             return base.Channel.GetGlobalSettings();
         }
@@ -399,53 +560,44 @@ namespace BleDA.AttiLA {
             return base.Channel.GetGlobalSettingsAsync();
         }
         
-        public void SetGlobalSettings(BleDA.AttiLA.GlobalSettings newSettings) {
-            base.Channel.SetGlobalSettings(newSettings);
+        public bool SetGlobalSettings(BleDA.AttiLA.GlobalSettings newSettings) {
+            return base.Channel.SetGlobalSettings(newSettings);
         }
         
-        public System.Threading.Tasks.Task SetGlobalSettingsAsync(BleDA.AttiLA.GlobalSettings newSettings) {
+        public System.Threading.Tasks.Task<bool> SetGlobalSettingsAsync(BleDA.AttiLA.GlobalSettings newSettings) {
             return base.Channel.SetGlobalSettingsAsync(newSettings);
         }
         
-        public void ChangeContext(string newContextId) {
-            base.Channel.ChangeContext(newContextId);
+        public BleDA.AttiLA.ContextPreference[] GetCloserContexts() {
+            return base.Channel.GetCloserContexts();
         }
         
-        public System.Threading.Tasks.Task ChangeContextAsync(string newContextId) {
-            return base.Channel.ChangeContextAsync(newContextId);
+        public System.Threading.Tasks.Task<BleDA.AttiLA.ContextPreference[]> GetCloserContextsAsync() {
+            return base.Channel.GetCloserContextsAsync();
         }
         
-        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-        BleDA.AttiLA.LocalizeResponse BleDA.AttiLA.ILocalizationService.Localize(BleDA.AttiLA.LocalizeRequest request) {
-            return base.Channel.Localize(request);
+        public bool TrackingStart(string contextId) {
+            return base.Channel.TrackingStart(contextId);
         }
         
-        public string Localize(bool changeContext, out BleDA.AttiLA.ContextSimilarity[] similarContexts) {
-            BleDA.AttiLA.LocalizeRequest inValue = new BleDA.AttiLA.LocalizeRequest();
-            inValue.changeContext = changeContext;
-            BleDA.AttiLA.LocalizeResponse retVal = ((BleDA.AttiLA.ILocalizationService)(this)).Localize(inValue);
-            similarContexts = retVal.similarContexts;
-            return retVal.LocalizeResult;
+        public System.Threading.Tasks.Task<bool> TrackingStartAsync(string contextId) {
+            return base.Channel.TrackingStartAsync(contextId);
         }
         
-        public System.Threading.Tasks.Task<BleDA.AttiLA.LocalizeResponse> LocalizeAsync(BleDA.AttiLA.LocalizeRequest request) {
-            return base.Channel.LocalizeAsync(request);
+        public bool TrackingStop() {
+            return base.Channel.TrackingStop();
         }
         
-        public void TrackModeStart() {
-            base.Channel.TrackModeStart();
+        public System.Threading.Tasks.Task<bool> TrackingStopAsync() {
+            return base.Channel.TrackingStopAsync();
         }
         
-        public System.Threading.Tasks.Task TrackModeStartAsync() {
-            return base.Channel.TrackModeStartAsync();
+        public void Silence() {
+            base.Channel.Silence();
         }
         
-        public void TrackModeStop() {
-            base.Channel.TrackModeStop();
-        }
-        
-        public System.Threading.Tasks.Task TrackModeStopAsync() {
-            return base.Channel.TrackModeStopAsync();
+        public System.Threading.Tasks.Task SilenceAsync() {
+            return base.Channel.SilenceAsync();
         }
     }
 }
