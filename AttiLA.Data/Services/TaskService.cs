@@ -154,6 +154,33 @@ namespace AttiLA.Data.Services
 
         public override void Update(Task entity)
         {
+            if (entity == null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+
+            WriteConcernResult updateResult;
+            try
+            {
+                updateResult = this.MongoConnectionHandler.MongoCollection.Update(
+                    Query<Task>.EQ(t => t.Id, entity.Id),
+                    Update<Task>
+                        .Set(t => t.Actions, entity.Actions)
+                        .Set(t => t.TaskName, entity.TaskName),
+                    new MongoUpdateOptions
+                    {
+                        WriteConcern = WriteConcern.Acknowledged
+                    });
+            }
+            catch (MongoException ex)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorUpdate + entity.Id.ToString(), ex);
+            }
+
+            if (updateResult.DocumentsAffected == 0)
+            {
+                throw new DatabaseException(Properties.Resources.MsgErrorUpdate + entity.Id.ToString());
+            }
         } 
 
 

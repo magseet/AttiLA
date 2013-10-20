@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="Entities\Action.cs" />
     <Compile Include="Entities\ClosingAction.cs" />
+    <Compile Include="Entities\NetworkInterface.cs" />
     <Compile Include="Entities\NotificationAction.cs" />
     <Compile Include="Entities\FeatureKey.cs" />
     <Compile Include="Entities\FeatureValue.cs" />

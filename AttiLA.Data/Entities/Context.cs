@@ -8,11 +8,6 @@ namespace AttiLA.Data.Entities
     [BsonIgnoreExtraElements]
     public class Context : MongoEntity
     {
-        public Context()
-        {
-            Statistics = new List<ContextStatistics>();   
-        }
-
         /// <summary>
         /// The name assigned by the user to the scenario.
         /// </summary>
@@ -24,8 +19,19 @@ namespace AttiLA.Data.Entities
         public DateTime CreationDateTime { get; set; }
 
         /// <summary>
+        /// Actions on network interfaces.
+        /// </summary>
+        public List<NetworkInterface> NetworkInterfaces { get; set; }
+
+        /// <summary>
         /// Statistics about scenario usage periods.
         /// </summary>
         public List<ContextStatistics> Statistics { get; set; }
+
+        public Context()
+        {
+            Statistics = new List<ContextStatistics>();
+            NetworkInterfaces = new List<NetworkInterface>();
+        }
     }
 }

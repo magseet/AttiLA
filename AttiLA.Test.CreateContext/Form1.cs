@@ -34,7 +34,7 @@ namespace AttiLA.Test.CreateContext
         {
             InitializeComponent();
             _contextService = new ContextService();
-            //prova();
+            prova();
         }
 
        
@@ -45,6 +45,8 @@ namespace AttiLA.Test.CreateContext
             WlanClient client = new WlanClient();
             foreach(var wlanIface in client.Interfaces)
             {
+                //var networks = wlanIface.GetAvailableNetworkList()
+
                 //wlanIface.Connect(Wlan.WlanConnectionMode.Auto,Wlan.Dot11BssType.Any)
                 var profiles = wlanIface.GetProfiles();
                 foreach(var profile in profiles)
