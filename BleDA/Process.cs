@@ -9,26 +9,20 @@ namespace BleDA
     public enum State
     {
         Idle,
-        WaitForUser,
-        WaitFirstPrediction,
-        WaitNotifications,
-        WaitForUser2,
+        WaitForSelection,
+        WaitForCorrectPrediction,   
+        WaitForWrongPrediction,
+        WaitForConfirmation,
         Tracking,
         Unknown
     }
 
-    public class ProcessState
-    {
-        public State Name { get; set; }
-
-        public String Expected { get; set; }
-    }
-
     public enum Command
     {
-        UserSignal,
-        Right,
-        Wrong,
+        Selection,
+        Confirmation,
+        CorrectPrediction,
+        WrongPrediction,
         None
     }
 
@@ -36,12 +30,12 @@ namespace BleDA
     {
         class StateTransition
         {
-            readonly ProcessState CurrentState;
+            readonly State CurrentState;
             readonly Command Command;
 
-            public StateTransition(ProcessState currentState, Command command)
+            public StateTransition(State currentState, Command command)
             {
-                CurrentState = new ProcessState() { Name = currentState.Name, Expected = currentState.Expected };
+                CurrentState = State.Idle;
                 Command = command;
             }
 
@@ -59,38 +53,50 @@ namespace BleDA
             }
         }
 
-        Dictionary<StateTransition, ProcessState> transitions;
-        public ProcessState CurrentState { get; private set; }
+        Dictionary<StateTransition, State> transitions;
+        public State CurrentState { get; private set; }
 
         public Process()
         {
-            CurrentState = new ProcessState { Name = State.Idle, Expected = null };
-            transitions = new Dictionary<StateTransition, ProcessState>
+            //States under timer : WaitForPrediction, Tracking
+            CurrentState = State.Idle;
+            transitions = new Dictionary<StateTransition, State>
             {
-                { new StateTransition(new ProcessState { Name = State.WaitForUser, Expected = null  }, Command.None), new ProcessState { Name = State.WaitForUser, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.WaitForUser, Expected = null  }, Command.UserSignal), new ProcessState { Name = State.WaitFirstPrediction, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.WaitFirstPrediction, Expected = null  }, Command.Right), new ProcessState { Name = State.WaitNotifications, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.WaitFirstPrediction, Expected = null  }, Command.None), new ProcessState { Name = State.WaitForUser, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.WaitNotifications, Expected = null  }, Command.Wrong), new ProcessState { Name = State.WaitForUser2, Expected = null }},                
-                { new StateTransition(new ProcessState { Name = State.WaitNotifications, Expected = null  }, Command.None), new ProcessState { Name = State.WaitFirstPrediction, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.WaitForUser2, Expected = null  }, Command.Wrong), new ProcessState { Name = State.Tracking, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.WaitForUser2, Expected = null  }, Command.None), new ProcessState { Name = State.WaitFirstPrediction, Expected = null }},
-                { new StateTransition(new ProcessState { Name = State.Tracking, Expected = null  }, Command.None), new ProcessState { Name = State.WaitNotifications, Expected = null }}
+                { new StateTransition(State.Idle, Command.Selection), State.WaitForSelection },
+                { new StateTransition(State.Idle, Command.Confirmation), State.WaitForConfirmation },
+                { new StateTransition(State.WaitForSelection, Command.Selection), State.WaitForCorrectPrediction },
+                { new StateTransition(State.WaitForSelection, Command.CorrectPrediction),State.WaitForWrongPrediction },
+                { new StateTransition(State.WaitForCorrectPrediction, Command.CorrectPrediction), State.WaitForWrongPrediction },
+                { new StateTransition(State.WaitForCorrectPrediction, Command.None),State.WaitForSelection }, //Caso sfigato
+                { new StateTransition(State.WaitForWrongPrediction,Command.WrongPrediction), State.WaitForConfirmation },                
+                { new StateTransition(State.WaitForWrongPrediction,Command.Selection), State.WaitForCorrectPrediction },
+                { new StateTransition(State.WaitForConfirmation,  Command.Confirmation), State.Tracking  },
+                { new StateTransition(State.WaitForConfirmation,  Command.Selection), State.WaitForCorrectPrediction  },
+                { new StateTransition(State.WaitForConfirmation,  Command.Selection), State.WaitForWrongPrediction  },
+                { new StateTransition(State.Tracking, Command.None), State.WaitForWrongPrediction },
+                { new StateTransition(State.Tracking, Command.Selection), State.WaitForCorrectPrediction },
+                { new StateTransition(State.Tracking,  Command.CorrectPrediction), State.WaitForWrongPrediction  }
+
             };
         }
 
-        public ProcessState GetNext(Command command)
+        public State GetNext(Command command)
         {
             StateTransition transition = new StateTransition(CurrentState, command);
-            ProcessState nextState;
+            State nextState;
             if (!transitions.TryGetValue(transition, out nextState))
-                throw new Exception("Invalid transition: " + CurrentState + " -> " + command);
+                return null;
+
             return nextState;
         }
 
-        public ProcessState MoveNext(Command command)
+        public State MoveNext(Command command)
         {
-            CurrentState = GetNext(command);
+            State nextState = GetNext(command);
+            if(nextState == null)
+                return null;
+
+            CurrentState = nextState;
             return CurrentState;
         }
     }

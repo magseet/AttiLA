@@ -23,44 +23,108 @@ namespace BleDA
     /// </summary>
     public partial class MainWindow : Window, ILocalizationServiceCallback
     {
+        Status s = new Status();
+        private object lockStatus = new object();
+        private System.Timers.Timer timer;
+        LocalizationServiceClient _serviceClient;
+
+
         public MainWindow()
         {
             InitializeComponent();
 
-            //Modificare
-            Thread StateMachine = new Thread(Start);
-            StateMachine.Start();
+            var context = new InstanceContext(this);
+            _serviceClient = new LocalizationServiceClient(context);
+            _serviceClient.Subscribe();
+            EnterState(s.Process.CurrentState); // state machine reset
+
         }
 
-        private void Start()
+        public void EnterState(State state)
         {
-            var context = new InstanceContext(this);
-            LocalizationServiceClient _serviceClient = new LocalizationServiceClient(context);
-            _serviceClient.Subscribe();
+            lock (lockStatus)
+            {
+                switch (s.Process.CurrentState)
+                {
+                    case State.Idle:
+                        //ToDO: Load last context and CurrentState = WaitForSelection
+                        s.ServiceStatus = _serviceClient.GetServiceStatus();
+                        if (s.ServiceStatus.ContextId == null)
+                        {
+                            var nextState = s.Process.MoveNext(Command.Selection);
 
-            Process p = new Process();
+                            if (nextState == null)
+                                break;
 
-            switch(p.CurrentState.Name){
-                case State.Idle:
-                    //ToDO: Load last context and CurrentState = WaitForUser
+                            EnterState(nextState);
+                            
+                        }
+                        else
+                        {
+                            
+                            var nextState = s.Process.MoveNext(Command.Confirmation);
+
+                            if (nextState == null)
+                                break;
+                            
+                            // Notifica "Attila è attivo"
+                            EnterState(nextState);
+                        }
+                        break;
+
+                    case State.WaitForSelection:
+                        _serviceClient.Silence();   //Non fa notificare
+                        break;
+
+                    case State.WaitForCorrectPrediction:
+                        // ToDO: Start TimeOut (in), tracking start (in), quando clicco sulla messagebox
+                        // della selezione utente (tasto track), disabilito il timer e confrontro tra contextId
+                        // e selectedContextId e lo salvo nello Status s
+                        timer.Elapsed += timer_Elapsed;
+                        _serviceClient.TrackingStartAsync(s.CurrentContextId);
+                        break;
+
+                    case State.WaitForWrongPrediction:
+                        //ToDO: 
+                        break;
+                    case State.WaitForConfirmation:
+                        //ToDO: 
+                        break;
+                    case State.Tracking:
+                        //ToDO: 
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+
+        void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            State nextState;
+            //Determino da dove sono scattato
+            switch (s.Process.CurrentState)
+            {
+                case State.WaitForCorrectPrediction:
+                    nextState = s.Process.MoveNext(Command.None);
+
+                    if (nextState == null)
+                                break;
+                    //Notificare che "Attila non risponde"
+                    EnterState(nextState);
                     break;
-                case State.WaitForUser:
-                    //ToDO: CurrentState = WaitFirstPredication
-                    break;
-                case State.WaitFirstPrediction:
-                    //ToDO: Start TimeOut (in), tracking start (in), check matching 
-                    //      between selectede context and predicted context
-                    break;
-                case State.WaitNotifications:
-                    //ToDO: 
-                    break;
-                case State.WaitForUser2:
-                    //ToDO: 
-                    break;
+
                 case State.Tracking:
-                    //ToDO: 
+                    nextState = s.Process.MoveNext(Command.None);
+                    if (nextState == null)
+                                break;
+                    // Ho finito la sessione di Tracking e notifico che sono sicuro di essere in quel context.
+                    EnterState(nextState);
                     break;
+
                 default:
+                    // Non dovrebbe mai accadere!
                     break;
             }
         }
