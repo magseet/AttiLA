@@ -28,17 +28,35 @@ namespace BleDA
         private System.Timers.Timer timer;
         LocalizationServiceClient _serviceClient;
 
-
         public MainWindow()
         {
             InitializeComponent();
 
-            var context = new InstanceContext(this);
-            _serviceClient = new LocalizationServiceClient(context);
-            _serviceClient.Subscribe();
-            EnterState(s.Process.CurrentState); // state machine reset
-
+            //var context = new InstanceContext(this);
+            //_serviceClient = new LocalizationServiceClient(context);
+            //_serviceClient.Subscribe();
+            //EnterState(s.Process.CurrentState); // state machine reset
+            //Switcher.pageSwitcher = this;
+            //Switcher.Switch(new Starting());
         }
+
+        public void Navigate(UserControl nextPage)
+        {
+            this.Content = nextPage;
+        }
+
+        public void Navigate(UserControl nextPage, object state)
+        {
+            this.Content = nextPage;
+            ISwitchable s = nextPage as ISwitchable;
+
+            if (s != null)
+                s.UtilizeState(state);
+            else
+                throw new ArgumentException("NextPage is not ISwitchable! "
+                  + nextPage.Name.ToString());
+        }
+
 
         public void EnterState(State state)
         {
@@ -53,7 +71,7 @@ namespace BleDA
                         {
                             var nextState = s.Process.MoveNext(Command.Selection);
 
-                            if (nextState == null)
+                            if (nextState == State.Ignore)
                                 break;
 
                             EnterState(nextState);
@@ -64,7 +82,7 @@ namespace BleDA
                             
                             var nextState = s.Process.MoveNext(Command.Confirmation);
 
-                            if (nextState == null)
+                            if (nextState == State.Ignore)
                                 break;
                             
                             // Notifica "Attila è attivo"
@@ -109,7 +127,7 @@ namespace BleDA
                 case State.WaitForCorrectPrediction:
                     nextState = s.Process.MoveNext(Command.None);
 
-                    if (nextState == null)
+                    if (nextState == State.Ignore)
                                 break;
                     //Notificare che "Attila non risponde"
                     EnterState(nextState);
@@ -117,7 +135,7 @@ namespace BleDA
 
                 case State.Tracking:
                     nextState = s.Process.MoveNext(Command.None);
-                    if (nextState == null)
+                    if (nextState == State.Ignore)
                                 break;
                     // Ho finito la sessione di Tracking e notifico che sono sicuro di essere in quel context.
                     EnterState(nextState);
