@@ -14,7 +14,8 @@ namespace BleDA
         WaitForWrongPrediction,
         WaitForConfirmation,
         Tracking,
-        Unknown
+        Unknown,
+        Ignore
     }
 
     public enum Command
@@ -35,7 +36,7 @@ namespace BleDA
 
             public StateTransition(State currentState, Command command)
             {
-                CurrentState = State.Idle;
+                CurrentState = currentState;
                 Command = command;
             }
 
@@ -65,16 +66,16 @@ namespace BleDA
                 { new StateTransition(State.Idle, Command.Selection), State.WaitForSelection },
                 { new StateTransition(State.Idle, Command.Confirmation), State.WaitForConfirmation },
                 { new StateTransition(State.WaitForSelection, Command.Selection), State.WaitForCorrectPrediction },
-                { new StateTransition(State.WaitForSelection, Command.CorrectPrediction),State.WaitForWrongPrediction },
-                { new StateTransition(State.WaitForCorrectPrediction, Command.CorrectPrediction), State.WaitForWrongPrediction },
-                { new StateTransition(State.WaitForCorrectPrediction, Command.None),State.WaitForSelection }, //Caso sfigato
-                { new StateTransition(State.WaitForWrongPrediction,Command.WrongPrediction), State.WaitForConfirmation },                
-                { new StateTransition(State.WaitForWrongPrediction,Command.Selection), State.WaitForCorrectPrediction },
-                { new StateTransition(State.WaitForConfirmation,  Command.Confirmation), State.Tracking  },
-                { new StateTransition(State.WaitForConfirmation,  Command.Selection), State.WaitForCorrectPrediction  },
-                { new StateTransition(State.WaitForConfirmation,  Command.Selection), State.WaitForWrongPrediction  },
-                { new StateTransition(State.Tracking, Command.None), State.WaitForWrongPrediction },
-                { new StateTransition(State.Tracking, Command.Selection), State.WaitForCorrectPrediction },
+                { new StateTransition(State.WaitForSelection, Command.CorrectPrediction), State.WaitForWrongPrediction },
+                //{ new StateTransition(State.WaitForCorrectPrediction, Command.CorrectPrediction), State.WaitForWrongPrediction },
+                //{ new StateTransition(State.WaitForCorrectPrediction, Command.None),State.WaitForSelection }, //Caso sfigato
+                //{ new StateTransition(State.WaitForWrongPrediction,Command.WrongPrediction), State.WaitForConfirmation },                
+                //{ new StateTransition(State.WaitForWrongPrediction,Command.Selection), State.WaitForCorrectPrediction },
+                //{ new StateTransition(State.WaitForConfirmation,  Command.Confirmation), State.Tracking  },
+                //{ new StateTransition(State.WaitForConfirmation,  Command.Selection), State.WaitForCorrectPrediction  },
+                //{ new StateTransition(State.WaitForConfirmation,  Command.Selection), State.WaitForWrongPrediction  },
+                //{ new StateTransition(State.Tracking, Command.None), State.WaitForWrongPrediction },
+                //{ new StateTransition(State.Tracking, Command.Selection), State.WaitForCorrectPrediction },
                 { new StateTransition(State.Tracking,  Command.CorrectPrediction), State.WaitForWrongPrediction  }
 
             };
@@ -85,7 +86,7 @@ namespace BleDA
             StateTransition transition = new StateTransition(CurrentState, command);
             State nextState;
             if (!transitions.TryGetValue(transition, out nextState))
-                return null;
+                return State.Ignore;
 
             return nextState;
         }
@@ -94,7 +95,7 @@ namespace BleDA
         {
             State nextState = GetNext(command);
             if(nextState == null)
-                return null;
+                return State.Ignore;
 
             CurrentState = nextState;
             return CurrentState;
