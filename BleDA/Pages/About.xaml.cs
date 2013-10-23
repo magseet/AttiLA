@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace BleDA
 {
     /// <summary>
-    /// Interaction logic for Context.xaml
+    /// Interaction logic for About.xaml
     /// </summary>
-    public partial class Context : UserControl, ISwitchable
+    public partial class About : UserControl, ISwitchable
     {
-        public Context()
+        public About()
         {
             InitializeComponent();
         }
@@ -30,28 +30,10 @@ namespace BleDA
             throw new NotImplementedException();
         }
 
-        private void btnCreateContext_Click(object sender, RoutedEventArgs e)
-        {
-            if(txtContextName.Text != ""){
-                Status.BleDAStatus.CurrentContextId = txtContextName.Text;
-
-                Switcher.Switch(new Starting());
-                /*try
-                {
-                    _contextService.Create(c);
-                }
-                catch (DatabaseException)
-                {
-                    MessageBox.Show("Already exists.");
-                    return;
-                }*/               
-            }
-        }
-
         private void Back_Click(object sender, RoutedEventArgs e)
         {
+            // ToDO: to change returnUrl
             Switcher.Switch(new Starting());
         }
-
     }
 }

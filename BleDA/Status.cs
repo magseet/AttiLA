@@ -7,14 +7,32 @@ using BleDA.AttiLA;
 
 namespace BleDA
 {
-    public class Status
+    public sealed class Status
     {
+        private static volatile Status _instance;
+        private static object syncRoot = new Object();
 
-        public Status()
-        {
+        private Status() {
             CurrentContextId = "";
             ServiceStatus = null;
             Process = new Process();
+        }
+
+        public static Status BleDAStatus
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    lock (syncRoot)
+                    {
+                        if (_instance == null)
+                            _instance = new Status();
+                    }
+                }
+
+                return _instance;
+            }
         }
 
         public String CurrentContextId { get; set; }

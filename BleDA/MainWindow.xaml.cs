@@ -21,23 +21,14 @@ namespace BleDA
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, ILocalizationServiceCallback
+    public partial class MainWindow : Window
     {
-        Status s = new Status();
-        private object lockStatus = new object();
-        private System.Timers.Timer timer;
-        LocalizationServiceClient _serviceClient;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            //var context = new InstanceContext(this);
-            //_serviceClient = new LocalizationServiceClient(context);
-            //_serviceClient.Subscribe();
-            //EnterState(s.Process.CurrentState); // state machine reset
-            //Switcher.pageSwitcher = this;
-            //Switcher.Switch(new Starting());
+            Switcher.pageSwitcher = this;
+            Switcher.Switch(new Starting());
         }
 
         public void Navigate(UserControl nextPage)
@@ -55,113 +46,6 @@ namespace BleDA
             else
                 throw new ArgumentException("NextPage is not ISwitchable! "
                   + nextPage.Name.ToString());
-        }
-
-
-        public void EnterState(State state)
-        {
-            lock (lockStatus)
-            {
-                switch (s.Process.CurrentState)
-                {
-                    case State.Idle:
-                        //ToDO: Load last context and CurrentState = WaitForSelection
-                        s.ServiceStatus = _serviceClient.GetServiceStatus();
-                        if (s.ServiceStatus.ContextId == null)
-                        {
-                            var nextState = s.Process.MoveNext(Command.Selection);
-
-                            if (nextState == State.Ignore)
-                                break;
-
-                            EnterState(nextState);
-                            
-                        }
-                        else
-                        {
-                            
-                            var nextState = s.Process.MoveNext(Command.Confirmation);
-
-                            if (nextState == State.Ignore)
-                                break;
-                            
-                            // Notifica "Attila è attivo"
-                            EnterState(nextState);
-                        }
-                        break;
-
-                    case State.WaitForSelection:
-                        _serviceClient.Silence();   //Non fa notificare
-                        break;
-
-                    case State.WaitForCorrectPrediction:
-                        // ToDO: Start TimeOut (in), tracking start (in), quando clicco sulla messagebox
-                        // della selezione utente (tasto track), disabilito il timer e confrontro tra contextId
-                        // e selectedContextId e lo salvo nello Status s
-                        timer.Elapsed += timer_Elapsed;
-                        _serviceClient.TrackingStartAsync(s.CurrentContextId);
-                        break;
-
-                    case State.WaitForWrongPrediction:
-                        //ToDO: 
-                        break;
-                    case State.WaitForConfirmation:
-                        //ToDO: 
-                        break;
-                    case State.Tracking:
-                        //ToDO: 
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-        }
-
-        void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-            State nextState;
-            //Determino da dove sono scattato
-            switch (s.Process.CurrentState)
-            {
-                case State.WaitForCorrectPrediction:
-                    nextState = s.Process.MoveNext(Command.None);
-
-                    if (nextState == State.Ignore)
-                                break;
-                    //Notificare che "Attila non risponde"
-                    EnterState(nextState);
-                    break;
-
-                case State.Tracking:
-                    nextState = s.Process.MoveNext(Command.None);
-                    if (nextState == State.Ignore)
-                                break;
-                    // Ho finito la sessione di Tracking e notifico che sono sicuro di essere in quel context.
-                    EnterState(nextState);
-                    break;
-
-                default:
-                    // Non dovrebbe mai accadere!
-                    break;
-            }
-        }
-
-        public void ReportLocalizationProgress(double progress)
-        {
-            return;
-        }
-
-        public void ReportPrediction(string contextId)
-        {
-            //Transizione del processo, spia
-            return;
-        }
-
-        public void ReportServiceStatus(ServiceStatus serviceStatus)
-        {
-            //Aggiornare stato di attila sotto lock!
-            return;
         }
     }
 }
