@@ -22,7 +22,7 @@ namespace AttiLA.LocalizationService
         /// <summary>
         /// Notification callback informing about predicted context.
         /// </summary>
-        /// <param name="contextId">The predicted context id.</param>
+        /// <param name="contextId">The predicted context id or null.</param>
         [OperationContract(IsOneWay = true)]
         void ReportPrediction(string contextId);
 

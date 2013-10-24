@@ -18,7 +18,19 @@ namespace BleDA
         /// <summary>
         /// The localization service is running on a context.
         /// </summary>
-        PreviousContextFound
+        PreviousContextFound,
+        /// <summary>
+        /// The selected context is different than previous one.
+        /// </summary>
+        NewContextSelected,
+        /// <summary>
+        /// The service has been silenced due to difficulties in localizing.
+        /// </summary>
+        TrackingSessionFailed,
+        /// <summary>
+        /// The service has correctly terminated a tracking session.
+        /// </summary>
+        TrackingSessionSucceded
     }
 
     /// <summary>
@@ -51,6 +63,35 @@ namespace BleDA
         public UserInteractionCode Code { get; set; }
 
     }
+
+    #endregion
+
+    #region Exception
+
+    public enum StatusExceptionCode
+    {
+        /// <summary>
+        /// The service did not respond as expected
+        /// </summary>
+        ServiceFailure
+    }
+
+    /// <summary>
+    /// Information about a system operation failure.
+    /// </summary>
+    public class StatusException : Exception
+    {
+        /// <summary>
+        /// The service exception code.
+        /// </summary>
+        public StatusExceptionCode Code { get; set; }
+
+        /// <summary>
+        /// Message explaining the failure.
+        /// </summary>
+        public string Message { get; set; }
+    }
+
     #endregion
 
     public sealed class Status : ILocalizationServiceCallback
@@ -69,8 +110,6 @@ namespace BleDA
         public event UserInteractionEventHandler UserInteraction;
         #endregion
 
-
-
         private Status()
         {
             CurrentContextId = "";
@@ -84,30 +123,43 @@ namespace BleDA
 
         void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            State nextState;
-            //Determino da dove sono scattato
-            switch (_process.CurrentState)
+            _timer.Stop();
+
+            State nextState = State.Unknown, leavingState = _process.CurrentState;
+            UserInteractionEventArgs args;
+            Thread notificationThread;
+
+            lock (lockStatus)
             {
-                case State.WaitForCorrectPrediction:
-                    nextState = _process.MoveNext(Command.None);
+                switch (leavingState)
+                {
+                    case State.WaitForCorrectPrediction:
+                        args = new UserInteractionEventArgs
+                        {
+                            Code = UserInteractionCode.TrackingSessionFailed
+                        };
+                        notificationThread = new Thread(() => UserInteraction(this, args));
+                        notificationThread.Start();
 
-                    if (nextState == State.Ignore)
+                        nextState = _process.MoveNext(Command.None);
                         break;
-                    //Notificare che "Attila non risponde"
-                    EnterState(nextState);
-                    break;
 
-                case State.Tracking:
-                    nextState = _process.MoveNext(Command.None);
-                    if (nextState == State.Ignore)
+                    case State.Tracking:
+                        args = new UserInteractionEventArgs
+                        {
+                            Code = UserInteractionCode.TrackingSessionSucceded
+                        };
+                        notificationThread = new Thread(() => UserInteraction(this, args));
+                        notificationThread.Start();
+
+                        nextState = _process.MoveNext(Command.None);
                         break;
-                    // Ho finito la sessione di Tracking e notifico che sono sicuro di essere in quel context.
-                    EnterState(nextState);
-                    break;
 
-                default:
-                    // Non dovrebbe mai accadere!
-                    break;
+                    default:
+                        break;
+                }
+
+                EnterState(nextState);
             }
         }
 
@@ -170,9 +222,6 @@ namespace BleDA
             }
         }
 
-
-
-
         #region ILocalizationServiceCallback
 
         public void ReportLocalizationProgress(double progress)
@@ -183,12 +232,22 @@ namespace BleDA
 
         public void ReportPrediction(string contextId)
         {
-            throw new NotImplementedException();
+            //
+            lock (lockStatus)
+            {
+                if (_process.CurrentState == State.WaitForCorrectPrediction || _process.CurrentState == State.WaitForWrongPrediction)
+                {
+                    if (contextId == null) { 
+                        //try to recover 
+                    }
+                }
+            }
         }
 
         public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
-            throw new NotImplementedException();
+            //
+
         }
 
         #endregion
@@ -222,8 +281,13 @@ namespace BleDA
             }
         }
 
-
-        public bool UserInputPerformed(string contextId)
+        /// <summary>
+        /// Inform about User context selection
+        /// </summary>
+        /// <param name="contextId"></param>
+        /// <exception cref="StatusException"></exception>
+        /// <returns></returns>
+        public bool ContextSelected(string contextId)
         {
             if (contextId == null)
             {
@@ -240,6 +304,15 @@ namespace BleDA
                 State nextState;
                 if (contextId != CurrentContextId)
                 {
+                    // notify that AttiLA had a different context
+                    var args = new UserInteractionEventArgs
+                    {
+                        Code = UserInteractionCode.NewContextSelected
+                    };
+                    var t = new Thread(() => UserInteraction(this, args));
+                    t.Start();
+
+                    CurrentContextId = contextId;
                     // new context selected
                     nextState = _process.MoveNext(Command.Selection);
                 }
@@ -248,6 +321,7 @@ namespace BleDA
                     // confirmation
                     nextState = _process.MoveNext(Command.Confirmation);
                 }
+
                 EnterState(nextState);
             }
             return true;
@@ -286,16 +360,33 @@ namespace BleDA
                         break;
 
                     case State.WaitForSelection:
-                        Status.Instance._serviceClient.SilenceAsync();   //Non fa notificare
-                        // CRITICAL: se ritorno su questo controllo e non ho cambiato stato, va in eccezione.
+                        //Eventually stop notifications
+                        _serviceClient.Silence();
                         break;
 
                     case State.WaitForCorrectPrediction:
-                        // ToDO: Start TimeOut (in), tracking start (in), quando clicco sulla messagebox
-                        // della selezione utente (tasto track), disabilito il timer e confrontro tra contextId
-                        // e selectedContextId e lo salvo nello Status
-                        timer.Elapsed += timer_Elapsed;
-                        Status.Instance._serviceClient.TrackingStartAsync(Status.CurrentContextId);
+                        _timer.Enabled = true;
+                        // tracking start
+                        bool trackingStarted = false;
+                        for (var attempts = Properties.Settings.Default.ClientRetries + 1;
+                            attempts > 0; attempts--)
+                        {
+                            try
+                            {
+                                trackingStarted = _serviceClient.TrackingStart(CurrentContextId);
+                                if (trackingStarted)
+                                    break;
+                            }
+                            catch { }
+                        }
+                        if (!trackingStarted)
+                        {
+                            throw new StatusException
+                            {
+                                Code = StatusExceptionCode.ServiceFailure,
+                                Message = Properties.Resources.MsgTrackingStartFailure
+                            };
+                        }
                         break;
 
                     case State.WaitForWrongPrediction:

@@ -14,6 +14,7 @@ using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using MongoDB.Bson;
 using System.Diagnostics;
+using NativeWifi;
 
 namespace AttiLA.Test.LocalizationService
 {
@@ -36,6 +37,8 @@ namespace AttiLA.Test.LocalizationService
 
         private SynchronizationContext _syncContext = null;
 
+        private WlanClient _wlanClient = new WlanClient();
+
         private string SelectedContext { get; set; }
 
         #endregion
@@ -51,6 +54,31 @@ namespace AttiLA.Test.LocalizationService
             _serviceClient = new LocalizationServiceClient(context);
             _serviceClient.Subscribe();
 
+            Context c =_contextService.GetById("ciao");
+            foreach (var networkInterface in c.NetworkInterfaces)
+            {
+                var action = networkInterface.Action;
+                if(action == NetworkInterfaceActionType.Connect)
+                {
+                    var profile = networkInterface.ProfileName;
+
+                    var wlanIface = _wlanClient.Interfaces
+                        .AsQueryable()
+                        .Where(i => i.InterfaceGuid.ToString() == networkInterface.InterfaceGuid)
+                        .SingleOrDefault();
+
+                    if(wlanIface == null)
+                    {
+                        // may be removed
+                        continue;
+                    }
+                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profile);
+                } 
+                else if(action == NetworkInterfaceActionType.Disconnect)
+                {
+                   //...
+                }
+            }
         }
 
         void Form1_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
