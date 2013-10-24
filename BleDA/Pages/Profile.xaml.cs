@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace BleDA
 {
     /// <summary>
-    /// Interaction logic for Context.xaml
+    /// Interaction logic for Profile.xaml
     /// </summary>
-    public partial class Context : UserControl, ISwitchable
+    public partial class Profile : UserControl, ISwitchable
     {
-        public Context()
+        public Profile()
         {
             InitializeComponent();
         }
@@ -28,6 +28,12 @@ namespace BleDA
         public void UtilizeState(object state)
         {
             throw new NotImplementedException();
+        }
+
+        private void Back_Click(object sender, RoutedEventArgs e)
+        {
+            // ToDO: to change returnUrl
+            Switcher.Switch(new Starting());
         }
     }
 }
