@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="BleDA.Context"
+﻿<UserControl x:Class="BleDA.ContextPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -7,7 +7,7 @@
              d:DesignHeight="500" d:DesignWidth="600">
     <Grid Background="Transparent">
         <Canvas>
-            <Button x:Name="Back" Content="" Height="80" Width="80" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click" >
+            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" >
             <Button.Background>
                 <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" />
             </Button.Background>

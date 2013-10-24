@@ -9,7 +9,7 @@
         <ListBox HorizontalAlignment="Left" Height="122" Margin="30,130,0,0" VerticalAlignment="Top" Width="300" Style="{StaticResource ListBoxStyleModernUI}" Background="{x:Null}" />
         <ListBox HorizontalAlignment="Left" Height="174" Margin="30,300,0,0" VerticalAlignment="Top" Width="300" Style="{StaticResource ListBoxStyleModernUI}" Background="{x:Null}" />
         <Button x:Name="btnLocalized" Style="{StaticResource ButtonTileStyleGreen}" Content="Localize Me!" Foreground="White" FontFamily="Segoe UI Light" HorizontalAlignment="Left" Margin="391,130,0,0" VerticalAlignment="Top" Width="150" Height="50" FontSize="18" />
-        <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click">
+        <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60">
             <Button.Background>
                 <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" />
             </Button.Background>

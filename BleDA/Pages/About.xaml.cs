@@ -27,7 +27,7 @@ namespace BleDA
 
         public void UtilizeState(object state)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void Back_Click(object sender, RoutedEventArgs e)

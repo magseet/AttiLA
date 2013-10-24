@@ -18,9 +18,9 @@ namespace BleDA
     /// <summary>
     /// Interaction logic for Context.xaml
     /// </summary>
-    public partial class Context : UserControl, ISwitchable
+    public partial class ContextPage : UserControl, ISwitchable
     {
-        public Context()
+        public ContextPage()
         {
             InitializeComponent();
         }
@@ -33,7 +33,7 @@ namespace BleDA
         private void btnCreateContext_Click(object sender, RoutedEventArgs e)
         {
             if(txtContextName.Text != ""){
-                Status.BleDAStatus.CurrentContextId = txtContextName.Text;
+                Status.Instance.CurrentContextId = txtContextName.Text;
 
                 Switcher.Switch(new Starting());
                 /*try

@@ -23,10 +23,14 @@ namespace BleDA
     /// </summary>
     public partial class MainWindow : Window
     {
+        
 
         public MainWindow()
         {
             InitializeComponent();
+
+            
+
             Switcher.pageSwitcher = this;
             Switcher.Switch(new Starting());
         }

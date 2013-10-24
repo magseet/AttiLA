@@ -6,11 +6,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="600">
     <Grid>
-        <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click" >
-            <Button.Background>
-                <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" />
-            </Button.Background>
-        </Button>
-
+        <Canvas>
+            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" >
+                <Button.Background>
+                    <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" Stretch="Fill" />
+                </Button.Background>
+            </Button>
+        </Canvas>
     </Grid>
 </UserControl>
