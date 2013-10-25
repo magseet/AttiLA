@@ -159,11 +159,11 @@
     <None Include="Service References\LocalizationService\BleDA.LocalizationService.ServiceStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\LocalizationService\service.wsdl" />
-    <None Include="Service References\LocalizationService\service.xsd">
+    <None Include="Service References\LocalizationService\service1.wsdl" />
+    <None Include="Service References\LocalizationService\service2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\LocalizationService\service1.xsd">
+    <None Include="Service References\LocalizationService\service21.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>

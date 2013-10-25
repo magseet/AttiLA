@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="600">
     <Grid>
-        <Canvas>
+        <Canvas Background="#FF1B1B1B">
             <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" >
                 <Button.Background>
                     <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" Stretch="Fill" />

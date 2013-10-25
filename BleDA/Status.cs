@@ -24,13 +24,17 @@ namespace BleDA
         /// </summary>
         NewContextSelected,
         /// <summary>
-        /// The service has been silenced due to difficulties in localizing.
-        /// </summary>
-        TrackingSessionFailed,
-        /// <summary>
         /// The service has correctly terminated a tracking session.
         /// </summary>
-        TrackingSessionSucceded
+        TrackingSessionSucceded,
+        /// <summary>
+        /// The predicted context is different than the current context.
+        /// </summary>
+        BetterContextFound,
+        /// <summary>
+        /// Current context found.
+        /// </summary>
+        CurrentContextFound
     }
 
     /// <summary>
@@ -44,6 +48,22 @@ namespace BleDA
         /// Value casting for previous context found notification event.
         /// </summary>
         public string PreviousContextFoundValue
+        {
+            get
+            {
+                return (string)value;
+            }
+
+            set
+            {
+                this.value = (string)value;
+            }
+        }
+
+        /// <summary>
+        /// Value casting for better context found notification event.
+        /// </summary>
+        public string BetterContextFoundValue
         {
             get
             {
@@ -72,7 +92,11 @@ namespace BleDA
         /// <summary>
         /// The service responded with an unexpected context id.
         /// </summary>
-        UnexpectedPrediction
+        UnexpectedPrediction,
+        /// <summary>
+        /// The service has been silenced due to difficulties in localizing.
+        /// </summary>
+        TrackingSessionFailed
     }
 
 
@@ -121,7 +145,7 @@ namespace BleDA
     public class StatusException : Exception
     {
         /// <summary>
-        /// The service exception code.
+        /// The status exception code.
         /// </summary>
         public StatusExceptionCode Code { get; set; }
 
@@ -132,6 +156,7 @@ namespace BleDA
 
     #endregion
 
+    [CallbackBehavior(UseSynchronizationContext = false)]
     public sealed class Status : ILocalizationServiceCallback
     {
         private static volatile Status _instance;
@@ -142,16 +167,31 @@ namespace BleDA
         private System.Timers.Timer _timer = new System.Timers
             .Timer(Properties.Settings.Default.ClientTimeout);
 
+        private InstanceContext context;
+
         #region Events
         public delegate void UserInteractionEventHandler(object sender, EventArgs e);
         public event UserInteractionEventHandler UserInteraction;
+
+        /// <summary>
+        /// Represents a method that will handle <see cref="StatusErrorNotificationEvent"/>
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public delegate void StatusErrorNotificationEventHandler(object sender, StatusErrorNotificationEventArgs e);
+
+        /// <summary>
+        /// Status error notification event.
+        /// </summary>
+        public event StatusErrorNotificationEventHandler StatusErrorNotification;
+
         #endregion
 
         private Status()
         {
             CurrentContextId = "";
+            context = new InstanceContext(this);
 
-            var context = new InstanceContext(this);
             _serviceClient = new LocalizationServiceClient(context);
             _serviceClient.Subscribe();
             _timer.Elapsed += _timer_Elapsed;
@@ -186,7 +226,8 @@ namespace BleDA
             _timer.Stop();
 
             State nextState = State.Unknown, leavingState = _process.CurrentState;
-            UserInteractionEventArgs args;
+            UserInteractionEventArgs userInteractionargs;
+            StatusErrorNotificationEventArgs errorStatusArgs;
             Thread notificationThread;
 
             lock (lockStatus)
@@ -194,25 +235,27 @@ namespace BleDA
                 switch (leavingState)
                 {
                     case State.WaitForCorrectPrediction:
-                        args = new UserInteractionEventArgs
-                        {
-                            Code = UserInteractionCode.TrackingSessionFailed
-                        };
-                        notificationThread = new Thread(() => UserInteraction(this, args));
+                        // error notification
+                        errorStatusArgs = new StatusErrorNotificationEventArgs(
+                            StatusErrorNotificationCode.TrackingSessionFailed
+                            );
+                        notificationThread = new Thread(() => StatusErrorNotification(this, errorStatusArgs));
                         notificationThread.Start();
 
                         nextState = _process.MoveNext(Command.None);
+                        //expected state: WaitForSelection
                         break;
 
                     case State.Tracking:
-                        args = new UserInteractionEventArgs
+                        userInteractionargs = new UserInteractionEventArgs
                         {
                             Code = UserInteractionCode.TrackingSessionSucceded
                         };
-                        notificationThread = new Thread(() => UserInteraction(this, args));
+                        notificationThread = new Thread(() => UserInteraction(this, userInteractionargs));
                         notificationThread.Start();
 
                         nextState = _process.MoveNext(Command.None);
+                        //expected state: WaitForWrongPrediction
                         break;
 
                     default:
@@ -260,8 +303,6 @@ namespace BleDA
                 }
             }
         }
-
-        
 
         /// <summary>
         /// Perform status initialization.
@@ -315,7 +356,7 @@ namespace BleDA
                 State nextState;
                 if (contextId != CurrentContextId)
                 {
-                    // notify that AttiLA has a different context
+                    // notify that the selection is different than the previous one
                     var args = new UserInteractionEventArgs
                     {
                         Code = UserInteractionCode.NewContextSelected
@@ -326,20 +367,37 @@ namespace BleDA
                     CurrentContextId = contextId;
                     // new context selected
                     nextState = _process.MoveNext(Command.Selection);
+                    //expected state: WaitForCorrectPrediction
                 }
                 else
                 {
                     // confirmation
                     nextState = _process.MoveNext(Command.Confirmation);
+                    //expected state: Tracking or WaitForCorrectPrediction
                 }
-
-                EnterState(nextState);
+                try
+                {
+                    EnterState(nextState);
+                }
+                catch (StatusException se) {
+                    // error notification
+                    var args = new StatusErrorNotificationEventArgs(
+                        StatusErrorNotificationCode.TrackingSessionFailed,
+                        se
+                        );
+                    var t = new Thread(() => StatusErrorNotification(this, args));
+                    t.Start();
+                }
             }
             return true;
         }
 
         private void EnterState(State state)
         {
+            UserInteractionEventArgs userInteractionArgs;
+            Thread notificationThread;
+            bool trackingStarted;
+
             lock (lockStatus)
             {
                 switch (_process.CurrentState)
@@ -363,13 +421,13 @@ namespace BleDA
                         if (serviceStatus != null && serviceStatus.ContextId != null)
                         {
                             // notify that AttiLA had a context
-                            var args = new UserInteractionEventArgs
+                            userInteractionArgs = new UserInteractionEventArgs
                             {
                                 Code = UserInteractionCode.PreviousContextFound,
                                 PreviousContextFoundValue = serviceStatus.ContextId
                             };
-                            var t = new Thread(() => UserInteraction(this, args));
-                            t.Start();
+                            notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
+                            notificationThread.Start();
                         }
 
                         break;
@@ -382,7 +440,7 @@ namespace BleDA
                     case State.WaitForCorrectPrediction:
                         _timer.Enabled = true;
                         // tracking start
-                        bool trackingStarted = false;
+                        trackingStarted = false;
                         for (var attempts = Properties.Settings.Default.ClientRetries + 1;
                             attempts > 0; attempts--)
                         {
@@ -396,21 +454,50 @@ namespace BleDA
                         }
                         if (!trackingStarted)
                         {
-                            throw new SettingsException(Properties.Resources.MsgTrackingStartFailure)
+                            throw new StatusException(Properties.Resources.MsgTrackingStartFailure)
                             {
-                                Code = SettingsExceptionCode.ServiceFailure,
+                                Code = StatusExceptionCode.ServiceFailure
                             };
                         }
                         break;
 
                     case State.WaitForWrongPrediction:
-                        //ToDO: 
+                        _serviceClient.TrackingStop();
+
+                        userInteractionArgs = new UserInteractionEventArgs
+                        {
+                            Code = UserInteractionCode.CurrentContextFound,
+                            BetterContextFoundValue = CurrentContextId
+                        };
+                        notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
+                        notificationThread.Start();
+
                         break;
                     case State.WaitForConfirmation:
-                        //ToDO: 
+                        // Do nothing
                         break;
                     case State.Tracking:
-                        //ToDO: 
+                        _timer.Enabled = true;
+                        // tracking start
+                        trackingStarted = false;
+                        for (var attempts = Properties.Settings.Default.ClientRetries + 1;
+                            attempts > 0; attempts--)
+                        {
+                            try
+                            {
+                                trackingStarted = _serviceClient.TrackingStart(CurrentContextId);
+                                if (trackingStarted)
+                                    break;
+                            }
+                            catch { }
+                        }
+                        if (!trackingStarted)
+                        {
+                            throw new StatusException(Properties.Resources.MsgTrackingStartFailure)
+                            {
+                                Code = StatusExceptionCode.ServiceFailure
+                            };
+                        }
                         break;
                     default:
                         break;
@@ -429,7 +516,6 @@ namespace BleDA
 
         public void ReportPrediction(string contextId)
         {
-
             lock (lockStatus)
             {
                 if (_process.CurrentState == State.WaitForCorrectPrediction)
@@ -438,34 +524,42 @@ namespace BleDA
                     {
                         // error notification
                         var args = new StatusErrorNotificationEventArgs(
-                            StatusErrorNotificationCode.UnexpectedPrediction);
-                        var t = new Thread(() => UserInteraction(this, args));
+                            StatusErrorNotificationCode.UnexpectedPrediction
+                            );
+                        var t = new Thread(() => StatusErrorNotification(this, args));
                         t.Start();
                     }
                     else
                     {
                         // expected prediction
                         var nextState = _process.MoveNext(Command.CorrectPrediction);
+                        //expected state: WaitForWrongPrediction
                         EnterState(nextState);
                     }
                 }
                 else if (_process.CurrentState == State.WaitForWrongPrediction)
                 {
-                    if (contextId == null || contextId == _currentContextId)
+                    if (contextId == null || contextId != _currentContextId)
                     {
-                        // error notification
-                        var args = new StatusErrorNotificationEventArgs(
-                            StatusErrorNotificationCode.UnexpectedPrediction);
-                        var t = new Thread(() => UserInteraction(this, args));
-                        t.Start();
-                    }
-                    else
-                    {
+
                         // expected prediction
                         var nextState = _process.MoveNext(Command.WrongPrediction);
+                        //expected state: WaitForConfirmation
                         EnterState(nextState);
-                    }
 
+                        UserInteractionEventArgs userInteractionArgs = new UserInteractionEventArgs
+                        {
+                            Code = UserInteractionCode.BetterContextFound,
+                            BetterContextFoundValue = contextId
+                        };
+                        Thread notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
+                        notificationThread.Start();
+                    }
+                }else if(_process.CurrentState == State.WaitForConfirmation){
+                    // expected prediction
+                    var nextState = _process.MoveNext(Command.CorrectPrediction);
+                    //expected state: WaitForWrongPrediction
+                    EnterState(nextState);
                 }
             }
         }
@@ -473,8 +567,8 @@ namespace BleDA
         public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
             //
-
         }
+
 
         #endregion
 

@@ -28,7 +28,6 @@ namespace BleDA
         public MainWindow()
         {
             InitializeComponent();
-
             
 
             Switcher.pageSwitcher = this;

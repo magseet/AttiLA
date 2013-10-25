@@ -14,6 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AttiLA.Data.Services;
+using AttiLA.Data.Entities;
+using MongoDB.Bson;
 
 namespace BleDA
 {
@@ -21,12 +24,49 @@ namespace BleDA
     /// Interaction logic for StartingPage.xaml
     /// </summary>
     public partial class StartingPage : UserControl, ISwitchable
-    {        
+    {
+        Status _status = Status.Instance;
+        ContextService _contextService = new ContextService();
 
         public StartingPage()
         {
             InitializeComponent();
-            Status.Instance.Initialize();
+
+            _status.UserInteraction += _status_UserInteraction;
+            _status.StatusErrorNotification += _status_StatusErrorNotification;
+
+            _status.Initialize();
+
+
+        }
+
+        void _status_StatusErrorNotification(object sender, StatusErrorNotificationEventArgs e)
+        {
+            //throw new NotImplementedException();
+        }
+
+        void _status_UserInteraction(object sender, EventArgs e)
+        {
+            //throw new NotImplementedException();
+            UserInteractionEventArgs args = (UserInteractionEventArgs) e;
+
+            switch(args.Code){
+                case UserInteractionCode.BetterContextFound:
+                    break;
+                case UserInteractionCode.CurrentContextFound:
+                    break;
+                case UserInteractionCode.NewContextSelected:
+                    break;
+                case UserInteractionCode.PreviousContextFound:
+                    var context = _contextService.GetById(args.PreviousContextFoundValue);
+                    if (context != null)
+                    {
+                        MessageBox.Show("Attila è attivo. Context: " + context.ContextName);
+                    }
+                    break;
+                case UserInteractionCode.TrackingSessionSucceded:
+                    break;
+            }
         }
 
         public void UtilizeState(object state)

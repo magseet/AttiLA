@@ -22,9 +22,9 @@
     <MetadataSource Address="net.pipe://localhost/AttiLAService/mex" Protocol="mex" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="service.wsdl" MetadataType="Wsdl" ID="c7f7259c-0e3f-4a16-82c8-ac3773fc49b0" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
-    <MetadataFile FileName="service.xsd" MetadataType="Schema" ID="bc754e96-6ddf-46f6-a48e-a8eab4e456c3" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
-    <MetadataFile FileName="service1.xsd" MetadataType="Schema" ID="08bfe9a4-0b2a-4092-aba5-0d0b2177bdf8" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="service1.wsdl" MetadataType="Wsdl" ID="f1918988-9ae7-43f6-bcb4-9534562a6658" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="service2.xsd" MetadataType="Schema" ID="88aba34b-6a5e-4038-9deb-500974826daa" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
+    <MetadataFile FileName="service21.xsd" MetadataType="Schema" ID="14fa874a-d22f-4710-8d12-fa1072764a8b" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
     <MetadataFile FileName="AttiLA.LocalizationService.xsd" MetadataType="Schema" ID="c4612935-b660-4b98-a2cf-4b5fde25b54d" SourceId="1" SourceUrl="net.pipe://localhost/AttiLAService/mex" />
   </Metadata>
   <Extensions>

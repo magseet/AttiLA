@@ -53,32 +53,31 @@ namespace AttiLA.Test.LocalizationService
             var context = new InstanceContext(this);
             _serviceClient = new LocalizationServiceClient(context);
             _serviceClient.Subscribe();
+            //Context c =_contextService.GetById("ciao");
+            //foreach (var networkInterface in c.NetworkInterfaces)
+            //{
+            //    var action = networkInterface.Action;
+            //    if(action == NetworkInterfaceActionType.Connect)
+            //    {
+            //        var profile = networkInterface.ProfileName;
 
-            Context c =_contextService.GetById("ciao");
-            foreach (var networkInterface in c.NetworkInterfaces)
-            {
-                var action = networkInterface.Action;
-                if(action == NetworkInterfaceActionType.Connect)
-                {
-                    var profile = networkInterface.ProfileName;
+            //        var wlanIface = _wlanClient.Interfaces
+            //            .AsQueryable()
+            //            .Where(i => i.InterfaceGuid.ToString() == networkInterface.InterfaceGuid)
+            //            .SingleOrDefault();
 
-                    var wlanIface = _wlanClient.Interfaces
-                        .AsQueryable()
-                        .Where(i => i.InterfaceGuid.ToString() == networkInterface.InterfaceGuid)
-                        .SingleOrDefault();
-
-                    if(wlanIface == null)
-                    {
-                        // may be removed
-                        continue;
-                    }
-                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profile);
-                } 
-                else if(action == NetworkInterfaceActionType.Disconnect)
-                {
-                   //...
-                }
-            }
+            //        if(wlanIface == null)
+            //        {
+            //            // may be removed
+            //            continue;
+            //        }
+            //        wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profile);
+            //    } 
+            //    else if(action == NetworkInterfaceActionType.Disconnect)
+            //    {
+            //       //...
+            //    }
+            //}
         }
 
         void Form1_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)

@@ -29,7 +29,7 @@ namespace BleDA
 
     #endregion
 
-
+    [CallbackBehavior(UseSynchronizationContext = false)]
     public class Settings : ILocalizationServiceCallback
     {
 
@@ -62,6 +62,10 @@ namespace BleDA
             get { return _instance; }
         }
 
+        /// <summary>
+        /// Service settings
+        /// </summary>
+        /// <exception cref="SettingsException"></exception>
         public GlobalSettings Service
         {
             get
@@ -83,7 +87,7 @@ namespace BleDA
                         catch { }
 
                     }
-                    return null;
+                    return settings;
                 }
             }
             set
