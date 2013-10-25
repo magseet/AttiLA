@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BleDA.AttiLA;
+using BleDA.LocalizationService;
 using System.ServiceModel;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
@@ -64,9 +64,48 @@ namespace BleDA
 
     }
 
+    /// <summary>
+    /// The status notification error codes.
+    /// </summary>
+    public enum StatusErrorNotificationCode
+    {
+        /// <summary>
+        /// The service responded with an unexpected context id.
+        /// </summary>
+        UnexpectedPrediction
+    }
+
+
+    /// <summary>
+    /// Data for status error notification event handler.
+    /// </summary>
+    public class StatusErrorNotificationEventArgs : EventArgs
+    {
+        public StatusErrorNotificationEventArgs(StatusErrorNotificationCode code)
+        {
+            Code = code;
+        }
+
+        public StatusErrorNotificationEventArgs(StatusErrorNotificationCode code, Exception cause)
+        {
+            Code = code;
+            Cause = cause;
+        }
+
+        /// <summary>
+        /// A code to identify the status error notification type.
+        /// </summary>
+        public StatusErrorNotificationCode Code { get; set; }
+
+        /// <summary>
+        /// The exception that raised this status error.
+        /// </summary>
+        public Exception Cause { get; set; }
+    }
+
     #endregion
 
-    #region Exception
+    #region Exceptions
 
     public enum StatusExceptionCode
     {
@@ -86,10 +125,9 @@ namespace BleDA
         /// </summary>
         public StatusExceptionCode Code { get; set; }
 
-        /// <summary>
-        /// Message explaining the failure.
-        /// </summary>
-        public string Message { get; set; }
+        public StatusException() : base() { }
+        public StatusException(string message) : base(message) { }
+        public StatusException(string message, System.Exception inner) : base(message, inner) { }
     }
 
     #endregion
@@ -101,7 +139,6 @@ namespace BleDA
         private Process _process;
         private LocalizationServiceClient _serviceClient;
         private string _currentContextId;
-        private ServiceStatus _serviceStatus;
         private System.Timers.Timer _timer = new System.Timers
             .Timer(Properties.Settings.Default.ClientTimeout);
 
@@ -121,6 +158,29 @@ namespace BleDA
 
         }
 
+        /// <summary>
+        /// Localization service status
+        /// </summary>
+        public ServiceStatus ServiceStatus
+        {
+            get
+            {
+                lock (lockStatus)
+                {
+                    if (_serviceClient == null)
+                    {
+                        return null;
+                    }
+                    return _serviceClient.GetServiceStatus();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Timer event handler.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void _timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             _timer.Stop();
@@ -201,56 +261,7 @@ namespace BleDA
             }
         }
 
-        /// <summary>
-        /// AttiLA localization service status
-        /// </summary>
-        public ServiceStatus ServiceStatus
-        {
-            get
-            {
-                lock (lockStatus)
-                {
-                    return _serviceStatus;
-                }
-            }
-            set
-            {
-                lock (lockStatus)
-                {
-                    _serviceStatus = value;
-                }
-            }
-        }
-
-        #region ILocalizationServiceCallback
-
-        public void ReportLocalizationProgress(double progress)
-        {
-            // update status
-
-        }
-
-        public void ReportPrediction(string contextId)
-        {
-            //
-            lock (lockStatus)
-            {
-                if (_process.CurrentState == State.WaitForCorrectPrediction || _process.CurrentState == State.WaitForWrongPrediction)
-                {
-                    if (contextId == null) { 
-                        //try to recover 
-                    }
-                }
-            }
-        }
-
-        public void ReportServiceStatus(ServiceStatus serviceStatus)
-        {
-            //
-
-        }
-
-        #endregion
+        
 
         /// <summary>
         /// Perform status initialization.
@@ -269,7 +280,7 @@ namespace BleDA
 
                 // determine first operational state
                 State nextState;
-                if (_serviceStatus.ContextId == null)
+                if (ServiceStatus.ContextId == null)
                 {
                     nextState = _process.MoveNext(Command.Selection);
                 }
@@ -285,7 +296,7 @@ namespace BleDA
         /// Inform about User context selection
         /// </summary>
         /// <param name="contextId"></param>
-        /// <exception cref="StatusException"></exception>
+        /// <exception cref="SettingsException"></exception>
         /// <returns></returns>
         public bool ContextSelected(string contextId)
         {
@@ -304,7 +315,7 @@ namespace BleDA
                 State nextState;
                 if (contextId != CurrentContextId)
                 {
-                    // notify that AttiLA had a different context
+                    // notify that AttiLA has a different context
                     var args = new UserInteractionEventArgs
                     {
                         Code = UserInteractionCode.NewContextSelected
@@ -335,23 +346,27 @@ namespace BleDA
                 {
                     case State.Idle:
                         // retrieve service status
+                        ServiceStatus serviceStatus = null;
                         for (var attempts = Properties.Settings.Default.ClientRetries + 1;
                             attempts > 0; attempts--)
                         {
                             try
                             {
-                                _serviceStatus = _serviceClient.GetServiceStatus();
+                                serviceStatus = ServiceStatus;
+                                if (serviceStatus != null)
+                                    break;
                             }
                             catch { }
+
                         }
 
-                        if (_serviceStatus != null && _serviceStatus.ContextId != null)
+                        if (serviceStatus != null && serviceStatus.ContextId != null)
                         {
                             // notify that AttiLA had a context
                             var args = new UserInteractionEventArgs
                             {
                                 Code = UserInteractionCode.PreviousContextFound,
-                                PreviousContextFoundValue = _serviceStatus.ContextId
+                                PreviousContextFoundValue = serviceStatus.ContextId
                             };
                             var t = new Thread(() => UserInteraction(this, args));
                             t.Start();
@@ -381,10 +396,9 @@ namespace BleDA
                         }
                         if (!trackingStarted)
                         {
-                            throw new StatusException
+                            throw new SettingsException(Properties.Resources.MsgTrackingStartFailure)
                             {
-                                Code = StatusExceptionCode.ServiceFailure,
-                                Message = Properties.Resources.MsgTrackingStartFailure
+                                Code = SettingsExceptionCode.ServiceFailure,
                             };
                         }
                         break;
@@ -403,5 +417,66 @@ namespace BleDA
                 }
             }
         }
+
+
+        #region ILocalizationServiceCallback methods
+
+        public void ReportLocalizationProgress(double progress)
+        {
+            // update status
+
+        }
+
+        public void ReportPrediction(string contextId)
+        {
+
+            lock (lockStatus)
+            {
+                if (_process.CurrentState == State.WaitForCorrectPrediction)
+                {
+                    if (contextId == null || contextId != _currentContextId)
+                    {
+                        // error notification
+                        var args = new StatusErrorNotificationEventArgs(
+                            StatusErrorNotificationCode.UnexpectedPrediction);
+                        var t = new Thread(() => UserInteraction(this, args));
+                        t.Start();
+                    }
+                    else
+                    {
+                        // expected prediction
+                        var nextState = _process.MoveNext(Command.CorrectPrediction);
+                        EnterState(nextState);
+                    }
+                }
+                else if (_process.CurrentState == State.WaitForWrongPrediction)
+                {
+                    if (contextId == null || contextId == _currentContextId)
+                    {
+                        // error notification
+                        var args = new StatusErrorNotificationEventArgs(
+                            StatusErrorNotificationCode.UnexpectedPrediction);
+                        var t = new Thread(() => UserInteraction(this, args));
+                        t.Start();
+                    }
+                    else
+                    {
+                        // expected prediction
+                        var nextState = _process.MoveNext(Command.WrongPrediction);
+                        EnterState(nextState);
+                    }
+
+                }
+            }
+        }
+
+        public void ReportServiceStatus(ServiceStatus serviceStatus)
+        {
+            //
+
+        }
+
+        #endregion
+
     }
 }

@@ -60,30 +60,31 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ISwitchable.cs" />
-    <Compile Include="Pages\About.xaml.cs">
-      <DependentUpon>About.xaml</DependentUpon>
+    <Compile Include="Pages\AboutPage.xaml.cs">
+      <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\ContextPage.xaml.cs">
       <DependentUpon>ContextPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\ManagedProfile.xaml.cs">
-      <DependentUpon>ManagedProfile.xaml</DependentUpon>
+    <Compile Include="Pages\ManagedProfilePage.xaml.cs">
+      <DependentUpon>ManagedProfilePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Profile.xaml.cs">
-      <DependentUpon>Profile.xaml</DependentUpon>
+    <Compile Include="Pages\ProfilePage.xaml.cs">
+      <DependentUpon>ProfilePage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Settings.xaml.cs">
-      <DependentUpon>Settings.xaml</DependentUpon>
+    <Compile Include="Pages\SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\Starting.xaml.cs">
-      <DependentUpon>Starting.xaml</DependentUpon>
+    <Compile Include="Pages\StartingPage.xaml.cs">
+      <DependentUpon>StartingPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Process.cs" />
-    <Compile Include="Service References\AttiLA\Reference.cs">
+    <Compile Include="Service References\LocalizationService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="Status.cs" />
     <Compile Include="Switchable.cs" />
     <Page Include="MainWindow.xaml">
@@ -98,7 +99,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Pages\About.xaml">
+    <Page Include="Pages\AboutPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -106,19 +107,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\ManagedProfile.xaml">
+    <Page Include="Pages\ManagedProfilePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Profile.xaml">
+    <Page Include="Pages\ProfilePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Settings.xaml">
+    <Page Include="Pages\SettingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\Starting.xaml">
+    <Page Include="Pages\StartingPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -146,23 +147,23 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="Service References\AttiLA\AttiLA.LocalizationService.xsd">
+    <None Include="Service References\LocalizationService\AttiLA.LocalizationService.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\AttiLA\BleDA.AttiLA.ContextPreference.datasource">
+    <None Include="Service References\LocalizationService\BleDA.LocalizationService.ContextPreference.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\AttiLA\BleDA.AttiLA.GlobalSettings.datasource">
+    <None Include="Service References\LocalizationService\BleDA.LocalizationService.GlobalSettings.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\AttiLA\BleDA.AttiLA.ServiceStatus.datasource">
+    <None Include="Service References\LocalizationService\BleDA.LocalizationService.ServiceStatus.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\AttiLA\service.wsdl" />
-    <None Include="Service References\AttiLA\service.xsd">
+    <None Include="Service References\LocalizationService\service.wsdl" />
+    <None Include="Service References\LocalizationService\service.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\AttiLA\service1.xsd">
+    <None Include="Service References\LocalizationService\service1.xsd">
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
@@ -173,16 +174,16 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Service References\AttiLA\" />
+    <WCFMetadataStorage Include="Service References\LocalizationService\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\AttiLA\configuration91.svcinfo" />
+    <None Include="Service References\LocalizationService\configuration91.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\AttiLA\configuration.svcinfo" />
+    <None Include="Service References\LocalizationService\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\AttiLA\Reference.svcmap">
+    <None Include="Service References\LocalizationService\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>

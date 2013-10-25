@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="BleDA.SettingsPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="600">
+    <Grid>
+        <Canvas>
+            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" >
+                <Button.Background>
+                    <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" Stretch="Uniform" />
+                </Button.Background>
+            </Button>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Number of correct predictions before send notifications" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Height="49" Width="331" Canvas.Left="32" Canvas.Top="95"/>
+            <TextBox x:Name="txtNotificationThreshold" Height="40" Canvas.Left="384" TextWrapping="Wrap" Text="" Canvas.Top="94" Width="40" FontSize="16" Padding="17,15,0,0" />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Height="49" Width="331" Canvas.Left="32" Canvas.Top="169"><Run Language="it-it" Text="Minimum time in milliseconds between predictions"/></TextBlock>
+            <TextBox x:Name="txtLocalizerInterval" Height="40" Canvas.Left="384" TextWrapping="Wrap" Text="" Canvas.Top="169" Width="40" FontSize="16" Padding="17,15,0,0" />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Height="49" Width="331" Canvas.Left="32" Canvas.Top="224"><Run Language="it-it" Text="Times the localizer tries to recover from wrong predictions"/></TextBlock>
+            <TextBox x:Name="txtLocalizerReties" Height="40" Canvas.Left="384" TextWrapping="Wrap" Text="" Canvas.Top="224" Width="40" FontSize="16" Padding="17,15,0,0" />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Height="25" Width="331" Canvas.Left="32" Canvas.Top="314"><Run Language="it-it" Text="Minimum time between samples (in ms)"/></TextBlock>
+            <TextBox x:Name="txtTrackerInverval" Height="40" Canvas.Left="384" TextWrapping="Wrap" Text="" Canvas.Top="301" Width="40" FontSize="16" Padding="17,15,0,0" />
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Height="24" Width="331" Canvas.Left="32" Canvas.Top="364"><Run Language="it-it" Text="Number of samples required to train scenario"/></TextBlock>
+            <TextBox x:Name="txtTrackerTrainingThreshold" Height="40" Canvas.Left="384" TextWrapping="Wrap" Text="" Canvas.Top="354" Width="40" FontSize="16" Padding="17,15,0,0" />
+            <Button x:Name="btnCreateContext" FontFamily="Segoe UI Light" Style="{StaticResource ButtonTileStyleGreen}" Content="Save Settings" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Width="150" Height="50" FontSize="18" Canvas.Left="389" Canvas.Top="426" Click="btnCreateContext_Click" />
+
+        </Canvas>
+    </Grid>
+</UserControl>

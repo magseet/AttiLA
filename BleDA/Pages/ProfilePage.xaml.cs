@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace BleDA
 {
     /// <summary>
-    /// Interaction logic for ContextPage.xaml
+    /// Interaction logic for ProfilePage.xaml
     /// </summary>
-    public partial class ContextPage : UserControl, ISwitchable
+    public partial class ProfilePage : UserControl, ISwitchable
     {
-        public ContextPage()
+        public ProfilePage()
         {
             InitializeComponent();
         }
@@ -30,28 +30,10 @@ namespace BleDA
             throw new NotImplementedException();
         }
 
-        private void btnCreateContext_Click(object sender, RoutedEventArgs e)
-        {
-            if(txtContextName.Text != ""){
-                Status.Instance.CurrentContextId = txtContextName.Text;
-
-                Switcher.Switch(new StartingPage());
-                /*try
-                {
-                    _contextService.Create(c);
-                }
-                catch (DatabaseException)
-                {
-                    MessageBox.Show("Already exists.");
-                    return;
-                }*/               
-            }
-        }
-
         private void Back_Click(object sender, RoutedEventArgs e)
         {
+            // ToDO: to change returnUrl
             Switcher.Switch(new StartingPage());
         }
-
     }
 }

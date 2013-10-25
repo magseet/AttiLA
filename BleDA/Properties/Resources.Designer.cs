@@ -61,6 +61,15 @@ namespace BleDA.Properties {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Apply settings failure..
+        /// </summary>
+        internal static string MsgApplySettingsFailure {
+            get {
+                return ResourceManager.GetString("MsgApplySettingsFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Tracking start failure..
         /// </summary>
         internal static string MsgTrackingStartFailure {

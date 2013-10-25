@@ -13,7 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using BleDA.AttiLA;
+using BleDA.LocalizationService;
 using System.ServiceModel;
 
 namespace BleDA
@@ -32,7 +32,7 @@ namespace BleDA
             
 
             Switcher.pageSwitcher = this;
-            Switcher.Switch(new Starting());
+            Switcher.Switch(new StartingPage());
         }
 
         public void Navigate(UserControl nextPage)

@@ -1,4 +1,4 @@
-﻿using BleDA.AttiLA;
+﻿using BleDA.LocalizationService;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
