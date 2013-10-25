@@ -48,10 +48,11 @@ namespace BleDA
         /// <summary>
         /// Singleton class.
         /// </summary>
-        private Settings() 
+        private Settings()
         {
             var context = new InstanceContext(this);
             _serviceClient = new LocalizationServiceClient(context);
+
         }
 
         /// <summary>
@@ -60,6 +61,43 @@ namespace BleDA
         public static Settings Instance
         {
             get { return _instance; }
+        }
+
+
+        public double FindRefreshInterval
+        {
+            get
+            {
+                lock (lockSettings)
+                {
+                    return Properties.Settings.Default.FindRefresh;
+                }
+            }
+            set
+            {
+                lock (lockSettings)
+                {
+                    Properties.Settings.Default.FindRefresh = value;
+                }
+            }
+        }
+
+        public uint MostRecentLimit
+        {
+            get
+            {
+                lock (lockSettings)
+                {
+                    return Properties.Settings.Default.MostRecentLimit;
+                }
+            }
+            set
+            {
+                lock (lockSettings)
+                {
+                    Properties.Settings.Default.MostRecentLimit = value;
+                }
+            }
         }
 
         /// <summary>
@@ -79,7 +117,7 @@ namespace BleDA
                         try
                         {
                             settings = _serviceClient.GetGlobalSettings();
-                            if(settings != null)
+                            if (settings != null)
                             {
                                 break;
                             }
@@ -94,7 +132,7 @@ namespace BleDA
             {
                 lock (lockSettings)
                 {
-                    if(value == null)
+                    if (value == null)
                     {
                         throw new ArgumentNullException("value");
                     }
@@ -105,7 +143,7 @@ namespace BleDA
                         try
                         {
                             appliedSettings = _serviceClient.SetGlobalSettings(value);
-                            if(appliedSettings)
+                            if (appliedSettings)
                             {
                                 break;
                             }
@@ -118,7 +156,7 @@ namespace BleDA
                             }
                         }
                     }
-                    if(!appliedSettings)
+                    if (!appliedSettings)
                     {
                         throw new SettingsException(Properties.Resources.MsgApplySettingsFailure);
                     }

@@ -139,7 +139,6 @@ namespace AttiLA.Test.LocalizationService
                 btnPrediction.Enabled = false;
                 lstPreferences.Items.Clear();
                 var predictionCall = new Func<IEnumerable<ContextPreference>>(_serviceClient.GetCloserContexts);
-
                 predictionCall.BeginInvoke(
                     PredictionCallCompleted,
                     predictionCall);

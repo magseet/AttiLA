@@ -60,6 +60,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ISwitchable.cs" />
+    <Compile Include="Item.cs" />
     <Compile Include="Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
@@ -87,6 +88,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Status.cs" />
     <Compile Include="Switchable.cs" />
+    <Compile Include="ContextPreferenceExtended.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

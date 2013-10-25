@@ -42,12 +42,18 @@ namespace BleDA
 
         void _status_StatusErrorNotification(object sender, StatusErrorNotificationEventArgs e)
         {
-            //throw new NotImplementedException();
+            StatusErrorNotificationEventArgs args = (StatusErrorNotificationEventArgs)e;
+            switch (args.Code)
+            {
+                case StatusErrorNotificationCode.TrackingSessionFailed:
+                    break;
+                case StatusErrorNotificationCode.UnexpectedPrediction:
+                    break;
+            }
         }
 
         void _status_UserInteraction(object sender, EventArgs e)
         {
-            //throw new NotImplementedException();
             UserInteractionEventArgs args = (UserInteractionEventArgs) e;
 
             switch(args.Code){
@@ -81,7 +87,7 @@ namespace BleDA
 
         private void btnProfile_Click(object sender, RoutedEventArgs e)
         {
-            Switcher.Switch(new ManagedProfilePage(), new { returnPage = "Starting" });
+            Switcher.Switch(new ProfilePage(), new { returnPage = "Starting" });
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e)

@@ -8,5 +8,11 @@
     <Setting Name="ClientTimeout" Type="System.Double" Scope="User">
       <Value Profile="(Default)">300000</Value>
     </Setting>
+    <Setting Name="FindRefresh" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">10000</Value>
+    </Setting>
+    <Setting Name="MostRecentLimit" Type="System.UInt32" Scope="User">
+      <Value Profile="(Default)">5</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
