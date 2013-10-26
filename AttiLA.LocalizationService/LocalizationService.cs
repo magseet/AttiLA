@@ -331,6 +331,7 @@ namespace AttiLA.LocalizationService
                 Tracker = new TrackerSettings
                 {
                     Interval = Properties.Settings.Default.TrackerInterval,
+                    TrainingThreshold = Properties.Settings.Default.TrackerTrainingThreshold
                 },
                 NotificationThreshold = Properties.Settings.Default.NotificationThreshold
             };

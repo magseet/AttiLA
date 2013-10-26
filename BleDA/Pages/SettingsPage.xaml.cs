@@ -31,7 +31,6 @@ namespace BleDA
                 _settings = Settings.Instance;
 
                 if (_settings.Service != null)
-                
                 {
                     txtNotificationThreshold.Text = _settings.Service.NotificationThreshold.ToString();
 

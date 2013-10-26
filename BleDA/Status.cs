@@ -489,8 +489,7 @@ namespace BleDA
 
                         userInteractionArgs = new UserInteractionEventArgs
                         {
-                            Code = UserInteractionCode.CurrentContextFound,
-                            BetterContextFoundValue = CurrentContextId
+                            Code = UserInteractionCode.CurrentContextFound
                         };
                         notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
                         notificationThread.Start();

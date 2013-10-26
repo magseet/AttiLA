@@ -82,7 +82,7 @@ namespace BleDA
 
         private void btnGoContext_Click(object sender, RoutedEventArgs e)
         {
-            Switcher.Switch(new ContextPage());
+            Switcher.Switch(new NewContextPage());
         }
 
         private void btnProfile_Click(object sender, RoutedEventArgs e)

@@ -53,7 +53,11 @@ namespace BleDA
             _refreshTimer.Enabled = true;
 
             _serviceClient.Subscribe();
+
+            Pippo = "pippo";
         }
+
+        public string Pippo { get; set; }
 
         /// <summary>
         /// User selected context
@@ -180,14 +184,18 @@ namespace BleDA
             switch (args.Code)
             {
                 case UserInteractionCode.BetterContextFound:
+                    MessageBox.Show("You moved away?");
                     break;
                 case UserInteractionCode.CurrentContextFound:
+                    MessageBox.Show("Alignment completed.");
                     break;
                 case UserInteractionCode.NewContextSelected:
+                    MessageBox.Show("Alignment started. Please don't move.");
                     break;
                 case UserInteractionCode.PreviousContextFound:
                     break;
                 case UserInteractionCode.TrackingSessionSucceded:
+                    MessageBox.Show("Context updated with new data.");
                     break;
             }
         }
