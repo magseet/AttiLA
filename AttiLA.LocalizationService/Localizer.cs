@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using System.Timers;
 using System.Threading;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace AttiLA.LocalizationService
 {
@@ -332,7 +333,8 @@ namespace AttiLA.LocalizationService
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void localizerTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {   
+        {
+            Thread notificationThread = null;
             lock(_localizerLock)
             {
                 // suspend
@@ -348,14 +350,25 @@ namespace AttiLA.LocalizationService
                             Code = LocalizerNotificationCode.Prediction,
                             PredictionValue = prediction
                         };
-                        var t = new Thread(() => LocalizerNotification(this, args));
-                        t.Start();
+                        notificationThread = new Thread(() => LocalizerNotification(this, args));
+                        notificationThread.Start();
                     }
 
                 }
 
                 // resume
                 _localizerTimer.Start();
+            }
+            if(notificationThread != null)
+            {
+                try
+                {
+                    notificationThread.Join();
+                }
+                catch
+                {
+                    Debug.WriteLine("[Localizer] Notification thread failed.");
+                }
             }
         }
 
@@ -367,103 +380,121 @@ namespace AttiLA.LocalizationService
         /// <returns>A prediction, or null in case of error.</returns>
         public PredictionArgs Prediction()
         {
+            Thread errorNotificationThread = null;
+            Context context = null;
+            PredictionArgs prediction = null;
+
             lock (_localizerLock)
             {
-
-                if (ContextId == null)
+                if (ContextId != null)
                 {
-                    return null;
-                }
-
-                try
-                {
-                    if (_contextService.GetById(ContextId) == null)
-                    {
-                        // notify error
-                        if (LocalizerErrorNotification != null)
-                        {
-                            var args = new LocalizerErrorNotificationEventArgs(
-                                LocalizerErrorNotificationCode.UnknownContext);
-                            var t = new Thread(() => LocalizerErrorNotification(this, args));
-                            t.Start();
-                        }
-                        return null;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (LocalizerErrorNotification != null)
-                    {
-                        // notify error
-                        var args = new LocalizerErrorNotificationEventArgs(
-                            LocalizerErrorNotificationCode.DatabaseError, ex);
-                        var t = new Thread(() => LocalizerErrorNotification(this, args));
-                        t.Start();
-                    }
-                    return null;
-                }
-
-                // context found in the database
-
-                var prediction = new PredictionArgs
-                {
-                    Success = false
-                };
-
-                IEnumerable<ContextPreference> pref = null;
-                for (var attempts = this.Retries + 1; attempts > 0; attempts--)
-                {
-
-                    prediction.PredictedScenario = GetScenarioForCurrentPosition(out pref);
-                    if (prediction.PredictedScenario == null)
-                    {
-                        // retry, eventually..
-                        continue;
-                    }
-
-                    if (ContextId.Equals(prediction.PredictedScenario.ContextId.ToString()))
-                    {
-                        // correct prediction
-                        _scenarioService.IncreaseAccuracy(prediction.PredictedScenario);
-                        prediction.Success = true;
-                        break;
-                    }
-
-                    // wrong prediction
-                    _scenarioService.DecreaseAccuracy(prediction.PredictedScenario);
-                }
-
-                if (!prediction.Success && CreationAllowed)
-                {
-                    // create a new scenario for the requested context
-                    prediction.PredictedScenario = new Scenario
-                    {
-                        ContextId = new ObjectId(ContextId),
-                        CreationTime = DateTime.Now
-                    };
-
                     try
                     {
-                        _scenarioService.Create(prediction.PredictedScenario);
+                        context = _contextService.GetById(ContextId);
+                        if (context == null)
+                        {
+                            // notify error
+                            if (LocalizerErrorNotification != null)
+                            {
+                                var args = new LocalizerErrorNotificationEventArgs(
+                                    LocalizerErrorNotificationCode.UnknownContext);
+                                errorNotificationThread = new Thread(() => LocalizerErrorNotification(this, args));
+                                errorNotificationThread.Start();
+                            }
+                        }
                     }
                     catch (Exception ex)
                     {
                         if (LocalizerErrorNotification != null)
                         {
-                            
                             // notify error
                             var args = new LocalizerErrorNotificationEventArgs(
                                 LocalizerErrorNotificationCode.DatabaseError, ex);
-                            var t = new Thread(() => LocalizerErrorNotification(this, args));
-                            t.Start();
+                            errorNotificationThread = new Thread(() => LocalizerErrorNotification(this, args));
+                            errorNotificationThread.Start();
                         }
-                        return null;
                     }
                 }
 
-                return prediction;
+                if(context != null)
+                {
 
+                    // context found in the database
+
+                    prediction = new PredictionArgs
+                    {
+                        Success = false
+                    };
+
+                    IEnumerable<ContextPreference> pref = null;
+                    for (var attempts = this.Retries + 1; attempts > 0; attempts--)
+                    {
+
+                        prediction.PredictedScenario = GetScenarioForCurrentPosition(out pref);
+                        if (prediction.PredictedScenario == null)
+                        {
+                            // retry, eventually..
+                            continue;
+                        }
+
+                        if (ContextId.Equals(prediction.PredictedScenario.ContextId.ToString()))
+                        {
+                            // correct prediction
+                            _scenarioService.IncreaseAccuracy(prediction.PredictedScenario);
+                            prediction.Success = true;
+                            break;
+                        }
+
+                        // wrong prediction
+                        _scenarioService.DecreaseAccuracy(prediction.PredictedScenario);
+                    }
+
+                    if (!prediction.Success && CreationAllowed)
+                    {
+                        // create a new scenario for the requested context
+                        prediction.PredictedScenario = new Scenario
+                        {
+                            ContextId = new ObjectId(ContextId),
+                            CreationTime = DateTime.Now
+                        };
+
+                        try
+                        {
+                            _scenarioService.Create(prediction.PredictedScenario);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (LocalizerErrorNotification != null)
+                            {
+
+                                // notify error
+                                var args = new LocalizerErrorNotificationEventArgs(
+                                    LocalizerErrorNotificationCode.DatabaseError, ex);
+                                errorNotificationThread = new Thread(() => LocalizerErrorNotification(this, args));
+                                errorNotificationThread.Start();
+                            }
+                            prediction = null;
+                        }
+                    }
+
+                }   // end if(context != null)
+
+
+            }   // unlock
+
+            if(errorNotificationThread != null)
+            {
+                try
+                {
+                    errorNotificationThread.Join();
+                }
+                catch
+                {
+                    Debug.WriteLine("[Localizer] Error notification thread failed.");
+                }
             }
+
+            return prediction;
 
         }
 

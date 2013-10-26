@@ -31,13 +31,6 @@ namespace BleDA
         public StartingPage()
         {
             InitializeComponent();
-
-            _status.UserInteraction += _status_UserInteraction;
-            _status.StatusErrorNotification += _status_StatusErrorNotification;
-
-            _status.Initialize();
-
-
         }
 
         void _status_StatusErrorNotification(object sender, StatusErrorNotificationEventArgs e)
@@ -54,25 +47,6 @@ namespace BleDA
 
         void _status_UserInteraction(object sender, EventArgs e)
         {
-            UserInteractionEventArgs args = (UserInteractionEventArgs) e;
-
-            switch(args.Code){
-                case UserInteractionCode.BetterContextFound:
-                    break;
-                case UserInteractionCode.CurrentContextFound:
-                    break;
-                case UserInteractionCode.NewContextSelected:
-                    break;
-                case UserInteractionCode.PreviousContextFound:
-                    var context = _contextService.GetById(args.PreviousContextFoundValue);
-                    if (context != null)
-                    {
-                        MessageBox.Show("Attila è attivo. Context: " + context.ContextName);
-                    }
-                    break;
-                case UserInteractionCode.TrackingSessionSucceded:
-                    break;
-            }
         }
 
         public void UtilizeState(object state)
