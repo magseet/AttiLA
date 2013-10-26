@@ -35,6 +35,7 @@ namespace BleDA
         System.Timers.Timer _refreshTimer = new System.Timers.Timer();
         Settings _settings = Settings.Instance;
         private LocalizationServiceClient _serviceClient;
+        private Context _selectedContext = new Context();
 
 
         public ProfilePage()
@@ -72,29 +73,30 @@ namespace BleDA
         {
             var recentContexts = _contextService.GetMostRecent((int)_settings.MostRecentLimit);
             var closerContexts = _serviceClient.GetCloserContexts();
-
-            // create suitable list
+            
             List<ContextPreferenceItem> closerContextItems = new List<ContextPreferenceItem>();
             foreach (var closerContext in closerContexts.OrderByDescending(c => c.Value))
-            {
+	        {
                 var context = _contextService.GetById(closerContext.ContextId);
-                if (context == null)
+                if(context == null)
                     continue;
 
                 var item = new ContextPreferenceItem
                 {
-                    ContextName = context.ContextName,
-                    Preference = closerContext.Value.ToString()
+                    Name = context.ContextName,
+                    Value = closerContext.Value.ToString(),
+                    ContextId = closerContext.ContextId
                 };
-                closerContextItems.Add(item);
-            }
 
-            listRecent.Dispatcher.Invoke(new System.Action( 
-                () => { listRecent.ItemsSource = recentContexts;} ));
+		        closerContextItems.Add(item);
+
+	        }
+
+            listRecent.Dispatcher.Invoke(new System.Action(
+                () => { listRecent.ItemsSource = recentContexts; }));
 
             listCloser.Dispatcher.Invoke(new System.Action(
                 () => { listCloser.ItemsSource = closerContextItems; }));
-            
         }
 
         void _status_UserInteraction(object sender, EventArgs e)
@@ -145,6 +147,19 @@ namespace BleDA
         public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
             throw new NotImplementedException();
+        }
+
+        private void listRecent_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Context contextService = ((sender as ListBox).SelectedItem as Context);
+            if (contextService.Id == null) {
+
+            }
+        }
+
+        private void btnLocalized_Click(object sender, RoutedEventArgs e)
+        {
+            _status.CurrentContextId = _selectedContext.Id.ToString();
         }
     }
 }
