@@ -34,6 +34,7 @@ namespace BleDA
         System.Timers.Timer _refreshTimer = new System.Timers.Timer();
         Settings _settings = Settings.Instance;
         private LocalizationServiceClient _serviceClient;
+        private Context _selectedContext = new Context();
 
 
         public ProfilePage()
@@ -82,7 +83,7 @@ namespace BleDA
 
 		        closerContextList.Add(new ContextPreferenceExtended 
                 { ContextName = context.ContextName,
-                    Value = item.Value.ToString() });
+                    Value = item.Value.ToString(), ContextId = item.ContextId });
 
 	        }
 
@@ -144,6 +145,19 @@ namespace BleDA
         public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
             throw new NotImplementedException();
+        }
+
+        private void listRecent_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Context contextService = ((sender as ListBox).SelectedItem as Context);
+            if (contextService.Id == null) {
+
+            }
+        }
+
+        private void btnLocalized_Click(object sender, RoutedEventArgs e)
+        {
+            _status.CurrentContextId = _selectedContext.Id.ToString();
         }
     }
 }

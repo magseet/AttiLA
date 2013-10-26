@@ -9,6 +9,8 @@ namespace BleDA
 {
     public class ContextPreferenceExtended
     {
+        public string ContextId { get; set; }
+
         public String ContextName { get; set; }
 
         public String Value { get; set; }

@@ -12,7 +12,7 @@
       <Value Profile="(Default)">10000</Value>
     </Setting>
     <Setting Name="MostRecentLimit" Type="System.UInt32" Scope="User">
-      <Value Profile="(Default)">5</Value>
+      <Value Profile="(Default)">3</Value>
     </Setting>
   </Settings>
 </SettingsFile>
