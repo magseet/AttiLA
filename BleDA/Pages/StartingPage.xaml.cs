@@ -87,7 +87,7 @@ namespace BleDA
 
         private void btnProfile_Click(object sender, RoutedEventArgs e)
         {
-            Switcher.Switch(new FindPage(), new { returnPage = "Starting" });
+            Switcher.Switch(new ProfilePage(), new { returnPage = "Starting" });
         }
 
         private void btnSettings_Click(object sender, RoutedEventArgs e)

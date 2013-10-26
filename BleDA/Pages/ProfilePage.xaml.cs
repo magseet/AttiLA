@@ -17,6 +17,7 @@ using AttiLA.Data.Entities;
 using MongoDB.Bson;
 using BleDA.LocalizationService;
 using System.ServiceModel;
+using System.Threading;
 
 namespace BleDA
 {
@@ -45,11 +46,12 @@ namespace BleDA
             _status.StatusErrorNotification += _status_StatusErrorNotification;
             _status.UserInteraction += _status_UserInteraction;
 
-            getContext();
+            var t = new Thread(() => UpdateContextLists());
+            t.Start();
 
-            //_refreshTimer.Elapsed += _refreshTimer_Elapsed;
-            //_refreshTimer.Interval = _settings.FindRefreshInterval;
-            //_refreshTimer.Enabled = true;
+            _refreshTimer.Elapsed += _refreshTimer_Elapsed;
+            _refreshTimer.Interval = _settings.FindRefreshInterval;
+            _refreshTimer.Enabled = true;
 
 
 
@@ -60,40 +62,39 @@ namespace BleDA
             //Suspend timer
             _refreshTimer.Stop();
 
-            var getContextCall = new System.Action(getContext);
-
-            getContextCall.Invoke();
+            UpdateContextLists();
 
             //resume timer
             _refreshTimer.Start();
         }
 
-        private void getContext()
+        private void UpdateContextLists()
         {
-            var recentContextList = _contextService.GetMostRecent((int)_settings.MostRecentLimit);
-            var contexts = _serviceClient.GetCloserContexts();
-            
-            List<ContextPreferenceExtended> closerContextList = new List<ContextPreferenceExtended>();
-            foreach (var item in contexts)
-	        {
-                var context = _contextService.GetById(item.ContextId);
-                if(context == null)
+            var recentContexts = _contextService.GetMostRecent((int)_settings.MostRecentLimit);
+            var closerContexts = _serviceClient.GetCloserContexts();
+
+            // create suitable list
+            List<ContextPreferenceItem> closerContextItems = new List<ContextPreferenceItem>();
+            foreach (var closerContext in closerContexts.OrderByDescending(c => c.Value))
+            {
+                var context = _contextService.GetById(closerContext.ContextId);
+                if (context == null)
                     continue;
 
-		        closerContextList.Add(new ContextPreferenceExtended 
-                { ContextName = context.ContextName,
-                    Value = item.Value.ToString() });
-
-	        }
-
-
-            listRecent.ItemsSource = recentContextList;
-            
-            if (contexts != null)
-            {
-                listCloser.ItemsSource = closerContextList; 
+                var item = new ContextPreferenceItem
+                {
+                    ContextName = context.ContextName,
+                    Preference = closerContext.Value.ToString()
+                };
+                closerContextItems.Add(item);
             }
 
+            listRecent.Dispatcher.Invoke(new System.Action( 
+                () => { listRecent.ItemsSource = recentContexts;} ));
+
+            listCloser.Dispatcher.Invoke(new System.Action(
+                () => { listCloser.ItemsSource = closerContextItems; }));
+            
         }
 
         void _status_UserInteraction(object sender, EventArgs e)

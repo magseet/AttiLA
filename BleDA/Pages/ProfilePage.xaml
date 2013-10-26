@@ -87,8 +87,8 @@
                                 <RowDefinition Height="30"></RowDefinition>
                             </Grid.RowDefinitions>
                             <!-- TextBlock -->
-                            <TextBlock x:Name="First"  Text="{Binding Name}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
-                            <TextBlock x:Name="Second" Text="{Binding Value}" Grid.Column="1" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                            <TextBlock x:Name="First"  Text="{Binding ContextName}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                            <TextBlock x:Name="Second" Text="{Binding Preference}" Grid.Column="1" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
