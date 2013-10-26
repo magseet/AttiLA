@@ -20,7 +20,7 @@ namespace AttiLA.LocalizationService
     /// </summary>
     [ServiceBehavior(
         InstanceContextMode = InstanceContextMode.Single,
-        ConcurrencyMode = ConcurrencyMode.Single)]
+        ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class LocalizationService : ILocalizationService
     {
 

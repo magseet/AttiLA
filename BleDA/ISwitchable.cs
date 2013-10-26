@@ -8,6 +8,6 @@ namespace BleDA
 {
     public interface ISwitchable
     {
-        void UtilizeState(object state);
+        void UtilizeState(object state); 
     }
 }

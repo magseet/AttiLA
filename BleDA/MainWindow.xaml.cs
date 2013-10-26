@@ -36,6 +36,7 @@ namespace BleDA
 
         public void Navigate(UserControl nextPage)
         {
+            
             this.Content = nextPage;
         }
 

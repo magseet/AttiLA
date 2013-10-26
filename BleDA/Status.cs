@@ -156,7 +156,8 @@ namespace BleDA
 
     #endregion
 
-    [CallbackBehavior(UseSynchronizationContext = false)]
+    [CallbackBehavior(UseSynchronizationContext = false, 
+        ConcurrencyMode=ConcurrencyMode.Reentrant)]
     public sealed class Status : ILocalizationServiceCallback
     {
         private static volatile Status _instance;
