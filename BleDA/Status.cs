@@ -295,7 +295,7 @@ namespace BleDA
                     return _currentContextId;
                 }
             }
-            set
+            private set
             {
                 lock (lockStatus)
                 {
@@ -341,6 +341,9 @@ namespace BleDA
         /// <returns></returns>
         public bool ContextSelected(string contextId)
         {
+            StatusErrorNotificationEventArgs errorArgs;
+            Thread notificationThread;
+
             if (contextId == null)
             {
                 throw new ArgumentNullException("contextId");
@@ -361,32 +364,51 @@ namespace BleDA
                     {
                         Code = UserInteractionCode.NewContextSelected
                     };
-                    var t = new Thread(() => UserInteraction(this, args));
-                    t.Start();
+                    notificationThread = new Thread(() => UserInteraction(this, args));
+                    notificationThread.Start();
 
                     CurrentContextId = contextId;
                     // new context selected
                     nextState = _process.MoveNext(Command.Selection);
                     //expected state: WaitForCorrectPrediction
+
+                    try
+                    {
+                        EnterState(nextState);
+                    }
+                    catch (StatusException se)
+                    {
+                        // error notification
+                        errorArgs = new StatusErrorNotificationEventArgs(
+                            StatusErrorNotificationCode.TrackingSessionFailed,
+                            se
+                            );
+                        notificationThread = new Thread(() => StatusErrorNotification(this, errorArgs));
+                        notificationThread.Start();
+                    }
+
                 }
-                else
+                else if(_process.CurrentState == State.WaitForConfirmation)
                 {
                     // confirmation
                     nextState = _process.MoveNext(Command.Confirmation);
-                    //expected state: Tracking or WaitForCorrectPrediction
-                }
-                try
-                {
-                    EnterState(nextState);
-                }
-                catch (StatusException se) {
-                    // error notification
-                    var args = new StatusErrorNotificationEventArgs(
-                        StatusErrorNotificationCode.TrackingSessionFailed,
-                        se
-                        );
-                    var t = new Thread(() => StatusErrorNotification(this, args));
-                    t.Start();
+                    //expected state: Tracking
+
+                    try
+                    {
+                        EnterState(nextState);
+                    }
+                    catch (StatusException se)
+                    {
+                        // error notification
+                        var args = new StatusErrorNotificationEventArgs(
+                            StatusErrorNotificationCode.TrackingSessionFailed,
+                            se
+                            );
+                        var t = new Thread(() => StatusErrorNotification(this, args));
+                        t.Start();
+                    }
+
                 }
             }
             return true;

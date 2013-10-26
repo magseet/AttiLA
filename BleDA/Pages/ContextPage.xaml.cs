@@ -33,7 +33,7 @@ namespace BleDA
         private void btnCreateContext_Click(object sender, RoutedEventArgs e)
         {
             if(txtContextName.Text != ""){
-                Status.Instance.CurrentContextId = txtContextName.Text;
+                // Status.Instance.CurrentContextId = txtContextName.Text;
 
                 Switcher.Switch(new StartingPage());
                 /*try
