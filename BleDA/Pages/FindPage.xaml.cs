@@ -35,8 +35,6 @@ namespace BleDA
         System.Timers.Timer _refreshTimer = new System.Timers.Timer();
         Settings _settings = Settings.Instance;
         private LocalizationServiceClient _serviceClient;
-        private Context _selectedContext;
-
 
         public FindPage()
         {
@@ -56,30 +54,68 @@ namespace BleDA
             _refreshTimer.Enabled = true;
         }
 
+        /// <summary>
+        /// User selected context
+        /// </summary>
+        string SelectedContextId
+        {
+            get
+            {
+                var recent = listRecent.SelectedItem as Context;
+                var closer = listCloser.SelectedItem as ContextPreferenceItem;
+                if(recent != null)
+                {
+                    return recent.Id.ToString();
+                }
+                else if(closer != null)
+                {
+                    return closer.ContextId.ToString();
+                }
+                return null;
+            }
+        }
+
 
         void _refreshTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            //Suspend timer
+            // suspend timer
             _refreshTimer.Stop();
 
-            UpdateContextLists();
+            // check if user did select the context
+            bool closerSelected = listCloser.Dispatcher.Invoke(
+                new Func<bool>(
+                    () => { return listCloser.SelectedItem != null; })
+                );
 
-            //resume timer
-            _refreshTimer.Start();
+            bool recentSelected = listRecent.Dispatcher.Invoke(
+                new Func<bool>(
+                    () => { return listRecent.SelectedItem != null; })
+                );
+
+            if (!recentSelected && !closerSelected && UpdateContextLists())
+            {
+                // resume timer
+                _refreshTimer.Start();
+            }
         }
 
-        private void UpdateContextLists()
+
+        /// <summary>
+        /// Populate the context lists.
+        /// </summary>
+        /// <returns>False if update has been skipped due to the user selection</returns>
+        private bool UpdateContextLists()
         {
             // get new results
 
             var recentContexts = _contextService.GetMostRecent((int)_settings.MostRecentLimit);
             var closerContexts = _serviceClient.GetCloserContexts();
-            
+
             List<ContextPreferenceItem> closerContextItems = new List<ContextPreferenceItem>();
             foreach (var closerContext in closerContexts.OrderByDescending(c => c.Value))
-	        {
+            {
                 var context = _contextService.GetById(closerContext.ContextId);
-                if(context == null)
+                if (context == null)
                     continue;
 
                 var item = new ContextPreferenceItem
@@ -89,17 +125,39 @@ namespace BleDA
                     ContextId = closerContext.ContextId
                 };
 
-		        closerContextItems.Add(item);
+                closerContextItems.Add(item);
 
-	        }
-            
-            // update UI passing by the dispatcher
+            }
 
-            listRecent.Dispatcher.Invoke(new System.Action(
-                () => { listRecent.ItemsSource = recentContexts; }));
+            // update could take time
+            // check again for user selection
 
-            listCloser.Dispatcher.Invoke(new System.Action(
-                () => { listCloser.ItemsSource = closerContextItems; }));
+            bool closerSelected = listCloser.Dispatcher.Invoke(
+                new Func<bool>(
+                    () => { return listCloser.SelectedItem != null; })
+                );
+
+            bool recentSelected = listRecent.Dispatcher.Invoke(
+                new Func<bool>(
+                    () => { return listRecent.SelectedItem != null; })
+                );
+
+            if (!recentSelected && !closerSelected)
+            {
+                // update UI
+
+                listRecent.Dispatcher.Invoke(new System.Action(
+                    () => { listRecent.ItemsSource = recentContexts; }));
+
+                listCloser.Dispatcher.Invoke(new System.Action(
+                    () => { listCloser.ItemsSource = closerContextItems; }));
+
+                // update performed
+                return true;
+            }
+
+            // update skipped
+            return false;
         }
 
 
@@ -140,33 +198,50 @@ namespace BleDA
 
         public void ReportLocalizationProgress(double progress)
         {
-            throw new NotImplementedException();
+            // TODO: somehow show progress..
         }
 
         public void ReportPrediction(string contextId)
         {
-            throw new NotImplementedException();
+            // unused
         }
 
         public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
-            throw new NotImplementedException();
+            // usuned
         }
 
         private void listRecent_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Context contextService = ((sender as ListBox).SelectedItem as Context);
-            if (contextService.Id == null) {
+            if ((sender as ListBox).SelectedItem != null)
+            {
+                // only one selection for both lists is showed
+                listCloser.SelectedItem = null;
+            }
+        }
 
+        private void listCloser_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if((sender as ListBox).SelectedItem != null)
+            {
+                // only one selection for both lists is showed
+                listRecent.SelectedItem = null;
             }
         }
 
         private void btnLocalized_Click(object sender, RoutedEventArgs e)
         {
-            if(_selectedContext != null)
+            if(SelectedContextId == null)
             {
-                _status.ContextSelected(_selectedContext.Id.ToString());
+                // ToDO..
+                MessageBox.Show("No selection");
+            }
+            else
+            {
+                // ToDO..
+                MessageBox.Show("Selected: " + SelectedContextId);
             }
         }
+
     }
 }

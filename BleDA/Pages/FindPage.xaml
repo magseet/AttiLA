@@ -26,7 +26,7 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <ListBox x:Name="listCloser" BorderBrush="Transparent" HorizontalAlignment="Left" Height="174" Margin="30,300,0,0" VerticalAlignment="Top" Width="300" Background="{x:Null}">
+            <ListBox x:Name="listCloser" BorderBrush="Transparent" HorizontalAlignment="Left" Height="174" Margin="30,300,0,0" VerticalAlignment="Top" Width="300" Background="{x:Null}" SelectionChanged="listCloser_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
