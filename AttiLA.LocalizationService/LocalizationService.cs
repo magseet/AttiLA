@@ -9,6 +9,7 @@ using AttiLA.Data.Services;
 using AttiLA.Data;
 using MongoDB.Bson;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace AttiLA.LocalizationService
 {
@@ -132,7 +133,7 @@ namespace AttiLA.LocalizationService
                         // notify all subscribers about localization progress
                         foreach (var subscriber in subscribers)
                         {
-                            if (((ICommunicationObject)subscriber).State == CommunicationState.Opened)
+                            if ((subscriber as ICommunicationObject).State == CommunicationState.Opened)
                             {
                                 subscriber.ReportLocalizationProgress(e.ProgressValue);
                             }

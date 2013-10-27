@@ -12,6 +12,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using AttiLA.Data.Entities;
+using AttiLA.Data.Services;
+using AttiLA.Data;
+using MongoDB.Bson;
 
 namespace BleDA
 {
@@ -27,24 +31,30 @@ namespace BleDA
 
         public void UtilizeState(object state)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         private void btnCreateContext_Click(object sender, RoutedEventArgs e)
         {
-            if(txtContextName.Text != ""){
-                // Status.Instance.CurrentContextId = txtContextName.Text;
-
-                Switcher.Switch(new StartingPage());
-                /*try
+            if(!string.IsNullOrWhiteSpace(txtContextName.Text))
+            {
+                Context c = new Context
                 {
-                    _contextService.Create(c);
+                    ContextName = txtContextName.Text,
+                    CreationDateTime = DateTime.Now
+                };
+                try
+                {
+                    var contextService = new ContextService();
+                    contextService.Create(c);
                 }
                 catch (DatabaseException)
                 {
                     MessageBox.Show("Already exists.");
                     return;
-                }*/               
+                }
+                
+                Switcher.Switch(new StartingPage());
             }
         }
 

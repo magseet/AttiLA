@@ -65,7 +65,7 @@ namespace BleDA
 
         private void _status_StatusErrorNotification(object sender, StatusErrorNotificationEventArgs e)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
         }
 
         public void UtilizeState(object state)
