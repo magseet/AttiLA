@@ -18,6 +18,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using BleDA.Actions;
+using System.Diagnostics;
 
 namespace BleDA
 {
@@ -99,7 +101,9 @@ namespace BleDA
             if (SelectedExistingTask != null && !string.IsNullOrWhiteSpace(_status.CurrentContextId))
             {
                 _taskService.AddContext(SelectedExistingTask.Id.ToString(), _status.CurrentContextId);
-                PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.ContextTasks)));
+                
+                if (null != this.PropertyChanged)
+                    PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.ContextTasks)));
             }
 
         }
@@ -111,7 +115,8 @@ namespace BleDA
             if (SelectedContextTask != null)
             {
                 _taskService.RemoveContext(SelectedContextTask.Id.ToString(), _status.CurrentContextId);
-                PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.ContextTasks)));
+                if (null != this.PropertyChanged)
+                    PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.ContextTasks)));
             }                
         }
 
@@ -120,6 +125,42 @@ namespace BleDA
             if (SelectedContextTask != null)
             {
                 Switcher.Switch(new TaskPage(), (object) SelectedContextTask);
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if (ContextTasks == null)
+                return;
+
+            foreach( var task in ContextTasks ){
+                if (task.Actions == null)
+                    continue;
+
+                foreach (var action in task.Actions)
+                {
+                    if (action is OpeningAction)
+                    {
+                        try
+                        {
+                            Processes.ExecuteProcess(action as OpeningAction);
+                        }catch(Exception){
+                            Debug.WriteLine("[BleDA] - Operation execute process skipped.");
+                        }
+                    }
+                    else if (action is ClosingAction)
+                    {
+
+                    }
+                    else if (action is NotificationAction)
+                    {
+
+                    }
+                    else if (action is ServiceAction)
+                    {
+
+                    }
+                }
             }
         }
     }

@@ -31,13 +31,12 @@ namespace BleDA
     {
         private Status _status = Status.Instance;
         private ContextService _contextService = new ContextService();
-        private TaskbarIcon _notifyIcon;
-
+        
         public MainWindow()
         {
             InitializeComponent();
             //initialize NotifyIcon
-            _notifyIcon = (TaskbarIcon)FindResource("AttiLANotifyIcon");
+            _status.NotifyIcon = (TaskbarIcon)FindResource("AttiLANotifyIcon");
 
             // initialize status
             _status.UserInteraction += _status_UserInteraction;
@@ -67,7 +66,6 @@ namespace BleDA
 
         void _status_UserInteraction(object sender, EventArgs e)
         {
-            string notificationTitle = "WPF NotifyIcon";
             var args = e as UserInteractionEventArgs;
             Debug.WriteLine("[BleDA] UserInteraction: " + args.Code.ToString());
             switch (args.Code)
@@ -95,7 +93,7 @@ namespace BleDA
 
                     break;
                 case UserInteractionCode.CurrentContextFound:
-                    _notifyIcon.ShowBalloonTip(notificationTitle,
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo,
                         Properties.Resources.MsgAlignmentCompleted, BalloonIcon.Info);
                     //_notifyIcon.HideBalloonTip();
 
@@ -105,7 +103,7 @@ namespace BleDA
 
                 case UserInteractionCode.NewContextSelected:
 
-                    _notifyIcon.ShowBalloonTip(notificationTitle,
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo,
                         Properties.Resources.MsgAlignmentStarted, BalloonIcon.Info);
                     //_notifyIcon.HideBalloonTip();
 

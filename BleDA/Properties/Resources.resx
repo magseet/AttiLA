@@ -141,4 +141,13 @@
   <data name="MsgTrackingStartFailure" xml:space="preserve">
     <value>Tracking start failure.</value>
   </data>
+  <data name="PopupError" xml:space="preserve">
+    <value>BleDA Error</value>
+  </data>
+  <data name="PopupInfo" xml:space="preserve">
+    <value>BleDA Info</value>
+  </data>
+  <data name="PopupWarning" xml:space="preserve">
+    <value>BleDA Warning</value>
+  </data>
 </root>

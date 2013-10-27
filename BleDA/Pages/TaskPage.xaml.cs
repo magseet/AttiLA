@@ -16,6 +16,8 @@ using Ookii.Dialogs.Wpf;
 using System.ComponentModel;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
+using AttiLA.Data;
+using System.Collections.ObjectModel;
 
 namespace BleDA
 {
@@ -39,14 +41,16 @@ namespace BleDA
         private TaskService _taskService = new TaskService();
         private String _openingActionPath;
         private String _openingActionArgument;
+        private Status _status = Status.Instance;
+        private ObservableCollection<AttiLA.Data.Entities.Action> _taskActions = new ObservableCollection<AttiLA.Data.Entities.Action>();
 
-        public String OpeningActionPath 
+        public String OpeningActionPath
         {
-            get 
-            { 
-                return _openingActionPath; 
-            }  
-            set 
+            get
+            {
+                return string.IsNullOrWhiteSpace(_openingActionPath) ? null : _openingActionPath;
+            }
+            set
             {
                 _openingActionPath = value;
                 if (null != this.PropertyChanged)
@@ -55,13 +59,13 @@ namespace BleDA
                 }
             }
         }
-        public String OpeningActionArguments 
+        public String OpeningActionArguments
         {
-            get 
-            { 
-                return _openingActionArgument; 
-            }  
-            set 
+            get
+            {
+                return string.IsNullOrWhiteSpace(_openingActionArgument) ? null : _openingActionArgument;
+            }
+            set
             {
                 _openingActionArgument = value;
                 if (null != this.PropertyChanged)
@@ -73,31 +77,17 @@ namespace BleDA
 
         public AttiLA.Data.Entities.Task SelectedTask { get; set; }
 
-        public String TaskName { 
-            get 
-            { 
-                var task = _taskService.GetById(SelectedTask.Id.ToString()); 
-                if(task == null)
-                    return "";
+        public AttiLA.Data.Entities.Action SelectedAction { get; set; }
 
-                return task.TaskName;
-            }
-        }
-
-        public IEnumerable<AttiLA.Data.Entities.Action> TaskActions
+        public String TaskName
         {
             get
             {
-                if (SelectedTask != null)
-                {
-                    var task = _taskService.GetActions(SelectedTask.Id.ToString());
-                    if (task == null)
-                        return new List<AttiLA.Data.Entities.Action>();
+                var task = _taskService.GetById(SelectedTask.Id.ToString());
+                if (task == null)
+                    return "";
 
-                    return task;
-                }
-
-                return new List<AttiLA.Data.Entities.Action>();
+                return task.TaskName;
             }
         }
 
@@ -110,70 +100,26 @@ namespace BleDA
         public void UtilizeState(object state)
         {
             SelectedTask = (AttiLA.Data.Entities.Task)state;
+            LoadActions();
+            taskSelected.ItemsSource = _taskActions;
         }
 
-        //private AttiLA.Data.Entities.Task _selectedAction;
-        //private AttiLA.Data.Entities.Task SelectedAction
-        //{
-        //    get
-        //    {
-        //        return _selectedAction;
-        //    }
-        //    set
-        //    {
-        //        if (_selectedAction != value)
-        //        {
-        //            _selectedAction = value;
-        //            if (value != null)
-        //            {
-        //                _selectedAction.Actions = _taskService
-        //                    .GetActions(value.Id.ToString())
-        //                    .ToList();
-        //            }
-        //            OnSelectedTaskChanged();
-        //        }
-        //    }
-        //}
-
-        //public void OnSelectedTaskChanged()
-        //{
-        //    List<Action> listActions = new List<Action>();
-        //    taskSelected.Items.Clear();
-        //    if (SelectedTask == null)
-        //    {
-        //        return;
-        //    }
-
-        //    foreach (var action in SelectedTask.Actions)
-        //    {
-        //        //lvi.Text = action.GetType().ToString();
-
-        //        if (action.GetType() == typeof(OpeningAction))
-        //        {
-        //            var openingAction = (OpeningAction)action;
-        //            listActions.Add(new Action { Operation = Operation.Start, ActionName = action.GetType().ToString(), Param1 = openingAction.Path, Param2 = openingAction.Arguments });
-        //        }
-        //        else if (action.GetType() == typeof(ClosingAction))
-        //        {
-        //            var closingAction = (ClosingAction)action;
-        //            listActions.Add(new Action { Operation = Operation.Stop, ActionName = action.GetType().ToString(), Param1 = closingAction.ExecutablePath, Param2 = closingAction.CommandLine });
-
-        //        }
-        //        else if (action.GetType() == typeof(ServiceAction))
-        //        {
-        //            var serviceAction = (ServiceAction)action;
-        //            //lvi.SubItems.Add(serviceAction.ServiceName);
-        //            //lvi.SubItems.Add(serviceAction.ServiceActionType.ToString());
-        //        }
-        //        else if (action.GetType() == typeof(NotificationAction))
-        //        {
-        //            var notificationAction = (NotificationAction)action;
-        //            //lvi.SubItems.Add(notificationAction.Message);
-        //        }
-        //    }
-
-        //    taskSelected.ItemsSource = listActions;
-        //}
+        private void LoadActions()
+        {
+            if (SelectedTask != null)
+            {
+                var actions = _taskService.GetActions(SelectedTask.Id.ToString());
+                if (actions == null)
+                    _taskActions = new ObservableCollection<AttiLA.Data.Entities.Action>();
+                else
+                    _taskActions = new ObservableCollection<AttiLA.Data.Entities.Action>(actions);
+            }
+            else
+            {
+                _taskActions = new ObservableCollection<AttiLA.Data.Entities.Action>();
+            }
+            
+        }
 
         private void Back_Click(object sender, RoutedEventArgs e)
         {
@@ -186,7 +132,7 @@ namespace BleDA
             // As of .Net 3.5 SP1, WPF's Microsoft.Win32.OpenFileDialog class still uses the old style
             VistaOpenFileDialog dialog = new VistaOpenFileDialog();
             dialog.Filter = "All files (*.*)|*.*";
-            
+
             if (!VistaFileDialog.IsVistaFileDialogSupported)
                 MessageBox.Show("Because you are not using Windows Vista or later, the regular open file dialog will be used. Please use Windows Vista to see the new dialog.", "Sample open file dialog");
             if ((bool)dialog.ShowDialog())
@@ -202,16 +148,6 @@ namespace BleDA
 
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void btnAdd_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void btnClear_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show(OpeningActionPath);
@@ -221,11 +157,61 @@ namespace BleDA
 
         private void btnAddActionStart_Click(object sender, RoutedEventArgs e)
         {
-            //
+            if (OpeningActionPath == null || SelectedTask == null)
+                return;
+
+            var action = new OpeningAction { Path = OpeningActionPath, Arguments = OpeningActionArguments };
+
+            _taskActions.Add(action);
         }
 
         #region Implement INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         #endregion
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedTask == null)
+                return;
+
+            SelectedTask.Actions = _taskActions.ToList();
+
+            try
+            {
+                _taskService.Update(SelectedTask);
+            }
+            catch (DatabaseException)
+            {
+                _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupWarning, "Update failed. Try again later", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Warning);
+            }
+
+            Switcher.Switch(new ViewContextPage());
+        }
+
+        private void btnRemove_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedAction != null)
+                _taskActions.Remove(SelectedAction);
+        }
+
+        private void btnMoveUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedAction != null)
+            {
+                int indexAction = _taskActions.IndexOf(SelectedAction);
+                if (indexAction > 0)
+                    _taskActions.Move(indexAction, indexAction - 1);
+            }
+        }
+
+        private void btnMoveDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedAction != null)
+            {
+                int indexAction = _taskActions.IndexOf(SelectedAction);
+                if (indexAction < _taskActions.Count - 1)
+                    _taskActions.Move(indexAction, indexAction + 1);
+            }
+        }
     }
 }

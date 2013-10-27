@@ -20,6 +20,19 @@ namespace BleDA.Actions
 
     public class Processes
     {
+        public static void ExecuteProcess(OpeningAction action)
+        {
+            if (action == null || action.Path == null)
+                throw new ArgumentNullException("action");
+
+            if (action.Arguments == null)
+                Process.Start(action.Path);
+            else
+                Process.Start(action.Path, action.Arguments);
+
+            return;
+        }
+
         /// <summary>
         /// Select the processes for the current user.
         /// </summary>

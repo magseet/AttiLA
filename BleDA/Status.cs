@@ -8,6 +8,7 @@ using System.ServiceModel;
 using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using System.Threading;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace BleDA
 {
@@ -169,6 +170,7 @@ namespace BleDA
             .Timer(Properties.Settings.Default.ClientTimeout);
 
         private InstanceContext context;
+        private TaskbarIcon _notifyIcon;
 
         #region Events
         public delegate void UserInteractionEventHandler(object sender, EventArgs e);
@@ -195,6 +197,8 @@ namespace BleDA
         public event StatusErrorNotificationEventHandler StatusErrorNotification;
 
         #endregion
+
+        public TaskbarIcon NotifyIcon { get; set; }
 
         private Status()
         {

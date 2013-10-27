@@ -131,5 +131,32 @@ namespace BleDA.Properties {
                 return ResourceManager.GetString("MsgTrackingStartFailure", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BleDA Error.
+        /// </summary>
+        internal static string PopupError {
+            get {
+                return ResourceManager.GetString("PopupError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BleDA Info.
+        /// </summary>
+        internal static string PopupInfo {
+            get {
+                return ResourceManager.GetString("PopupInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BleDA Warning.
+        /// </summary>
+        internal static string PopupWarning {
+            get {
+                return ResourceManager.GetString("PopupWarning", resourceCulture);
+            }
+        }
     }
 }
