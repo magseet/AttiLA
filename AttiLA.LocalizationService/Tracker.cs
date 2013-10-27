@@ -221,7 +221,6 @@ namespace AttiLA.LocalizationService
             }
             set
             {
-                Thread notificationThread;
                 lock (_trackerLock)
                 {
                     var beforeState = _trackerTimer.Enabled;
@@ -236,9 +235,7 @@ namespace AttiLA.LocalizationService
                                 : TrackerNotificationCode.Stopped,
                             TargetScenario = _targetScenario
                         };
-                        notificationThread = new Thread(() => TrackerNotification(this, args));
-                        notificationThread.Start();
-                        Debug.WriteLine("PIPPO");
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                     }
                 }
             }
@@ -277,6 +274,29 @@ namespace AttiLA.LocalizationService
         }
 
         /// <summary>
+        /// Callback to send notifications.
+        /// </summary>
+        /// <param name="o"></param>
+        private void DoNotification(object o)
+        {
+            try
+            {
+                if (o is TrackerNotificationEventArgs && TrackerNotification != null)
+                {
+                    TrackerNotification(this, o as TrackerNotificationEventArgs);
+                }
+                else if (o is TrackerErrorNotificationEventArgs && TrackerErrorNotification != null)
+                {
+                    TrackerErrorNotification(this, o as TrackerErrorNotificationEventArgs);
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("[Tracker] Notification failed.");
+            }
+        }
+
+        /// <summary>
         /// All the examples in the staging area are stored in the database.
         /// </summary>
         public void Update()
@@ -308,8 +328,7 @@ namespace AttiLA.LocalizationService
                     {
                         var args = new TrackerErrorNotificationEventArgs(
                             TrackerErrorNotificationCode.DatabaseError, ex);
-                        var t = new Thread(() => TrackerErrorNotification(this, args));
-                        t.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                     }
                 }
                 finally
@@ -352,8 +371,7 @@ namespace AttiLA.LocalizationService
                         {
                             Code = TrackerNotificationCode.NoSignalsDetected
                         };
-                        var t = new Thread(() => TrackerNotification(this, args));
-                        t.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                     }
                 }
                 else
@@ -365,7 +383,8 @@ namespace AttiLA.LocalizationService
                     };
 
                     _targetScenario.TrainingSet.Add(example);
-
+                    Debug.WriteLine("[Tracker] " + _targetScenario.ContextId.ToString()
+                        + " - Count: " + _targetScenario.TrainingSet.Count);
                     if(_targetScenario.TrainingSet.Count == TrainingThreshold)
                     {
                         if(TrackerNotification != null)
@@ -375,8 +394,7 @@ namespace AttiLA.LocalizationService
                                 Code = TrackerNotificationCode.TrainingCompleted,
                                 TargetScenario = _targetScenario
                             };
-                            var t = new Thread(() => TrackerNotification(this, args));
-                            t.Start();
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                         }
                     }
                 }

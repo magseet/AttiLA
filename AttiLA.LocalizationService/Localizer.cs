@@ -59,7 +59,7 @@ namespace AttiLA.LocalizationService
                 this.value = (PredictionArgs)value;
             }
         }
- 
+
 
         /// <summary>
         /// A code to identify the notification type.
@@ -197,17 +197,17 @@ namespace AttiLA.LocalizationService
         {
             private get
             {
-                lock(_localizerLock)
+                lock (_localizerLock)
                 {
-                    return 
-                        _similarityAlgorithm != null 
-                        ? _similarityAlgorithm 
+                    return
+                        _similarityAlgorithm != null
+                        ? _similarityAlgorithm
                         : (scenario, signals) => 0.0;
                 }
             }
             set
             {
-                lock(_localizerLock)
+                lock (_localizerLock)
                 {
                     _similarityAlgorithm = value;
                 }
@@ -228,7 +228,7 @@ namespace AttiLA.LocalizationService
             }
             set
             {
-                lock(_localizerLock)
+                lock (_localizerLock)
                 {
                     _retries = (value > 0 ? value : 0);
                 }
@@ -242,14 +242,14 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock(_localizerLock)
+                lock (_localizerLock)
                 {
                     return _contextId;
                 }
             }
             set
             {
-                lock(_localizerLock)
+                lock (_localizerLock)
                 {
                     if (value != null && !ContextService.IsValidObjectID(value))
                     {
@@ -309,7 +309,7 @@ namespace AttiLA.LocalizationService
         {
             get
             {
-                lock(_localizerTimer)
+                lock (_localizerTimer)
                 {
                     return _creationAllowed;
                 }
@@ -317,7 +317,7 @@ namespace AttiLA.LocalizationService
 
             set
             {
-                lock(_localizerTimer)
+                lock (_localizerTimer)
                 {
                     _creationAllowed = value;
                 }
@@ -325,6 +325,29 @@ namespace AttiLA.LocalizationService
         }
 
         #endregion
+
+        /// <summary>
+        /// Callback to send notifications.
+        /// </summary>
+        /// <param name="o"></param>
+        private void DoNotification(object o)
+        {
+            try
+            {
+                if (o is LocalizerNotificationEventArgs && LocalizerNotification != null)
+                {
+                    LocalizerNotification(this, o as LocalizerNotificationEventArgs);
+                }
+                else if (o is LocalizerErrorNotificationEventArgs && LocalizerErrorNotification != null)
+                {
+                    LocalizerErrorNotification(this, o as LocalizerErrorNotificationEventArgs);
+                }
+            }
+            catch
+            {
+                Debug.WriteLine("[Localizer] Notification failed.");
+            }
+        }
 
 
         /// <summary>
@@ -334,8 +357,7 @@ namespace AttiLA.LocalizationService
         /// <param name="e"></param>
         void localizerTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            Thread notificationThread = null;
-            lock(_localizerLock)
+            lock (_localizerLock)
             {
                 // suspend
                 _localizerTimer.Stop();
@@ -350,25 +372,13 @@ namespace AttiLA.LocalizationService
                             Code = LocalizerNotificationCode.Prediction,
                             PredictionValue = prediction
                         };
-                        notificationThread = new Thread(() => LocalizerNotification(this, args));
-                        notificationThread.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                     }
 
                 }
 
                 // resume
                 _localizerTimer.Start();
-            }
-            if(notificationThread != null)
-            {
-                try
-                {
-                    notificationThread.Join();
-                }
-                catch
-                {
-                    Debug.WriteLine("[Localizer] Notification thread failed.");
-                }
             }
         }
 
@@ -380,7 +390,6 @@ namespace AttiLA.LocalizationService
         /// <returns>A prediction, or null in case of error.</returns>
         public PredictionArgs Prediction()
         {
-            Thread errorNotificationThread = null;
             Context context = null;
             PredictionArgs prediction = null;
 
@@ -398,8 +407,7 @@ namespace AttiLA.LocalizationService
                             {
                                 var args = new LocalizerErrorNotificationEventArgs(
                                     LocalizerErrorNotificationCode.UnknownContext);
-                                errorNotificationThread = new Thread(() => LocalizerErrorNotification(this, args));
-                                errorNotificationThread.Start();
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                             }
                         }
                     }
@@ -410,13 +418,12 @@ namespace AttiLA.LocalizationService
                             // notify error
                             var args = new LocalizerErrorNotificationEventArgs(
                                 LocalizerErrorNotificationCode.DatabaseError, ex);
-                            errorNotificationThread = new Thread(() => LocalizerErrorNotification(this, args));
-                            errorNotificationThread.Start();
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                         }
                     }
                 }
 
-                if(context != null)
+                if (context != null)
                 {
 
                     // context found in the database
@@ -470,8 +477,7 @@ namespace AttiLA.LocalizationService
                                 // notify error
                                 var args = new LocalizerErrorNotificationEventArgs(
                                     LocalizerErrorNotificationCode.DatabaseError, ex);
-                                errorNotificationThread = new Thread(() => LocalizerErrorNotification(this, args));
-                                errorNotificationThread.Start();
+                                ThreadPool.QueueUserWorkItem(new WaitCallback(DoNotification), args);
                             }
                             prediction = null;
                         }
@@ -481,18 +487,6 @@ namespace AttiLA.LocalizationService
 
 
             }   // unlock
-
-            if(errorNotificationThread != null)
-            {
-                try
-                {
-                    errorNotificationThread.Join();
-                }
-                catch
-                {
-                    Debug.WriteLine("[Localizer] Error notification thread failed.");
-                }
-            }
 
             return prediction;
 
@@ -505,7 +499,7 @@ namespace AttiLA.LocalizationService
         /// <returns>The most suitable scenario or null.</returns>
         public Scenario GetScenarioForCurrentPosition(out IEnumerable<ContextPreference> preferences)
         {
-            lock(_localizerLock)
+            lock (_localizerLock)
             {
                 List<ScanSignal> signals = _wlanScanner.GetScanSignals();
 
@@ -623,7 +617,7 @@ namespace AttiLA.LocalizationService
             {
                 foreach (double progress in _progressCollection.GetConsumingEnumerable())
                 {
-                    if(LocalizerNotification != null)
+                    if (LocalizerNotification != null)
                     {
                         var args = new LocalizerNotificationEventArgs
                         {
@@ -640,6 +634,6 @@ namespace AttiLA.LocalizationService
 
 
 
-        
+
     }
 }
