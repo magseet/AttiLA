@@ -227,9 +227,8 @@ namespace BleDA
             _timer.Stop();
 
             State nextState = State.Unknown, leavingState = _process.CurrentState;
-            UserInteractionEventArgs userInteractionargs;
-            StatusErrorNotificationEventArgs errorStatusArgs;
-            Thread notificationThread;
+            UserInteractionEventArgs userInteractionArgs;
+            StatusErrorNotificationEventArgs errorArgs;
 
             lock (lockStatus)
             {
@@ -237,23 +236,23 @@ namespace BleDA
                 {
                     case State.WaitForCorrectPrediction:
                         // error notification
-                        errorStatusArgs = new StatusErrorNotificationEventArgs(
+                        errorArgs = new StatusErrorNotificationEventArgs(
                             StatusErrorNotificationCode.TrackingSessionFailed
                             );
-                        notificationThread = new Thread(() => StatusErrorNotification(this, errorStatusArgs));
-                        notificationThread.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => StatusErrorNotification(this, errorArgs)));
 
                         nextState = _process.MoveNext(Command.None);
                         //expected state: WaitForSelection
                         break;
 
                     case State.Tracking:
-                        userInteractionargs = new UserInteractionEventArgs
+                        userInteractionArgs = new UserInteractionEventArgs
                         {
                             Code = UserInteractionCode.TrackingSessionSucceded
                         };
-                        notificationThread = new Thread(() => UserInteraction(this, userInteractionargs));
-                        notificationThread.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => UserInteraction(this, userInteractionArgs)));
 
                         nextState = _process.MoveNext(Command.None);
                         //expected state: WaitForWrongPrediction
@@ -342,9 +341,6 @@ namespace BleDA
         /// <returns></returns>
         public bool ContextSelected(string contextId)
         {
-            StatusErrorNotificationEventArgs errorArgs;
-            Thread notificationThread;
-
             if (contextId == null)
             {
                 throw new ArgumentNullException("contextId");
@@ -361,12 +357,12 @@ namespace BleDA
                 if (contextId != CurrentContextId)
                 {
                     // notify that the selection is different than the previous one
-                    var args = new UserInteractionEventArgs
+                    var userInteractionArgs = new UserInteractionEventArgs
                     {
                         Code = UserInteractionCode.NewContextSelected
                     };
-                    notificationThread = new Thread(() => UserInteraction(this, args));
-                    notificationThread.Start();
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => UserInteraction(this, userInteractionArgs)));
 
                     CurrentContextId = contextId;
                     // new context selected
@@ -381,12 +377,12 @@ namespace BleDA
                     catch (StatusException se)
                     {
                         // error notification
-                        errorArgs = new StatusErrorNotificationEventArgs(
+                        var errorArgs = new StatusErrorNotificationEventArgs(
                             StatusErrorNotificationCode.TrackingSessionFailed,
                             se
                             );
-                        notificationThread = new Thread(() => StatusErrorNotification(this, errorArgs));
-                        notificationThread.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => StatusErrorNotification(this, errorArgs)));
                     }
 
                 }
@@ -403,12 +399,12 @@ namespace BleDA
                     catch (StatusException se)
                     {
                         // error notification
-                        var args = new StatusErrorNotificationEventArgs(
+                        var errorArgs = new StatusErrorNotificationEventArgs(
                             StatusErrorNotificationCode.TrackingSessionFailed,
                             se
                             );
-                        var t = new Thread(() => StatusErrorNotification(this, args));
-                        t.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => StatusErrorNotification(this, errorArgs)));
                     }
 
                 }
@@ -419,7 +415,6 @@ namespace BleDA
         private void EnterState(State state)
         {
             UserInteractionEventArgs userInteractionArgs;
-            Thread notificationThread;
             bool trackingStarted;
 
             lock (lockStatus)
@@ -450,8 +445,8 @@ namespace BleDA
                                 Code = UserInteractionCode.PreviousContextFound,
                                 PreviousContextFoundValue = serviceStatus.ContextId
                             };
-                            notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
-                            notificationThread.Start();
+                            ThreadPool.QueueUserWorkItem(new WaitCallback(
+                                (object o) => UserInteraction(this, userInteractionArgs)));
                         }
 
                         break;
@@ -495,8 +490,8 @@ namespace BleDA
                         {
                             Code = UserInteractionCode.CurrentContextFound
                         };
-                        notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
-                        notificationThread.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback( 
+                            (object o) => UserInteraction(this, userInteractionArgs)));
 
                         break;
                     case State.WaitForConfirmation:
@@ -552,11 +547,11 @@ namespace BleDA
                     if (contextId == null || contextId != _currentContextId)
                     {
                         // error notification
-                        var args = new StatusErrorNotificationEventArgs(
+                        var errorArgs = new StatusErrorNotificationEventArgs(
                             StatusErrorNotificationCode.UnexpectedPrediction
                             );
-                        var t = new Thread(() => StatusErrorNotification(this, args));
-                        t.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => StatusErrorNotification(this, errorArgs)));
                     }
                     else
                     {
@@ -577,13 +572,13 @@ namespace BleDA
                         //expected state: WaitForConfirmation
                         EnterState(nextState);
 
-                        UserInteractionEventArgs userInteractionArgs = new UserInteractionEventArgs
+                        var userInteractionArgs = new UserInteractionEventArgs
                         {
                             Code = UserInteractionCode.BetterContextFound,
                             BetterContextFoundValue = contextId
                         };
-                        Thread notificationThread = new Thread(() => UserInteraction(this, userInteractionArgs));
-                        notificationThread.Start();
+                        ThreadPool.QueueUserWorkItem(new WaitCallback(
+                            (object o) => UserInteraction(this, userInteractionArgs)));
                     }
                 }else if(_process.CurrentState == State.WaitForConfirmation){
                     // expected prediction
