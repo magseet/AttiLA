@@ -42,8 +42,9 @@ namespace BleDA
             _serviceClient = new LocalizationServiceClient(context);
 
             // update in a separated thread to avoid UI freeze
-            var t = new Thread(() => UpdateContextLists());
-            t.Start();
+            ThreadPool.QueueUserWorkItem(new WaitCallback(
+                (object o) =>  UpdateContextLists()
+                ));
 
             _refreshTimer.Elapsed += _refreshTimer_Elapsed;
             _refreshTimer.Interval = _settings.FindRefreshInterval;
