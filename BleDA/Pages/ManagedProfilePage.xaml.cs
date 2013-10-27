@@ -120,7 +120,7 @@ namespace BleDA
             {
                 case "Start":
                 case "Stop":
-                    dialog.Filter = "*.exe";
+                    //dialog.Filter = "*.exe";
                     break;
                 default:
                     dialog.Filter = "All files (*.*)|*.*";

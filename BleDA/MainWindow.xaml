@@ -1,7 +1,8 @@
 ﻿<Window x:Class="BleDA.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="BleDA - ver 1.0.0.0" Height="500" Width="600">
+        Title="BleDA - ver 1.0.0.0" Height="500" Width="600"
+        Icon="./Icons/AttiLA.ico">
     <Window.Resources>
         <Style x:Key="ButtonTile" TargetType="{x:Type Button}">
             <Setter Property="Template">
