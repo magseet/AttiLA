@@ -21,21 +21,44 @@ namespace BleDA
 {
     public enum Operation
     {
-        [Description("Start")]
+        [Description("Start program")]
         Start = 1,
-        [Description("Stop")]
-        Stop
+        [Description("Stop program")]
+        Stop,
+        [Description("Manage windows service")]
+        Service,
+        [Description("Send notification")]
+        Notification
+
     }
     /// <summary>
     /// Interaction logic for ManagedProfilePage.xaml
     /// </summary>
-    public partial class ManagedProfilePage : UserControl, ISwitchable
+    public partial class ManagedProfilePage : UserControl, ISwitchable, INotifyPropertyChanged
     {
         private TaskService _taskService = new TaskService();
+        private String _openingActionPath = "";
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public String OpeningActionPath {
+            get { return _openingActionPath; }
+            set {
+                _openingActionPath = value;
+                if (null != this.PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("OpeningActionPath"));
+                }
+            }
+        }
+        public String OpeningActionArguments { get; set; }
+
         public ManagedProfilePage()
         {
+            OpeningActionPath = "12";
             InitializeComponent();
-            this.DataContext = new EnumHelper();
+            this.DataContext = this;
+
+            //this.DataContext = new EnumHelper();
         }
 
         public void UtilizeState(object state)
@@ -112,30 +135,25 @@ namespace BleDA
             Switcher.Switch(new StartingPage());
         }
 
-        private void ShowOpenFileDialog(string operation)
+        private String ShowOpenFileDialog()
         {
             // As of .Net 3.5 SP1, WPF's Microsoft.Win32.OpenFileDialog class still uses the old style
             VistaOpenFileDialog dialog = new VistaOpenFileDialog();
-            switch (operation)
-            {
-                case "Start":
-                case "Stop":
-                    //dialog.Filter = "*.exe";
-                    break;
-                default:
-                    dialog.Filter = "All files (*.*)|*.*";
-                    break;
-            }
+            dialog.Filter = "All files (*.*)|*.*";
+            
             if (!VistaFileDialog.IsVistaFileDialogSupported)
                 MessageBox.Show("Because you are not using Windows Vista or later, the regular open file dialog will be used. Please use Windows Vista to see the new dialog.", "Sample open file dialog");
             if ((bool)dialog.ShowDialog())
-                MessageBox.Show("The selected file was: " + dialog.FileName, "Sample open file dialog");
+                return dialog.FileName;
+
+            return "";
         }
 
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
         {
-            var operation = comboBoxAction.SelectedValue;
-            ShowOpenFileDialog(operation.ToString());
+            String retValue = ShowOpenFileDialog();
+            OpeningActionPath = retValue;
+
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
@@ -146,6 +164,13 @@ namespace BleDA
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void btnClear_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(OpeningActionPath);
+            OpeningActionArguments = "";
+            OpeningActionPath = "";
         }
     }
 }

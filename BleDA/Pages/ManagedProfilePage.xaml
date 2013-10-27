@@ -8,17 +8,6 @@
     <Grid>
         <Canvas Background="#FF1B1B1B">
             <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click" Style="{StaticResource ButtonTileStyleBack}" Height="60" Width="60" />
-            <ComboBox x:Name="comboBoxAction" Canvas.Left="30" Canvas.Top="81" Width="140" Height="26" 
-                DisplayMemberPath="Key"
-                SelectedValuePath="Value"
-                ItemsSource="{Binding OperationList}"
-                SelectedValue="{Binding SelectedOperation, ValidatesOnDataErrors=True, Mode=TwoWay}">
-            </ComboBox>
-            <Button x:Name="btnBrowse" Content="Browse"  Canvas.Left="200" Canvas.Top="81" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe Light UI" Click="btnBrowse_Click"/>
-            <Button x:Name="btnAdd" Content="Add actions"  Canvas.Left="374" Canvas.Top="81" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe Light UI" Click="btnAdd_Click"/>
-            <TextBox Height="27" Canvas.Left="376" Padding="4" TextWrapping="Wrap" Text="Param1" Canvas.Top="170" Width="140"/>
-            <TextBox Height="27" Canvas.Left="202" Padding="4" TextWrapping="Wrap" Text="Param2" Canvas.Top="170" Width="140"/>
-            <TextBlock x:Name="textBlockFile" Text="" Canvas.Left="30" Canvas.Top="170" Width="140" Foreground="White" FontSize="14" Height="27"/>
             <TextBlock Text="Create actions" FontFamily="Segoe UI Light" Canvas.Left="30" Canvas.Top="19" Width="321" Foreground="White" FontSize="26" Height="38"/>
             <ListBox x:Name="taskSelected" Background="Transparent" Height="195" Width="484" Canvas.Left="30" Canvas.Top="233">
                 <ListBox.ItemTemplate>
@@ -37,10 +26,22 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TextBlock Text="File" Canvas.Left="30" Canvas.Top="137" Width="140" Foreground="White" FontSize="14" />
-            <TextBlock Text="Argument 1" Canvas.Left="202" Canvas.Top="137" Width="140" Foreground="White" FontSize="14"/>
-            <TextBlock Text="Argument 2" Canvas.Left="374" Canvas.Top="137" Width="140" Foreground="White" FontSize="14"/>
             <Button x:Name="btnSave" Content="Save"  Canvas.Left="376" Canvas.Top="451" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleBlue}" FontFamily="Segoe Light UI" Click="btnSave_Click"/>
+            <TabControl Height="158" Canvas.Left="30" Canvas.Top="70" Width="527">
+                <TabItem Header="Start">
+                    <Grid Background="#FFE5E5E5">
+                        <Button x:Name="btnBrowse" Content="Browse" Width="120" Height="30" Margin="383,17,18,83" Click="btnBrowse_Click"/>
+                        <TextBlock Text="URL:" Margin="10,18,417,83" />
+                        <TextBox x:Name="txtUrl" Height="30" Margin="121,17,241,83" Text="{Binding Path=OpeningActionPath, Mode=TwoWay}" />
+                        <TextBlock Text="Arguments:" Margin="10,65,417,36" />
+                        <TextBox x:Name="txtArgs" Height="30" Margin="121,64,241,36" Text="{Binding OpeningActionArguments}" />
+                        <Button x:Name="btnClear" Content="Clear" Width="120" Height="30" Margin="383,65,18,35" Click="btnClear_Click" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="TabItem">
+                    <Grid Background="#FFE5E5E5"/>
+                </TabItem>
+            </TabControl>
         </Canvas>
     </Grid>
 </UserControl>
