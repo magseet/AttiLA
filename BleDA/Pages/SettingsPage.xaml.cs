@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BleDA.LocalizationService;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,44 +21,19 @@ namespace BleDA
     /// </summary>
     public partial class SettingsPage : UserControl, ISwitchable
     {
-        private Settings _settings;
+        private Settings _settings = Settings.Instance;
+        private Status _status = Status.Instance;
 
         public SettingsPage()
         {
             InitializeComponent();
+            DataContext = _settings.Service;
 
-            try
-            {
-                _settings = Settings.Instance;
-
-                if (_settings.Service != null)
-                {
-                    txtNotificationThreshold.Text = _settings.Service.NotificationThreshold.ToString();
-
-                    //Localizer import settings
-                    txtLocalizerInterval.Text = _settings.Service.Localizer.Interval.ToString();
-                    txtLocalizerReties.Text = _settings.Service.Localizer.Retries.ToString();
-                    
-                    // fill combo box with this..
-                    //_settings.Service.Localizer.SimilarityAlgorithm
-
-                    //Tracker import settings
-                    txtTrackerInverval.Text = _settings.Service.Tracker.Interval.ToString();
-                    txtTrackerTrainingThreshold.Text = _settings.Service.Tracker.TrainingThreshold.ToString();
-                }
-                    
-
-            }
-            catch(SettingsException)
-            {
-                //..
-            }
-            
         }
 
         public void UtilizeState(object state)
         {
-            
+
             //throw new NotImplementedException();
         }
 
@@ -69,17 +45,46 @@ namespace BleDA
 
         private void btnCreateContext_Click(object sender, RoutedEventArgs e)
         {
-            uint notificationThreshold, retries;
-            double interval;
-            if (UInt32.TryParse(txtNotificationThreshold.Text, out notificationThreshold)){
-                _settings.Service.NotificationThreshold = notificationThreshold;
+            uint notificationThreshold, retries, localizerInterval, trackerInterval, TrackerTrainingThreshold;
+            GlobalSettings serviceSettings = new GlobalSettings() { Localizer = new LocalizerSettings(), Tracker = new TrackerSettings() };
+
+            if (UInt32.TryParse(txtNotificationThreshold.Text, out notificationThreshold))
+            {
+                serviceSettings.NotificationThreshold = notificationThreshold;
             }
 
             if (UInt32.TryParse(txtLocalizerReties.Text, out retries))
             {
-                _settings.Service.Localizer.Retries = retries;
+                serviceSettings.Localizer.Retries = retries;
             }
 
+            if (UInt32.TryParse(txtLocalizerInterval.Text, out localizerInterval))
+            {
+                serviceSettings.Localizer.Interval = localizerInterval;
+            }
+
+            if (UInt32.TryParse(txtTrackerInverval.Text, out trackerInterval))
+            {
+                serviceSettings.Localizer.Retries = retries;
+            }
+
+            if (UInt32.TryParse(txtTrackerTrainingThreshold.Text, out TrackerTrainingThreshold))
+            {
+                serviceSettings.Localizer.Retries = retries;
+            }
+
+            serviceSettings.Localizer.SimilarityAlgorithm = _settings.Service.Localizer.SimilarityAlgorithm;
+
+            try
+            {
+                _settings.Service = serviceSettings;
+            }
+            catch (Exception)
+            {
+                _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupWarning, "Update settings failed.", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Warning);
+            }
+
+            Switcher.Switch(new StartingPage());
         }
     }
 }

@@ -112,6 +112,11 @@ namespace AttiLA.LocalizationService
     [DataContract]
     public class GlobalSettings
     {
+        public GlobalSettings()
+        {
+            Tracker = new TrackerSettings();
+            Localizer = new LocalizerSettings();
+        }
         /// <summary>
         /// The tracker settings.
         /// </summary>
