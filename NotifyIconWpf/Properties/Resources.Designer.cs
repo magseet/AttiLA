@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BleDA.Properties {
+namespace Hardcodet.Wpf.TaskbarNotification.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace BleDA.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("BleDA.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Hardcodet.Wpf.TaskbarNotification.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,38 +61,12 @@ namespace BleDA.Properties {
         }
         
         /// <summary>
-        ///   Cerca una stringa localizzata simile a Alignment completed..
+        ///   Cerca una risorsa localizzata di tipo System.Drawing.Icon simile a (Icona).
         /// </summary>
-        internal static string MsgAlignmentCompleted {
+        internal static System.Drawing.Icon DefaultTrayIcon {
             get {
-                return ResourceManager.GetString("MsgAlignmentCompleted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Alignment started. Please don&apos;t move..
-        /// </summary>
-        internal static string MsgAlignmentStarted {
-            get {
-                return ResourceManager.GetString("MsgAlignmentStarted", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Apply settings failure..
-        /// </summary>
-        internal static string MsgApplySettingsFailure {
-            get {
-                return ResourceManager.GetString("MsgApplySettingsFailure", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Cerca una stringa localizzata simile a Tracking start failure..
-        /// </summary>
-        internal static string MsgTrackingStartFailure {
-            get {
-                return ResourceManager.GetString("MsgTrackingStartFailure", resourceCulture);
+                object obj = ResourceManager.GetObject("DefaultTrayIcon", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }

@@ -20,6 +20,7 @@ using AttiLA.Data.Services;
 using System.Diagnostics;
 using Ookii.Dialogs.Wpf;
 using Ookii.Dialogs;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace BleDA
 {
@@ -28,12 +29,16 @@ namespace BleDA
     /// </summary>
     public partial class MainWindow : Window
     {
-        Status _status = Status.Instance;
-        ContextService _contextService = new ContextService();
+        private Status _status = Status.Instance;
+        private ContextService _contextService = new ContextService();
+        private TaskbarIcon _notifyIcon;
 
         public MainWindow()
         {
             InitializeComponent();
+            //initialize NotifyIcon
+            _notifyIcon = (TaskbarIcon)FindResource("AttiLANotifyIcon");
+
             // initialize status
             _status.UserInteraction += _status_UserInteraction;
             _status.StatusErrorNotification += _status_StatusErrorNotification;
@@ -62,6 +67,7 @@ namespace BleDA
 
         void _status_UserInteraction(object sender, EventArgs e)
         {
+            string notificationTitle = "WPF NotifyIcon";
             var args = e as UserInteractionEventArgs;
             Debug.WriteLine("[BleDA] UserInteraction: " + args.Code.ToString());
             switch (args.Code)
@@ -69,9 +75,9 @@ namespace BleDA
                 case UserInteractionCode.BetterContextFound:
                     MessageBox.Show("Better context found");
                     if (MessageBox.Show(
-                        "Confirm your position?", 
-                        "Better context found", 
-                        MessageBoxButton.YesNo, 
+                        "Confirm your position?",
+                        "Better context found",
+                        MessageBoxButton.YesNo,
                         MessageBoxImage.Warning
                         ) == MessageBoxResult.No)
                     {
@@ -89,13 +95,20 @@ namespace BleDA
 
                     break;
                 case UserInteractionCode.CurrentContextFound:
-                    MessageBox.Show("Alignment completed.");
+                    _notifyIcon.ShowBalloonTip(notificationTitle,
+                        Properties.Resources.MsgAlignmentCompleted, BalloonIcon.Info);
+                    //_notifyIcon.HideBalloonTip();
+
                     this.Dispatcher.BeginInvoke(new System.Action(
                         () => { Switcher.Switch(new ManagedProfilePage()); }));
                     break;
 
                 case UserInteractionCode.NewContextSelected:
-                    MessageBox.Show("Alignment started. Please don't move.");
+
+                    _notifyIcon.ShowBalloonTip(notificationTitle,
+                        Properties.Resources.MsgAlignmentStarted, BalloonIcon.Info);
+                    //_notifyIcon.HideBalloonTip();
+
                     this.Dispatcher.BeginInvoke(new System.Action(
                         () => { Switcher.Switch(new AlignmentPage()); }));
                     break;
