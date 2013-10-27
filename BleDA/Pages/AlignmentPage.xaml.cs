@@ -30,42 +30,69 @@ namespace BleDA
     {
         Status _status = Status.Instance;
         ContextService _contextService = new ContextService();
-        Settings _settings = Settings.Instance;
 
         public AlignmentPage()
         {
             InitializeComponent();
-
-            _status.StatusErrorNotification += _status_StatusErrorNotification;
-            _status.UserInteraction += _status_UserInteraction;
+            DataContext = this;
+            _status.Updated += _status_Updated;
         }
 
-        void _status_UserInteraction(object sender, EventArgs e)
+        void _status_Updated()
         {
-            //var args = e as UserInteractionEventArgs;
-            //Debug.WriteLine("[Find] UserInteraction: " + args.Code.ToString());
-            //switch (args.Code)
-            //{
-            //    case UserInteractionCode.BetterContextFound:
-            //        MessageBox.Show("You moved away?");
-            //        break;
-            //    case UserInteractionCode.CurrentContextFound:
-            //        MessageBox.Show("Alignment completed.");
-            //        break;
-            //    case UserInteractionCode.NewContextSelected:
-            //        MessageBox.Show("Alignment started. Please don't move.");
-            //        break;
-            //    case UserInteractionCode.PreviousContextFound:
-            //        break;
-            //    case UserInteractionCode.TrackingSessionSucceded:
-            //        MessageBox.Show("Context updated with new data.");
-            //        break;
-            //}
+            this.Dispatcher.Invoke(new System.Action(
+                () => {
+
+                    txtStatus.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+                    txtSelectedContext.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
+                    txtServiceContext.GetBindingExpression(TextBox.TextProperty).UpdateTarget(); 
+                }));
         }
 
-        private void _status_StatusErrorNotification(object sender, StatusErrorNotificationEventArgs e)
+        public string SelectedContextName
         {
-            //throw new NotImplementedException();
+            get
+            {
+                var contextId = _status.CurrentContextId;
+                if (contextId != null)
+                {
+                    var context = _contextService.GetById(contextId);
+                    return context.ContextName;
+                }
+                return "";
+            }
+        }
+
+        public string ServiceContextName
+        {
+            get
+            {
+                var serviceStatus = _status.ServiceStatus;
+                if (serviceStatus == null)
+                {
+                    return "None";
+                }
+                var contextId = _status.ServiceStatus.ContextId;
+                if (contextId != null)
+                {
+                    var context = _contextService.GetById(contextId);
+                    return context.ContextName;
+                }
+                return "";
+            }
+        }
+
+        public string ServiceStatus
+        {
+            get
+            {
+                var serviceStatus = _status.ServiceStatus;
+                if (serviceStatus == null)
+                {
+                    return "Not responding";
+                }
+                return _status.ServiceStatus.ServiceState.ToString();
+            }
         }
 
         public void UtilizeState(object state)

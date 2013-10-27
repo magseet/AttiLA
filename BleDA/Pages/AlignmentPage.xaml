@@ -13,9 +13,11 @@
                 </Button.Background>
             </Button>
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="103" ><Run Language="it-it" Text="Selected context:"/></TextBlock>
-            <TextBlock x:Name="txtContextName" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="103" ><Run Language="it-it" Text=""/></TextBlock>
-            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="141" ><Run Language="it-it" Text="Status:"/></TextBlock>
-            <TextBlock x:Name="txtStatus" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="141" ><Run Language="it-it" Text=""/></TextBlock>
+            <TextBlock x:Name="txtSelectedContext" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="103"  Text="{Binding SelectedContextName, Mode=OneWay}"></TextBlock>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="141" ><Run Language="it-it" Text="Service status:"/></TextBlock>
+            <TextBlock x:Name="txtStatus" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="141" ><Run Language="it-it" Text="{Binding ServiceStatus, Mode=OneWay}"/></TextBlock>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="179" ><Run Language="it-it" Text="Service context:"/></TextBlock>
+            <TextBlock x:Name="txtServiceContext" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="179" ><Run Language="it-it" Text="{Binding ServiceContextName, Mode=OneWay}"/></TextBlock>
         </Canvas>
     </Grid>
 </UserControl>

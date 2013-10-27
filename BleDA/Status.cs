@@ -174,6 +174,14 @@ namespace BleDA
         public delegate void UserInteractionEventHandler(object sender, EventArgs e);
         public event UserInteractionEventHandler UserInteraction;
 
+        public delegate void UpdatedEventHandler();
+
+        /// <summary>
+        /// This event is raised when the status changes.
+        /// </summary>
+        public event UpdatedEventHandler Updated;
+
+
         /// <summary>
         /// Represents a method that will handle <see cref="StatusErrorNotificationEvent"/>
         /// </summary>
@@ -591,7 +599,10 @@ namespace BleDA
 
         public void ReportServiceStatus(ServiceStatus serviceStatus)
         {
-            //
+            if(Updated != null)
+            {
+                Updated();
+            }
         }
 
 
