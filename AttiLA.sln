@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.20617.1 PREVIEW
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AttiLA.WindowsService", "AttiLA.WindowsService\AttiLA.WindowsService.csproj", "{83A83622-5725-4DCF-8502-C4302CB84622}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedWifi", "managedwifi-1.1\ManagedWifi.csproj", "{6AA425C9-EA6A-4B01-AAED-5FF122E8B663}"
@@ -36,6 +34,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BleDA.Test.TaskEditor", "Bl
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{9DDF35C3-4C9C-4949-9E4D-496F60834499}"
 	ProjectSection(SolutionItems) = preProject
+		Library\Hardcodet.Wpf.TaskbarNotification.dll = Library\Hardcodet.Wpf.TaskbarNotification.dll
 		Library\MongoDB.Bson.dll = Library\MongoDB.Bson.dll
 		Library\MongoDB.Driver.dll = Library\MongoDB.Driver.dll
 		Library\Ookii.Dialogs.Wpf.dll = Library\Ookii.Dialogs.Wpf.dll

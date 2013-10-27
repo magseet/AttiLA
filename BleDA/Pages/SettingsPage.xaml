@@ -7,11 +7,7 @@
              d:DesignHeight="500" d:DesignWidth="600">
     <Grid>
         <Canvas Background="#FF1B1B1B">
-            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" >
-                <Button.Background>
-                    <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" Stretch="Uniform" />
-                </Button.Background>
-            </Button>
+            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" Style="{StaticResource ButtonTileStyleBack}" />
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Number of correct predictions before send notifications" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Foreground="White" Height="49" Width="331" Canvas.Left="32" Canvas.Top="95"/>
             <TextBox x:Name="txtNotificationThreshold" Height="40" Canvas.Left="384" TextWrapping="Wrap" Text="" Canvas.Top="94" Width="104" FontSize="16" Padding="17,15,0,0" />
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Segoeu UI Light" FontSize="16" Foreground="White" Height="49" Width="331" Canvas.Left="32" Canvas.Top="159" Text="Minimum time in milliseconds between predictions"></TextBlock>
