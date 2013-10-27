@@ -22,5 +22,10 @@ namespace AttiLA.Data.Entities
         /// The complete command used to start the process.
         /// </summary>
         public string CommandLine { get; set; }
+
+        public override string ToString()
+        {
+            return ProcessName;
+        }
     }
 }

@@ -181,8 +181,15 @@ namespace AttiLA.Data.Services
             {
                 throw new DatabaseException(Properties.Resources.MsgErrorUpdate + entity.Id.ToString());
             }
-        } 
+        }
 
 
+
+        public IEnumerable<Task> GetByContextId(string contextId)
+        {
+            var entityQuery = Query<Task>.EQ(t => t.Contexts, new ObjectId(contextId));
+
+            return this.MongoConnectionHandler.MongoCollection.Find(entityQuery);
+        }
     }
 }

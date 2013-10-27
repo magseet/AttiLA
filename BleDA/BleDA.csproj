@@ -75,7 +75,6 @@
     <Compile Include="Code\EnumHelper.cs" />
     <Compile Include="ComboBoxItem.cs" />
     <Compile Include="ISwitchable.cs" />
-    <Compile Include="Model\Action.cs" />
     <Compile Include="Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
@@ -85,8 +84,8 @@
     <Compile Include="Pages\NewContextPage.xaml.cs">
       <DependentUpon>NewContextPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\ManagedProfilePage.xaml.cs">
-      <DependentUpon>ManagedProfilePage.xaml</DependentUpon>
+    <Compile Include="Pages\TaskPage.xaml.cs">
+      <DependentUpon>TaskPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\FindPage.xaml.cs">
       <DependentUpon>FindPage.xaml</DependentUpon>
@@ -96,6 +95,9 @@
     </Compile>
     <Compile Include="Pages\StartingPage.xaml.cs">
       <DependentUpon>StartingPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ViewContextPage.xaml.cs">
+      <DependentUpon>ViewContextPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Process.cs" />
     <Compile Include="Service References\LocalizationService\Reference.cs">
@@ -131,7 +133,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\ManagedProfilePage.xaml">
+    <Page Include="Pages\TaskPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -144,6 +146,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\StartingPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ViewContextPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

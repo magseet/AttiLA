@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AttiLA.Data
 {
-    internal class Utils<T>
+    public class Utils<T>
     {
         private Utils() { }
 
@@ -17,7 +17,7 @@ namespace AttiLA.Data
         /// <typeparam name="TMember"></typeparam>
         /// <param name="memberExpr">Lambda expression to reach the property</param>
         /// <returns></returns>
-        internal static string MemberName<TMember>(Expression<Func<T, TMember>> memberExpr)
+        public static string MemberName<TMember>(Expression<Func<T, TMember>> memberExpr)
         {
             return ((MemberExpression)memberExpr.Body).Member.Name;
         }
@@ -26,7 +26,7 @@ namespace AttiLA.Data
         /// Utility to get the name of the collection associated to the entity type
         /// </summary>
         /// <returns></returns>
-        internal static string CollectionName
+        public static string CollectionName
         {
             get { return typeof(T).Name.ToLower() + "s"; }
         }

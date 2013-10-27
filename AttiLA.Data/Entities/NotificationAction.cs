@@ -13,5 +13,9 @@ namespace AttiLA.Data.Entities
         /// </summary>
         public string Message { get; set; }
 
+        public override string ToString()
+        {
+            return Message;
+        }
     }
 }

@@ -100,7 +100,7 @@ namespace BleDA
                     //_notifyIcon.HideBalloonTip();
 
                     this.Dispatcher.BeginInvoke(new System.Action(
-                        () => { Switcher.Switch(new ManagedProfilePage()); }));
+                        () => { Switcher.Switch(new ViewContextPage()); }));
                     break;
 
                 case UserInteractionCode.NewContextSelected:

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="BleDA.ManagedProfilePage"
+﻿<UserControl x:Class="BleDA.TaskPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -9,7 +9,7 @@
         <Canvas Background="#FF1B1B1B">
             <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click" Style="{StaticResource ButtonTileStyleBack}" Height="60" Width="60" />
             <TextBlock Text="Create actions" FontFamily="Segoe UI Light" Canvas.Left="30" Canvas.Top="19" Width="321" Foreground="White" FontSize="26" Height="38"/>
-            <ListBox x:Name="taskSelected" Background="Transparent" Height="195" Width="484" Canvas.Left="30" Canvas.Top="233">
+            <ListBox x:Name="taskSelected" ItemsSource="{Binding TaskActions}" SelectedValue="{Binding SelectedAction}" Background="Transparent" Height="153" Width="527" Canvas.Left="30" Canvas.Top="275">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -21,21 +21,23 @@
                                 <RowDefinition Height="25"></RowDefinition>
                             </Grid.RowDefinitions>
                             <!-- TextBlock -->
-                            <TextBlock x:Name="First"  Text="{Binding ContextName}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                            <TextBlock x:Name="First" Text="{Binding Type}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                            <TextBlock x:Name="Second" Text="{Binding Summary}" Grid.Column="1" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <Button x:Name="btnSave" Content="Save"  Canvas.Left="376" Canvas.Top="451" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleBlue}" FontFamily="Segoe Light UI" Click="btnSave_Click"/>
-            <TabControl Height="158" Canvas.Left="30" Canvas.Top="70" Width="527">
+            <Button x:Name="btnSave" Content="Save"  Canvas.Left="415" Canvas.Top="433" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleBlue}" FontFamily="Segoe Light UI" Click="btnSave_Click"/>
+            <TabControl Height="189" Canvas.Left="30" Canvas.Top="70" Width="527">
                 <TabItem Header="Start">
                     <Grid Background="#FFE5E5E5">
                         <Button x:Name="btnBrowse" Content="Browse" Width="120" Height="30" Margin="383,17,18,83" Click="btnBrowse_Click"/>
-                        <TextBlock Text="URL:" Margin="10,18,417,83" />
-                        <TextBox x:Name="txtUrl" Height="30" Margin="121,17,241,83" Text="{Binding Path=OpeningActionPath, Mode=TwoWay}" />
-                        <TextBlock Text="Arguments:" Margin="10,65,417,36" />
-                        <TextBox x:Name="txtArgs" Height="30" Margin="121,64,241,36" Text="{Binding OpeningActionArguments}" />
+                        <TextBlock Text="URL:" Padding="5" Margin="10,18,447,83" />
+                        <TextBox x:Name="txtUrl" Height="30" Margin="88,17,143,83" Text="{Binding Path=OpeningActionPath, Mode=TwoWay}" />
+                        <TextBlock Text="Arguments:" Padding="5" Margin="10,65,438,36" />
+                        <TextBox x:Name="txtArgs" Height="30" Margin="88,64,143,36" Text="{Binding OpeningActionArguments}" />
                         <Button x:Name="btnClear" Content="Clear" Width="120" Height="30" Margin="383,65,18,35" Click="btnClear_Click" />
+                        <Button x:Name="btnAddActionStart" Content="Add Action" Width="120" Height="30" Margin="383,121,18,10" Click="btnAddActionStart_Click" />
                     </Grid>
                 </TabItem>
                 <TabItem Header="TabItem">

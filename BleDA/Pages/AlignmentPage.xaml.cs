@@ -26,7 +26,7 @@ namespace BleDA
     /// </summary>
     [CallbackBehavior(UseSynchronizationContext = false,
         ConcurrencyMode = ConcurrencyMode.Reentrant)]
-    public partial class AlignmentPage : UserControl, ISwitchable
+    public partial class AlignmentPage : UserControl, ISwitchable, IDisposable
     {
         Status _status = Status.Instance;
         ContextService _contextService = new ContextService();
@@ -105,5 +105,32 @@ namespace BleDA
             // ToDO: to change returnUrl
             Switcher.Switch(new StartingPage());
         }
+
+
+        #region IDisposable implementation
+        public void Dispose()
+        {
+            Dispose(true);              //i am calling you from Dispose, it's safe
+            GC.SuppressFinalize(this);  //Hey, GC: don't bother calling finalize later
+        }
+
+        protected void Dispose(Boolean freeManagedObjectsAlso)
+        {
+            //Free unmanaged resources
+            _status.Updated -= _status_Updated;
+
+            //Free managed resources too, but only if i'm being called from Dispose
+            //(If i'm being called from Finalize then the objects might not exist
+            //anymore
+            if (freeManagedObjectsAlso)
+            {
+            }
+        }
+
+        ~AlignmentPage()
+        {
+            Dispose(false); //i am *not* calling you from Dispose, it's *not* safe
+        }
+        #endregion
     }
 }

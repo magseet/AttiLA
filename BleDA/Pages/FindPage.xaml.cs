@@ -230,7 +230,7 @@ namespace BleDA
             {
                 Debug.WriteLine("[Find] Selection: " + SelectedContextId);
                 _status.ContextSelected(SelectedContextId);
-                Switcher.Switch(new ManagedProfilePage());
+                Switcher.Switch(new ViewContextPage());
             }
         }
 

@@ -18,5 +18,16 @@ namespace AttiLA.Data.Entities
         /// </summary>
         public string Arguments { get; set; }
 
+        public override string ToString()
+        {
+            if (Arguments != null)
+            {
+                return Path + " " + Arguments;
+            }
+            else
+            {
+                return Path;
+            }
+        }
     }
 }

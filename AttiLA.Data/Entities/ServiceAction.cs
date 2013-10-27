@@ -26,5 +26,9 @@ namespace AttiLA.Data.Entities
         [BsonRepresentation(BsonType.String)]
         public ServiceActionType ServiceActionType { get; set; }
 
+        public override string ToString()
+        {
+            return ServiceName + " (" + ServiceActionType.ToString() + ")";
+        }
     }
 }

@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="BleDA.ViewContextPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="600">
+    <Grid>
+        <Canvas Background="#FF1B1B1B">
+            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Style="{StaticResource ButtonTileStyleBack}" Height="60" Width="60" Click="Back_Click" />
+            <TextBlock Text="{Binding SelectedContextName}" FontFamily="Segoe UI Light" Canvas.Left="30" Canvas.Top="19" Width="321" Foreground="White" FontSize="26" Height="38"/>
+            <ListBox x:Name="lstTask" ItemsSource="{Binding ContextTasks}" SelectedValue="{Binding SelectedContextTask}" Background="Transparent" Height="171" Width="506" Canvas.Left="30" Canvas.Top="97">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"></ColumnDefinition>
+                                <ColumnDefinition Width="140"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <!-- TextBlock -->
+                            <TextBlock x:Name="First"  Text="{Binding TaskName}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                            <TextBlock x:Name="Second" Text="{Binding CreationDateTime}" Grid.Column="1" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Border Canvas.Left="30" Canvas.Top="304" BorderBrush="White" BorderThickness="1">
+                <Canvas Height="130" Canvas.Left="35" Canvas.Top="296" Width="504" Background="Transparent" >
+                    <ComboBox x:Name="comboBoxTask" ItemsSource="{Binding ExistingTasks}" DisplayMemberPath="TaskName" SelectedValue="{Binding SelectedExistingTask}" Canvas.Left="10" Canvas.Top="62" Width="340" />
+                    <TextBox Text="" Width="340" Canvas.Left="10" Canvas.Top="10" Height="24"></TextBox>
+                    <Button x:Name="btnNew" Content="New" Canvas.Left="400" Canvas.Top="14" Width="75"/>
+                    <Button x:Name="btnExisting" Content="Existing" Canvas.Left="400" Canvas.Top="62" Width="75" Click="btnExisting_Click"/>
+                </Canvas>
+            </Border>
+            <Button x:Name="btnRemove" Content="Remove" Canvas.Left="343" Canvas.Top="273" Width="85" Height="26" Click="btnRemove_Click"/>
+            <Button x:Name="btnEdit" Content="Edit" Canvas.Left="451" Canvas.Top="273" Width="85" Height="26" Click="btnEdit_Click"/>
+            <TextBlock Canvas.Left="30" TextWrapping="Wrap" Text="Add" Foreground="White" Padding="5" FontSize="14" Canvas.Top="278" Width="138" Height="26"/>
+        </Canvas>
+    </Grid>
+</UserControl>
