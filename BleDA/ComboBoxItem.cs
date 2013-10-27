@@ -4,15 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BleDA
+namespace BleDA.Test.TaskEditor
 {
-    public class Item<T>
+    public class ComboBoxItem<T>
     {
         string _displayValue;
         T _hiddenValue;
 
         //Constructor
-        public Item(string displayValue, T hiddenValue)
+        public ComboBoxItem (string displayValue, T hiddenValue)
         {
             _displayValue = displayValue;
             _hiddenValue = hiddenValue;
@@ -25,7 +25,7 @@ namespace BleDA
             {
                 return _hiddenValue;
             }
-        }
+       }
 
         //Override ToString method
         public override string ToString()

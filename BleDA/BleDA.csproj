@@ -59,8 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Code\EnumHelper.cs" />
+    <Compile Include="ComboBoxItem.cs" />
     <Compile Include="ISwitchable.cs" />
-    <Compile Include="Item.cs" />
+    <Compile Include="Model\Action.cs" />
     <Compile Include="Pages\AboutPage.xaml.cs">
       <DependentUpon>AboutPage.xaml</DependentUpon>
     </Compile>
@@ -191,6 +193,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Desktop\Ookii.Dialogs.Wpf\Ookii.Dialogs.Wpf.csproj">
+      <Project>{d01b1d20-8f5b-4834-8e5c-c7ec6dd587d4}</Project>
+      <Name>Ookii.Dialogs.Wpf</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AttiLA.Data\AttiLA.Data.csproj">
       <Project>{ee8e2895-5075-41b6-8742-2711dce3b573}</Project>
       <Name>AttiLA.Data</Name>

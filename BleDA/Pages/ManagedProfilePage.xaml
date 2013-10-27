@@ -12,6 +12,39 @@
                     <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" Stretch="Fill" />
                 </Button.Background>
             </Button>
+            <ComboBox x:Name="comboBoxAction" Canvas.Left="30" Canvas.Top="81" Width="140" Height="26" 
+                DisplayMemberPath="Key"
+                SelectedValuePath="Value"
+                ItemsSource="{Binding OperationList}"
+                SelectedValue="{Binding SelectedOperation, ValidatesOnDataErrors=True, Mode=TwoWay}">
+            </ComboBox>
+            <Button x:Name="btnBrowse" Content="Browse"  Canvas.Left="200" Canvas.Top="81" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe Light UI" Click="btnBrowse_Click"/>
+            <Button x:Name="btnAdd" Content="Add actions"  Canvas.Left="374" Canvas.Top="81" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe Light UI" Click="btnAdd_Click"/>
+            <TextBox Height="27" Canvas.Left="376" Padding="4" TextWrapping="Wrap" Text="Param1" Canvas.Top="170" Width="140"/>
+            <TextBox Height="27" Canvas.Left="202" Padding="4" TextWrapping="Wrap" Text="Param2" Canvas.Top="170" Width="140"/>
+            <TextBlock x:Name="textBlockFile" Text="" Canvas.Left="30" Canvas.Top="170" Width="140" Foreground="White" FontSize="14" Height="27"/>
+            <TextBlock Text="Create actions" FontFamily="Segoe UI Light" Canvas.Left="30" Canvas.Top="19" Width="321" Foreground="White" FontSize="26" Height="38"/>
+            <ListBox x:Name="taskSelected" Background="Transparent" Height="195" Width="484" Canvas.Left="30" Canvas.Top="233">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"></ColumnDefinition>
+                                <ColumnDefinition Width="140"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <!-- TextBlock -->
+                            <TextBlock x:Name="First"  Text="{Binding ContextName}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <TextBlock Text="File" Canvas.Left="30" Canvas.Top="137" Width="140" Foreground="White" FontSize="14" />
+            <TextBlock Text="Argument 1" Canvas.Left="202" Canvas.Top="137" Width="140" Foreground="White" FontSize="14"/>
+            <TextBlock Text="Argument 2" Canvas.Left="374" Canvas.Top="137" Width="140" Foreground="White" FontSize="14"/>
+            <Button x:Name="btnSave" Content="Save"  Canvas.Left="376" Canvas.Top="451" Foreground="White" Width="142" Height="26" Style="{StaticResource ButtonTileStyleBlue}" FontFamily="Segoe Light UI" Click="btnSave_Click"/>
         </Canvas>
     </Grid>
 </UserControl>

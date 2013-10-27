@@ -15,5 +15,6 @@
         <Button x:Name="btnCreateContext" Style="{StaticResource ButtonTileStyleGreen}" Content="Create Context" Foreground="White" HorizontalAlignment="Left" Margin="370,134,0,0" VerticalAlignment="Top" Width="150" Height="50" FontSize="18" Click="btnCreateContext_Click" />
         <TextBox x:Name="txtContextName" HorizontalAlignment="Left" Height="50" Padding="10" Margin="27,134,0,0" FontSize="18" Text="Insert a new context name" VerticalAlignment="Top" Width="285" TextWrapping="Wrap"/>
         </Canvas>
+        <TextBlock Text="Create context" FontFamily="Segoe UI Light" Foreground="White" FontSize="26" Margin="30,19,249,443"/>
     </Grid>
 </UserControl>

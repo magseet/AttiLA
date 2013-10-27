@@ -54,5 +54,6 @@
             <TextBlock HorizontalAlignment="Left" Margin="30,87,0,0" TextWrapping="Wrap" Text="Recents:" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" />
             <TextBlock HorizontalAlignment="Left" Margin="30,257,0,0" TextWrapping="Wrap" Text="Localized:" FontSize="16" Foreground="White" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" />
         </Canvas>
+        <TextBlock Text="Localize" FontFamily="Segoe UI Light" Foreground="White" FontSize="26" Margin="30,19,249,443"/>
     </Grid>
 </UserControl>

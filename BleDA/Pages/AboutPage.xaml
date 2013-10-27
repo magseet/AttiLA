@@ -19,5 +19,6 @@
             <TextBlock HorizontalAlignment="Left" Margin="36,190,0,0" TextWrapping="Wrap" Text="AttiLA" FontFamily="Segoe Light UI" FontSize="18" Foreground="White" VerticalAlignment="Top"/>
             <TextBlock HorizontalAlignment="Left" Margin="36,231,0,0" TextWrapping="Wrap" Text="Version 1.0.0.0" FontFamily="Segoe Light UI" FontSize="18" Foreground="White" VerticalAlignment="Top"/>
         </Canvas>
+        <TextBlock Text="About" FontFamily="Segoe UI Light" Foreground="White" FontSize="26" Margin="30,19,249,443"/>
     </Grid>
 </UserControl>
