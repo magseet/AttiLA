@@ -37,7 +37,7 @@ namespace BleDA.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("300000")]
+        [global::System.Configuration.DefaultSettingValueAttribute("20000")]
         public double ClientTimeout {
             get {
                 return ((double)(this["ClientTimeout"]));

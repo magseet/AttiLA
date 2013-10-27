@@ -41,9 +41,6 @@ namespace BleDA
             var context = new InstanceContext(this);
             _serviceClient = new LocalizationServiceClient(context);
 
-            _status.StatusErrorNotification += _status_StatusErrorNotification;
-            _status.UserInteraction += _status_UserInteraction;
-
             // update in a separated thread to avoid UI freeze
             var t = new Thread(() => UpdateContextLists());
             t.Start();
@@ -53,11 +50,7 @@ namespace BleDA
             _refreshTimer.Enabled = true;
 
             _serviceClient.Subscribe();
-
-            Pippo = "pippo";
         }
-
-        public string Pippo { get; set; }
 
         /// <summary>
         /// User selected context
@@ -144,6 +137,7 @@ namespace BleDA
                         () => { return listCloser.SelectedItem != null; })
                     );
 
+
                 bool recentSelected = listRecent.Dispatcher.Invoke(
                     new Func<bool>(
                         () => { return listRecent.SelectedItem != null; })
@@ -152,7 +146,6 @@ namespace BleDA
                 if (!recentSelected && !closerSelected)
                 {
                     // update UI
-
                     listRecent.Dispatcher.Invoke(new System.Action(
                         () => { listRecent.ItemsSource = recentContexts; }));
 
@@ -170,39 +163,8 @@ namespace BleDA
                 return false;
             }
 
-
-
             // update skipped
             return false;
-        }
-
-
-        void _status_UserInteraction(object sender, EventArgs e)
-        {
-            var args = e as UserInteractionEventArgs;
-            Debug.WriteLine("[Find] UserInteraction: " + args.Code.ToString());
-            switch (args.Code)
-            {
-                case UserInteractionCode.BetterContextFound:
-                    MessageBox.Show("You moved away?");
-                    break;
-                case UserInteractionCode.CurrentContextFound:
-                    MessageBox.Show("Alignment completed.");
-                    break;
-                case UserInteractionCode.NewContextSelected:
-                    MessageBox.Show("Alignment started. Please don't move.");
-                    break;
-                case UserInteractionCode.PreviousContextFound:
-                    break;
-                case UserInteractionCode.TrackingSessionSucceded:
-                    MessageBox.Show("Context updated with new data.");
-                    break;
-            }
-        }
-
-        void _status_StatusErrorNotification(object sender, StatusErrorNotificationEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         public void UtilizeState(object state)
@@ -212,9 +174,6 @@ namespace BleDA
 
         private void Back_Click(object sender, RoutedEventArgs e)
         {
-            // this page is no more needed
-            Dispose();
-
             // ToDO: to change returnUrl
             Switcher.Switch(new StartingPage());
         }
@@ -268,9 +227,9 @@ namespace BleDA
             }
             else
             {
-                // ToDO..
                 Debug.WriteLine("[Find] Selection: " + SelectedContextId);
                 _status.ContextSelected(SelectedContextId);
+                Switcher.Switch(new ManagedProfilePage());
             }
         }
 
@@ -284,14 +243,13 @@ namespace BleDA
         protected void Dispose(Boolean freeManagedObjectsAlso)
         {
             //Free unmanaged resources
-            
+            _serviceClient.Unsubscribe();
 
             //Free managed resources too, but only if i'm being called from Dispose
             //(If i'm being called from Finalize then the objects might not exist
             //anymore
             if (freeManagedObjectsAlso)
             {
-                _serviceClient.Unsubscribe();
                 _refreshTimer.Enabled = false;
             }
         }

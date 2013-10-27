@@ -65,6 +65,7 @@ namespace BleDA
                 { new StateTransition(State.WaitForSelection, Command.Selection), State.WaitForCorrectPrediction },
                 { new StateTransition(State.WaitForSelection, Command.CorrectPrediction), State.WaitForWrongPrediction },
                 { new StateTransition(State.WaitForCorrectPrediction, Command.CorrectPrediction), State.WaitForWrongPrediction },
+                { new StateTransition(State.WaitForCorrectPrediction, Command.Selection), State.WaitForCorrectPrediction }, // reset timer
                 { new StateTransition(State.WaitForCorrectPrediction, Command.None),State.WaitForSelection },
                 { new StateTransition(State.WaitForWrongPrediction,Command.WrongPrediction), State.WaitForConfirmation },                
                 { new StateTransition(State.WaitForWrongPrediction,Command.Selection), State.WaitForCorrectPrediction },

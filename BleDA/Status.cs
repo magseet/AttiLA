@@ -370,6 +370,7 @@ namespace BleDA
 
                     CurrentContextId = contextId;
                     // new context selected
+                    _timer.Stop();
                     nextState = _process.MoveNext(Command.Selection);
                     //expected state: WaitForCorrectPrediction
 
@@ -461,7 +462,10 @@ namespace BleDA
                         break;
 
                     case State.WaitForCorrectPrediction:
+
                         _timer.Enabled = true;
+                        _timer.Interval = Properties.Settings.Default.ClientTimeout;
+
                         // tracking start
                         trackingStarted = false;
                         for (var attempts = Properties.Settings.Default.ClientRetries + 1;
@@ -500,6 +504,8 @@ namespace BleDA
                         break;
                     case State.Tracking:
                         _timer.Enabled = true;
+                        _timer.Interval = Properties.Settings.Default.ClientTimeout;
+
                         // tracking start
                         trackingStarted = false;
                         for (var attempts = Properties.Settings.Default.ClientRetries + 1;
@@ -540,7 +546,8 @@ namespace BleDA
         {
             lock (lockStatus)
             {
-                if (_process.CurrentState == State.WaitForCorrectPrediction)
+                if (_process.CurrentState == State.WaitForCorrectPrediction || 
+                    _process.CurrentState == State.Tracking)
                 {
                     if (contextId == null || contextId != _currentContextId)
                     {
@@ -553,9 +560,10 @@ namespace BleDA
                     }
                     else
                     {
-                        // expected prediction
+                        // expected prediction (correct)
                         var nextState = _process.MoveNext(Command.CorrectPrediction);
                         //expected state: WaitForWrongPrediction
+                        _timer.Stop();
                         EnterState(nextState);
                     }
                 }
@@ -564,7 +572,7 @@ namespace BleDA
                     if (contextId == null || contextId != _currentContextId)
                     {
 
-                        // expected prediction
+                        // expected prediction (wrong)
                         var nextState = _process.MoveNext(Command.WrongPrediction);
                         //expected state: WaitForConfirmation
                         EnterState(nextState);

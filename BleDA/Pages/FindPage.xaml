@@ -7,7 +7,15 @@
              d:DesignHeight="500" d:DesignWidth="600">
     <Grid Background="Transparent">
         <Canvas Background="#FF1B1B1B">
-            <ListBox x:Name="listRecent" BorderBrush="Transparent" HorizontalAlignment="Left" Height="122" Margin="30,130,0,0" VerticalAlignment="Top" Width="300" Background="{x:Null}" SelectionChanged="listRecent_SelectionChanged">
+            <ListBox x:Name="listRecent" 
+                     BorderBrush="Transparent" 
+                     HorizontalAlignment="Left" 
+                     Height="122" 
+                     Margin="30,130,0,0" 
+                     VerticalAlignment="Top" 
+                     Width="300" 
+                     Background="{x:Null}" 
+                     SelectionChanged="listRecent_SelectionChanged">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -21,7 +29,6 @@
                             <!-- TextBlock -->
                             <TextBlock x:Name="First"  Text="{Binding ContextName}" Grid.Column="0" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
                             <TextBlock x:Name="Second" Text="{Binding CreationDateTime}" Grid.Column="1" Grid.Row="0" Background="{x:Null}" FontFamily="Segoe UI Light" FontSize="12" Padding="0,2,0,0" Foreground="White"></TextBlock>
-                            <!--<TextBlock x:Name="ContextId" Text="{Binding ContextId}" Visibility="Hidden"/>-->
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

@@ -9,6 +9,7 @@ using AttiLA.Data;
 using System.Timers;
 using MongoDB.Bson;
 using System.Threading;
+using System.Diagnostics;
 
 namespace AttiLA.LocalizationService
 {
@@ -220,6 +221,7 @@ namespace AttiLA.LocalizationService
             }
             set
             {
+                Thread notificationThread;
                 lock (_trackerLock)
                 {
                     var beforeState = _trackerTimer.Enabled;
@@ -234,8 +236,9 @@ namespace AttiLA.LocalizationService
                                 : TrackerNotificationCode.Stopped,
                             TargetScenario = _targetScenario
                         };
-                        var t = new Thread(() => TrackerNotification(this, args));
-                        t.Start();
+                        notificationThread = new Thread(() => TrackerNotification(this, args));
+                        notificationThread.Start();
+                        Debug.WriteLine("PIPPO");
                     }
                 }
             }
