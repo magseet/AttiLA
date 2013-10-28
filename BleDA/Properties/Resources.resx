@@ -132,11 +132,20 @@
   <data name="MsgAlignmentCompleted" xml:space="preserve">
     <value>Alignment completed.</value>
   </data>
+  <data name="MsgAlignmentFailed" xml:space="preserve">
+    <value>Alignment failed.</value>
+  </data>
   <data name="MsgAlignmentStarted" xml:space="preserve">
     <value>Alignment started. Please don't move.</value>
   </data>
   <data name="MsgApplySettingsFailure" xml:space="preserve">
     <value>Apply settings failure.</value>
+  </data>
+  <data name="MsgAskConfirmation" xml:space="preserve">
+    <value>Confirm your position?</value>
+  </data>
+  <data name="MsgBetterContext" xml:space="preserve">
+    <value>Better context found.</value>
   </data>
   <data name="MsgContexUpdated" xml:space="preserve">
     <value>Context updated with new data.</value>

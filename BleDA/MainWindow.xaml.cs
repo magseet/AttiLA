@@ -31,7 +31,9 @@ namespace BleDA
     {
         private Status _status = Status.Instance;
         private ContextService _contextService = new ContextService();
-        
+        private object lockConfirm = new Object();
+        private bool askingForConfirmation = false; // under lock
+
         public MainWindow()
         {
             InitializeComponent();
@@ -56,10 +58,43 @@ namespace BleDA
                 case StatusErrorNotificationCode.UnexpectedPrediction:
                     break;
                 case StatusErrorNotificationCode.TrackingSessionFailed:
-                    MessageBox.Show("Alignment failed");
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupWarning, Properties.Resources.MsgAlignmentFailed, BalloonIcon.Warning);
                     break;
+
                 default:
                     break;
+            }
+        }
+
+        void AskForConfirmation(object o)
+        {
+            if (Monitor.TryEnter(lockConfirm))
+            {
+                try
+                {
+                    if (MessageBox.Show(
+                        Properties.Resources.MsgAskConfirmation,
+                        Properties.Resources.PopupWarning,
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning) == MessageBoxResult.No)
+                    {
+                        // permit new context selection
+                        this.Dispatcher.Invoke(new System.Action(
+                        () => { Switcher.Switch(new FindPage()); }));
+
+                    }
+                    else
+                    {
+                        // send confirmation
+                        _status.ContextSelected(_status.CurrentContextId);
+                    }
+
+                }
+                finally
+                {
+                    Monitor.Exit(lockConfirm);
+                }
+
             }
         }
 
@@ -71,27 +106,10 @@ namespace BleDA
             switch (args.Code)
             {
                 case UserInteractionCode.BetterContextFound:
-                    MessageBox.Show("Better context found");
-                    if (MessageBox.Show(
-                        "Confirm your position?",
-                        "Better context found",
-                        MessageBoxButton.YesNo,
-                        MessageBoxImage.Warning
-                        ) == MessageBoxResult.No)
-                    {
-                        // permit new context selection
-                        this.Dispatcher.BeginInvoke(new System.Action(
-                        () => { Switcher.Switch(new FindPage()); }));
-                        break;
-
-                    }
-                    else
-                    {
-                        // send confirmation
-                        _status.ContextSelected(_status.CurrentContextId);
-                    }
-
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupWarning, Properties.Resources.MsgBetterContext, BalloonIcon.Warning);
+                    ThreadPool.QueueUserWorkItem(new WaitCallback(AskForConfirmation));
                     break;
+
                 case UserInteractionCode.CurrentContextFound:
                     _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo,
                         Properties.Resources.MsgAlignmentCompleted, BalloonIcon.Info);

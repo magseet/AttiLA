@@ -106,6 +106,15 @@ namespace BleDA.Properties {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a Alignment failed..
+        /// </summary>
+        internal static string MsgAlignmentFailed {
+            get {
+                return ResourceManager.GetString("MsgAlignmentFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Alignment started. Please don&apos;t move..
         /// </summary>
         internal static string MsgAlignmentStarted {
@@ -120,6 +129,24 @@ namespace BleDA.Properties {
         internal static string MsgApplySettingsFailure {
             get {
                 return ResourceManager.GetString("MsgApplySettingsFailure", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Confirm your position?.
+        /// </summary>
+        internal static string MsgAskConfirmation {
+            get {
+                return ResourceManager.GetString("MsgAskConfirmation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a Better context found..
+        /// </summary>
+        internal static string MsgBetterContext {
+            get {
+                return ResourceManager.GetString("MsgBetterContext", resourceCulture);
             }
         }
         
