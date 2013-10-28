@@ -169,6 +169,24 @@ namespace BleDA.Properties {
         }
         
         /// <summary>
+        ///   Cerca una stringa localizzata simile a AttiLA has been awakened..
+        /// </summary>
+        internal static string MsgServiceAwake {
+            get {
+                return ResourceManager.GetString("MsgServiceAwake", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Cerca una stringa localizzata simile a AttiLA will be sleepy until the next localization request..
+        /// </summary>
+        internal static string MsgServiceSleeping {
+            get {
+                return ResourceManager.GetString("MsgServiceSleeping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Cerca una stringa localizzata simile a Tracking start failure..
         /// </summary>
         internal static string MsgTrackingStartFailure {

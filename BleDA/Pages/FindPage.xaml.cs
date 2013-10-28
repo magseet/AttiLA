@@ -222,7 +222,6 @@ namespace BleDA
         {
             if (SelectedContextId == null)
             {
-                // ToDO..
                 Debug.WriteLine("[Find] No selection");
                 MessageBox.Show("No selection");
             }

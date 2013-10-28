@@ -153,6 +153,12 @@
   <data name="MsgPreviousContext" xml:space="preserve">
     <value>AttiLA is running.</value>
   </data>
+  <data name="MsgServiceAwake" xml:space="preserve">
+    <value>AttiLA has been awakened.</value>
+  </data>
+  <data name="MsgServiceSleeping" xml:space="preserve">
+    <value>AttiLA will be sleepy until the next localization request.</value>
+  </data>
   <data name="MsgTrackingStartFailure" xml:space="preserve">
     <value>Tracking start failure.</value>
   </data>

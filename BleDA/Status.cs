@@ -420,8 +420,65 @@ namespace BleDA
                     }
 
                 }
+                else
+                {
+                    // if the service is in Idle, need to be put in notification
+                    AwakeService();
+                }
             }
             return true;
+        }
+
+        private void AwakeService()
+        {
+            lock (lockStatus)
+            {
+                var serviceStatus = ServiceStatus;
+                if(serviceStatus == null || serviceStatus.ServiceState == ServiceStateCode.Idle)
+                {
+                    // tracking start
+                    bool performed = false;
+                    for (var attempts = Properties.Settings.Default.ClientRetries + 1;
+                        attempts > 0; attempts--)
+                    {
+                        try
+                        {
+                            performed = _serviceClient.TrackingStart(CurrentContextId);
+                            if (performed)
+                                break;
+                        }
+                        catch { }
+                    }
+                    if (!performed)
+                    {
+                        throw new StatusException(Properties.Resources.MsgTrackingStartFailure)
+                        {
+                            Code = StatusExceptionCode.ServiceFailure
+                        };
+                    }
+                    for (var attempts = Properties.Settings.Default.ClientRetries + 1;
+                        attempts > 0; attempts--)
+                    {
+                        try
+                        {
+                            performed = _serviceClient.TrackingStop();
+                            if (performed)
+                                break;
+                        }
+                        catch { }
+                    }
+                    if (!performed)
+                    {
+                        throw new StatusException(Properties.Resources.MsgTrackingStartFailure)
+                        {
+                            Code = StatusExceptionCode.ServiceFailure
+                        };
+                    }
+                    NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo, 
+                        Properties.Resources.MsgServiceAwake, BalloonIcon.Info);
+
+                }
+            }
         }
 
         private void EnterState(State state)
@@ -607,6 +664,11 @@ namespace BleDA
             if(Updated != null)
             {
                 Updated();
+            }
+            if(serviceStatus == null || serviceStatus.ServiceState == ServiceStateCode.Idle)
+            {
+                NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo, 
+                    Properties.Resources.MsgServiceSleeping, BalloonIcon.Info);
             }
         }
 
