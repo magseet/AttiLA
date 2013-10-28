@@ -45,7 +45,7 @@ namespace BleDA
 
         private void btnCreateContext_Click(object sender, RoutedEventArgs e)
         {
-            uint notificationThreshold, retries, localizerInterval, trackerInterval, TrackerTrainingThreshold;
+            uint notificationThreshold, retries, localizerInterval, trackerInterval, trackerTrainingThreshold;
             GlobalSettings serviceSettings = new GlobalSettings() { Localizer = new LocalizerSettings(), Tracker = new TrackerSettings() };
 
             if (UInt32.TryParse(txtNotificationThreshold.Text, out notificationThreshold))
@@ -65,12 +65,12 @@ namespace BleDA
 
             if (UInt32.TryParse(txtTrackerInverval.Text, out trackerInterval))
             {
-                serviceSettings.Localizer.Retries = retries;
+                serviceSettings.Tracker.Interval = trackerInterval;
             }
 
-            if (UInt32.TryParse(txtTrackerTrainingThreshold.Text, out TrackerTrainingThreshold))
+            if (UInt32.TryParse(txtTrackerTrainingThreshold.Text, out trackerTrainingThreshold))
             {
-                serviceSettings.Localizer.Retries = retries;
+                serviceSettings.Tracker.TrainingThreshold = trackerTrainingThreshold;
             }
 
             serviceSettings.Localizer.SimilarityAlgorithm = _settings.Service.Localizer.SimilarityAlgorithm;
