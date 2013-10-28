@@ -64,7 +64,7 @@
                         <Button Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnAddActionStart" Content="Add Action" Width="120" Height="30" Margin="391,124,10,7" Click="btnAddActionStart_Click" />
                     </Grid>
                 </TabItem>
-                <TabItem Header="TabItem" Foreground="White" FontSize="14">
+                <TabItem Header="Other" Foreground="White" FontSize="14">
                     <Grid />
                 </TabItem>
             </TabControl>

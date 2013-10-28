@@ -274,7 +274,7 @@
       <wsa10:EndpointReference>
         <wsa10:Address>net.pipe://localhost/AttiLAService/Localization</wsa10:Address>
         <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>MAGSEET\Riccardo</Upn>
+          <Upn>TINA\Manuel</Upn>
         </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>

@@ -29,16 +29,17 @@
             </ListBox>
             <Border Canvas.Left="30" Canvas.Top="304" BorderBrush="White" BorderThickness="1">
                 <Canvas Height="130" Canvas.Left="35" Canvas.Top="296" Width="504" Background="Transparent" >
-                    <ComboBox x:Name="comboBoxTask" ItemsSource="{Binding ExistingTasks}" DisplayMemberPath="TaskName" SelectedValue="{Binding SelectedExistingTask}" Canvas.Left="10" Canvas.Top="62" Width="340" />
-                    <TextBox Text="{Binding NewTaskName}" Width="340" Canvas.Left="10" Canvas.Top="10" Height="24"></TextBox>
-                    <Button x:Name="btnNew" Content="New" Canvas.Left="400" Canvas.Top="14" Width="75" Click="btnNew_Click"/>
-                    <Button x:Name="btnExisting" Content="Existing" Canvas.Left="400" Canvas.Top="62" Width="75" Click="btnExisting_Click"/>
+                    <ComboBox x:Name="comboBoxTask" ItemsSource="{Binding ExistingTasks}" DisplayMemberPath="TaskName" SelectedValue="{Binding SelectedExistingTask}" Canvas.Left="10" Canvas.Top="62" Width="366" />
+                    <TextBox Text="{Binding NewTaskName}" Width="366" Canvas.Left="10" Canvas.Top="10" Height="24"></TextBox>
+                    <Button Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnNew" Content="New" Canvas.Left="390" Canvas.Top="10" Width="104" Click="btnNew_Click" Height="24"/>
+                    <Button Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnExisting" Content="Existing" Canvas.Left="390" Canvas.Top="62" Width="104" Click="btnExisting_Click" Height="22"/>
                 </Canvas>
             </Border>
-            <Button x:Name="btnRemove" Content="Remove" Canvas.Left="343" Canvas.Top="273" Width="85" Height="26" Click="btnRemove_Click"/>
-            <Button x:Name="btnEdit" Content="Edit" Canvas.Left="451" Canvas.Top="273" Width="85" Height="26" Click="btnEdit_Click"/>
+            <Button Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnRemove" Content="Remove" Canvas.Left="343" Canvas.Top="273" Width="85" Height="26" Click="btnRemove_Click"/>
+            <Button Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnEdit" Content="Edit" Canvas.Left="451" Canvas.Top="273" Width="85" Height="26" Click="btnEdit_Click"/>
             <TextBlock Canvas.Left="30" TextWrapping="Wrap" Text="Add" Foreground="White" Padding="5" FontSize="14" Canvas.Top="278" Width="138" Height="26"/>
-            <Button Content="GO!" Canvas.Left="429" Canvas.Top="451" Width="107" Height="39" Click="Button_Click"/>
+            <Button Style="{StaticResource ButtonTileStyleBlue}" FontFamily="Segoe UI Light" FontSize="18" Foreground="White" Content="GO!" Canvas.Left="429" Canvas.Top="451" Width="107" Height="39" Click="Button_Click"/>
+            <TextBlock Canvas.Left="30" TextWrapping="Wrap" Text="Tasks" Foreground="White" Padding="5" FontSize="14" Canvas.Top="71" Width="138" Height="26"/>
         </Canvas>
     </Grid>
 </UserControl>

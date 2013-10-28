@@ -9,7 +9,7 @@
         <Canvas Background="#FF1B1B1B">
             <TextBlock HorizontalAlignment="Left" Margin="36,86,0,0" TextWrapping="Wrap" Text="BleDA" FontFamily="Segoe Light UI" FontSize="18" Foreground="White" VerticalAlignment="Top"/>
             <TextBlock HorizontalAlignment="Left" Margin="36,127,0,0" TextWrapping="Wrap" Text="Version 1.0.0.0" FontFamily="Segoe Light UI" FontSize="18" Foreground="White" VerticalAlignment="Top"/>
-            <TextBlock HorizontalAlignment="Left" Margin="36,334,0,0" TextWrapping="Wrap" Text="Created by Riccardo Cantoro and Manuel Gaetani" FontFamily="Segoe Light UI" Foreground="White" FontSize="18" VerticalAlignment="Top"/>
+            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Created by Riccardo Cantoro and Manuel Gaetani" FontFamily="Segoe Light UI" Foreground="White" FontSize="18" VerticalAlignment="Top" Canvas.Left="36" Canvas.Top="424"/>
             <Image Margin="251,377,253,27" />
             <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Style="{StaticResource ButtonTileStyleBack}" Click="Back_Click" Height="60" Width="60" >
             </Button>
