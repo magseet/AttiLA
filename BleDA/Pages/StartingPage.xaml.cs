@@ -76,8 +76,15 @@ namespace BleDA
 
         private void btnViewContext_Click(object sender, RoutedEventArgs e)
         {
-            if (_status.CurrentContextId != null)
+            if (!string.IsNullOrWhiteSpace(_status.CurrentContextId))
+            {
                 Switcher.Switch(new ViewContextPage());
+            }
+            else
+            {
+                _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo, 
+                    "No context selected. Use Find.", Hardcodet.Wpf.TaskbarNotification.BalloonIcon.Info);
+            }
         }
     }
 }
