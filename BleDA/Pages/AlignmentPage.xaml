@@ -7,17 +7,13 @@
              d:DesignHeight="500" d:DesignWidth="600">
     <Grid>
         <Canvas Background="#FF1B1B1B">
-            <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click"  Height="60" Width="60" >
-                <Button.Background>
-                    <ImageBrush ImageSource="/BleDA;component/Images/SwapLeft.png" Stretch="Fill" />
-                </Button.Background>
-            </Button>
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="103" ><Run Language="it-it" Text="Selected context:"/></TextBlock>
             <TextBlock x:Name="txtSelectedContext" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="103"  Text="{Binding SelectedContextName, Mode=OneWay}"></TextBlock>
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="141" ><Run Language="it-it" Text="Service status:"/></TextBlock>
             <TextBlock x:Name="txtStatus" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="141" ><Run Language="it-it" Text="{Binding ServiceStatus, Mode=OneWay}"/></TextBlock>
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="159" FontFamily="Segoe UI Light" Canvas.Left="85" Canvas.Top="179" ><Run Language="it-it" Text="Service context:"/></TextBlock>
             <TextBlock x:Name="txtServiceContext" HorizontalAlignment="Left" TextWrapping="Wrap" Foreground="White" FontSize="16" Padding="0,8,0,0" VerticalAlignment="Top" Height="38" Width="232" FontFamily="Segoe UI Light" Canvas.Left="249" Canvas.Top="179" ><Run Language="it-it" Text="{Binding ServiceContextName, Mode=OneWay}"/></TextBlock>
+            <Button x:Name="Back" Content="" BorderBrush="{x:Null}" Style="{StaticResource ButtonTileStyleBack}" Height="60" Width="60" Click="Back_Click" Canvas.Left="479" Canvas.Top="10" />
         </Canvas>
     </Grid>
 </UserControl>
