@@ -138,6 +138,12 @@
   <data name="MsgApplySettingsFailure" xml:space="preserve">
     <value>Apply settings failure.</value>
   </data>
+  <data name="MsgContexUpdated" xml:space="preserve">
+    <value>Context updated with new data.</value>
+  </data>
+  <data name="MsgPreviousContext" xml:space="preserve">
+    <value>AttiLA is running.</value>
+  </data>
   <data name="MsgTrackingStartFailure" xml:space="preserve">
     <value>Tracking start failure.</value>
   </data>

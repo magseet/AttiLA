@@ -95,7 +95,6 @@ namespace BleDA
                 case UserInteractionCode.CurrentContextFound:
                     _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo,
                         Properties.Resources.MsgAlignmentCompleted, BalloonIcon.Info);
-                    //_notifyIcon.HideBalloonTip();
 
                     this.Dispatcher.BeginInvoke(new System.Action(
                         () => { Switcher.Switch(new ViewContextPage()); }));
@@ -113,13 +112,17 @@ namespace BleDA
 
                 case UserInteractionCode.PreviousContextFound:
                     var context = _contextService.GetById(args.PreviousContextFoundValue);
-                    if (context != null)
-                    {
-                        MessageBox.Show("Attila è attivo. Context: " + context.ContextName);
-                    }
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo,
+                        Properties.Resources.MsgPreviousContext + context.ContextName, BalloonIcon.Info);
+                    //_notifyIcon.HideBalloonTip();
+
+                    this.Dispatcher.BeginInvoke(new System.Action(
+                        () => { Switcher.Switch(new ViewContextPage()); }));
                     break;
+
                 case UserInteractionCode.TrackingSessionSucceded:
-                    MessageBox.Show("Context updated with new data.");
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupInfo,
+                        Properties.Resources.MsgContexUpdated, BalloonIcon.Info);
                     break;
             }
         }
