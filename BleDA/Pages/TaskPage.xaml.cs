@@ -55,7 +55,8 @@ namespace BleDA
                 _openingActionPath = value;
                 if (null != this.PropertyChanged)
                 {
-                    PropertyChanged(this, new PropertyChangedEventArgs("OpeningActionPath"));
+                    PropertyChanged(this, new PropertyChangedEventArgs(
+                        Utils<TaskPage>.MemberName(p => p.OpeningActionPath)));
                 }
             }
         }
@@ -70,7 +71,8 @@ namespace BleDA
                 _openingActionArgument = value;
                 if (null != this.PropertyChanged)
                 {
-                    PropertyChanged(this, new PropertyChangedEventArgs("OpeningActionPath"));
+                    PropertyChanged(this, new PropertyChangedEventArgs(
+                        Utils<TaskPage>.MemberName(p => p.OpeningActionPath)));
                 }
             }
         }

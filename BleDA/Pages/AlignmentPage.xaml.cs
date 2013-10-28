@@ -18,6 +18,8 @@ using AttiLA.Data.Services;
 using AttiLA.Data.Entities;
 using MongoDB.Bson;
 using System.Diagnostics;
+using System.ComponentModel;
+using AttiLA.Data;
 
 namespace BleDA
 {
@@ -26,7 +28,7 @@ namespace BleDA
     /// </summary>
     [CallbackBehavior(UseSynchronizationContext = false,
         ConcurrencyMode = ConcurrencyMode.Reentrant)]
-    public partial class AlignmentPage : UserControl, ISwitchable, IDisposable
+    public partial class AlignmentPage : UserControl, ISwitchable, IDisposable, INotifyPropertyChanged
     {
         Status _status = Status.Instance;
         ContextService _contextService = new ContextService();
@@ -40,13 +42,15 @@ namespace BleDA
 
         void _status_Updated()
         {
-            this.Dispatcher.Invoke(new System.Action(
-                () => {
-
-                    txtStatus.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
-                    txtSelectedContext.GetBindingExpression(TextBox.TextProperty).UpdateTarget();
-                    txtServiceContext.GetBindingExpression(TextBox.TextProperty).UpdateTarget(); 
-                }));
+            if (null != this.PropertyChanged)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(
+                    Utils<AlignmentPage>.MemberName(p => p.SelectedContextName)));
+                PropertyChanged(this, new PropertyChangedEventArgs(
+                    Utils<AlignmentPage>.MemberName(p => p.ServiceStatus)));
+                PropertyChanged(this, new PropertyChangedEventArgs(
+                    Utils<AlignmentPage>.MemberName(p => p.ServiceContextName)));
+            }
         }
 
         public string SelectedContextName
@@ -132,5 +136,7 @@ namespace BleDA
             Dispose(false); //i am *not* calling you from Dispose, it's *not* safe
         }
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }
