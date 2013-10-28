@@ -11,6 +11,7 @@
             <Button x:Name="btnGoContext" Style="{StaticResource ButtonTileStyleOrange}" Content="New" Foreground="White" Background="#7fba00"  HorizontalAlignment="Left" Margin="313,71,0,0" VerticalAlignment="Top" Width="110" Height="110" FontSize="25" Click="btnGoContext_Click" />
             <Button x:Name="btnAbout" Style="{StaticResource ButtonTileStyleBlue}" Content="About" Foreground="White" Background="#7fba00"  HorizontalAlignment="Left" Margin="313,211,0,0" VerticalAlignment="Top" Width="110" Height="110" FontSize="25" Click="btnAbout_Click"  />
             <Button x:Name="btnSettings" Style="{StaticResource ButtonTileStylePurple}" Content="Settings" Foreground="White" Background="#7fba00"  HorizontalAlignment="Left" Margin="453,71,0,0" VerticalAlignment="Top" Width="110" Height="110" FontSize="25" Click="btnSettings_Click"  />
+            <Button x:Name="btnViewContext" Style="{StaticResource ButtonTileStyleGreen}" Content="View" Foreground="White" Background="#7fba00"  HorizontalAlignment="Left" VerticalAlignment="Top" Width="110" Height="110" FontSize="25" Canvas.Left="453" Canvas.Top="211" Click="btnViewContext_Click"  />
         </Canvas>
     </Grid>
 </UserControl>

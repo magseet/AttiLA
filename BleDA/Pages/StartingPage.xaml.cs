@@ -73,5 +73,11 @@ namespace BleDA
         {
             Switcher.Switch(new AboutPage(), new { returnPage = "Starting" });
         }
+
+        private void btnViewContext_Click(object sender, RoutedEventArgs e)
+        {
+            if (_status.CurrentContextId != null)
+                Switcher.Switch(new ViewContextPage());
+        }
     }
 }

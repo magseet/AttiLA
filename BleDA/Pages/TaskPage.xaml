@@ -9,13 +9,13 @@
         <Canvas Background="#FF1B1B1B">
             <Button x:Name="Back" Content="" Margin="479,10,41,410" BorderBrush="{x:Null}" Click="Back_Click" Style="{StaticResource ButtonTileStyleBack}" Height="60" Width="60" />
             <TextBlock Text="Create actions" FontFamily="Segoe UI Light" Canvas.Left="30" Canvas.Top="19" Width="321" Foreground="White" FontSize="26" Height="38"/>
-            <ListBox x:Name="taskSelected" SelectedValue="{Binding SelectedAction}" Background="Transparent" Height="160" Width="527" Canvas.Left="30" Canvas.Top="275">
+            <ListBox x:Name="taskSelected" SelectedValue="{Binding SelectedAction}" Background="Transparent" Height="150" Width="527" Canvas.Left="30" Canvas.Top="285">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="140"></ColumnDefinition>
-                                <ColumnDefinition Width="140"></ColumnDefinition>
+                                <ColumnDefinition Width="250"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="25"></RowDefinition>
@@ -27,26 +27,51 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            <TabControl Height="189" Canvas.Left="30" Canvas.Top="70" Width="527">
-                <TabItem Header="Start">
-                    <Grid Background="#FFE5E5E5">
-                        <Button x:Name="btnBrowse" Content="Browse" Width="120" Height="30" Margin="383,17,18,83" Click="btnBrowse_Click"/>
-                        <TextBlock Text="URL:" Padding="5" Margin="10,18,447,83" />
+            <TabControl Height="200" Canvas.Left="30" Canvas.Top="70" Width="527" Background="Transparent">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="TabItem">
+                                    <Grid Name="Panel">
+                                        <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                                    </Grid>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Panel" Property="Background" Value="#7FBA00" />
+                                        </Trigger>
+                                        <Trigger Property="IsSelected" Value="False">
+                                            <Setter TargetName="Panel" Property="Background" Value="Transparent" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </TabControl.Resources>
+                <TabItem Header="Start" Foreground="White" FontSize="14">
+                    <Grid>
+                        <Button  Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnBrowse" Content="Browse" Width="120" Height="30" Margin="391,32,10,99" Click="btnBrowse_Click"/>
+                        <TextBlock FontFamily="Segoe UI Light" Foreground="White" Text="URL:" Padding="5" Margin="10,32,447,99" />
                         <TextBox x:Name="txtUrl" Height="30" Margin="88,17,143,83" Text="{Binding Path=OpeningActionPath, Mode=TwoWay}" />
-                        <TextBlock Text="Arguments:" Padding="5" Margin="10,78,438,51" />
+                        <TextBlock FontFamily="Segoe UI Light" Foreground="White" Text="Arguments:" Padding="5" Margin="10,78,438,51" />
                         <TextBox x:Name="txtArgs" Height="30" Margin="88,64,143,36" Text="{Binding OpeningActionArguments}" />
-                        <Button x:Name="btnClear" Content="Clear" Width="120" Height="30" Margin="383,65,18,35" Click="btnClear_Click" />
-                        <Button x:Name="btnAddActionStart" Content="Add Action" Width="120" Height="30" Margin="383,121,18,10" Click="btnAddActionStart_Click" />
+                        <Button Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnClear" Content="Clear" Width="120" Height="30" Margin="391,80,10,51" Click="btnClear_Click" />
+                        <Button Style="{StaticResource ButtonTileStyleGreen}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnAddActionStart" Content="Add Action" Width="120" Height="30" Margin="391,124,10,7" Click="btnAddActionStart_Click" />
                     </Grid>
                 </TabItem>
-                <TabItem Header="TabItem">
-                    <Grid Background="#FFE5E5E5"/>
+                <TabItem Header="TabItem" Foreground="White" FontSize="14">
+                    <Grid />
                 </TabItem>
             </TabControl>
-            <Button x:Name="btnSave" Content="Save" Canvas.Left="447" Canvas.Top="450" Width="110" Height="26" Click="btnSave_Click"/>
-            <Button x:Name="btnMoveUp" Content="MoveUp" Canvas.Left="30" Canvas.Top="450" Width="75" Click="btnMoveUp_Click"/>
-            <Button x:Name="btnMoveDown" Content="MoveDown" Canvas.Left="127" Canvas.Top="450" Width="75" Click="btnMoveDown_Click"/>
-            <Button x:Name="btnRemove" Content="Remove" Canvas.Left="223" Canvas.Top="450" Width="75" Click="btnRemove_Click"/>
+            <Button Style="{StaticResource ButtonTileStyleBlue}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnSave" Content="Save" Canvas.Left="447" Canvas.Top="450" Width="110" Height="26" Click="btnSave_Click"/>
+            <Button Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnMoveUp" Content="MoveUp" Canvas.Left="30" Canvas.Top="450" Width="75" Click="btnMoveUp_Click" Height="26"/>
+            <Button Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnMoveDown" Content="MoveDown" Canvas.Left="127" Canvas.Top="450" Width="75" Click="btnMoveDown_Click" Height="26"/>
+            <Button Style="{StaticResource ButtonTileStyleOrange}" FontFamily="Segoe UI Light" Foreground="White" x:Name="btnRemove" Content="Remove" Canvas.Left="228" Canvas.Top="450" Width="75" Click="btnRemove_Click" Height="26"/>
         </Canvas>
     </Grid>
 </UserControl>
