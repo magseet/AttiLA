@@ -30,8 +30,8 @@
             <Border Canvas.Left="30" Canvas.Top="304" BorderBrush="White" BorderThickness="1">
                 <Canvas Height="130" Canvas.Left="35" Canvas.Top="296" Width="504" Background="Transparent" >
                     <ComboBox x:Name="comboBoxTask" ItemsSource="{Binding ExistingTasks}" DisplayMemberPath="TaskName" SelectedValue="{Binding SelectedExistingTask}" Canvas.Left="10" Canvas.Top="62" Width="340" />
-                    <TextBox Text="" Width="340" Canvas.Left="10" Canvas.Top="10" Height="24"></TextBox>
-                    <Button x:Name="btnNew" Content="New" Canvas.Left="400" Canvas.Top="14" Width="75"/>
+                    <TextBox Text="{Binding NewTaskName}" Width="340" Canvas.Left="10" Canvas.Top="10" Height="24"></TextBox>
+                    <Button x:Name="btnNew" Content="New" Canvas.Left="400" Canvas.Top="14" Width="75" Click="btnNew_Click"/>
                     <Button x:Name="btnExisting" Content="Existing" Canvas.Left="400" Canvas.Top="62" Width="75" Click="btnExisting_Click"/>
                 </Canvas>
             </Border>

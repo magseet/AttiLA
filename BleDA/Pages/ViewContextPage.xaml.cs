@@ -20,6 +20,8 @@ using System.ComponentModel;
 using System.Collections.ObjectModel;
 using BleDA.Actions;
 using System.Diagnostics;
+using MongoDB.Bson;
+using Hardcodet.Wpf.TaskbarNotification;
 
 namespace BleDA
 {
@@ -162,6 +164,39 @@ namespace BleDA
                     }
                 }
             }
+        }
+
+        public string NewTaskName { get; set; }
+
+        private void btnNew_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(NewTaskName) && !string.IsNullOrWhiteSpace(_status.CurrentContextId))
+            {
+                var task = new AttiLA.Data.Entities.Task
+                {
+                    CreationDateTime = DateTime.Now,
+                    TaskName = NewTaskName
+                };
+                task.Contexts.Add(new ObjectId(_status.CurrentContextId));
+                try
+                {
+                    _taskService.Create(task);
+                }
+                catch
+                {
+                    _status.NotifyIcon.ShowBalloonTip(Properties.Resources.PopupWarning, "Error during task creation.", BalloonIcon.Warning);
+                }
+
+                if (null != this.PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.ContextTasks)));
+                    PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.ExistingTasks)));
+                    NewTaskName = "";
+                    PropertyChanged(this, new PropertyChangedEventArgs(Utils<ViewContextPage>.MemberName(s => s.NewTaskName)));
+                }
+            }
+
+            
         }
     }
 }
