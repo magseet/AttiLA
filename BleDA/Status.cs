@@ -451,6 +451,7 @@ namespace BleDA
 
                         if (serviceStatus != null && serviceStatus.ContextId != null)
                         {
+                            CurrentContextId = serviceStatus.ContextId;
                             // notify that AttiLA had a context
                             userInteractionArgs = new UserInteractionEventArgs
                             {
