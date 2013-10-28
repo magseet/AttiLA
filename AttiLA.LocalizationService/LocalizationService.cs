@@ -608,9 +608,10 @@ namespace AttiLA.LocalizationService
 
             lock (_lockStatus)
             {
-                Debug.WriteLine("SILENCE");
+                Debug.WriteLine("[Service] SILENCE");
                 _localizer.Enabled = false;
                 ServiceState = ServiceStateCode.Idle;
+                ConsecutiveCorrectPredictions = 0;
 
                 // notify all subscribers
                 var serviceStatus = new ServiceStatus
